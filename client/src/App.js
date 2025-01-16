@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { base } from "../api/api";
+import { base } from "./api/api";
 
 const App = () => {
   const [message, setMessage] = useState("");
