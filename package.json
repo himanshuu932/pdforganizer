@@ -1,10 +1,12 @@
 {
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-private-property-in-object": "^7.25.9",
     "concurrently": "^9.1.2"
   },
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "client": "npm start --prefix client",  
-    "server": "npm start --prefix server"  
+    "client": "npm start --prefix client",
+    "server": "npm start --prefix server"
   }
 }
