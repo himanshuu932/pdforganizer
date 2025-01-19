@@ -1,7 +1,7 @@
 import React, { useState } from "react";
+import "./FileUpload.css"; // Import the custom styles
 
-const FileUpload = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
+const FileUpload = ({ selectedFile, setSelectedFile }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -47,11 +47,8 @@ const FileUpload = () => {
       }
 
       const data = await response.json();
-      //alert(data.extractedText);
-    //  st(data.extractedText);
       setUploadedFile(data.file);
       setUploadProgress(100); // Mark upload as complete
-      //console.log("File uploaded successfully:", data.file);
     } catch (err) {
       setErrorMessage(`Error uploading file: ${err.message}`);
       console.error("Upload error:", err);
@@ -63,12 +60,21 @@ const FileUpload = () => {
   return (
     <div className="file-upload-container">
       <h2>Upload PDF Documents</h2>
-      <input
-        type="file"
-        accept="application/pdf"
-        onChange={handleFileChange}
-        className="file-input"
-      />
+      <div className="custom-file-input-wrapper">
+        <input
+          type="file"
+          accept="application/pdf"
+          onChange={handleFileChange}
+          className="file-input"
+          id="file-input"
+        />
+        <label htmlFor="file-input" className="custom-file-label">
+          Choose File
+        </label>
+        <span className="file-name">
+          {selectedFile ? selectedFile.name : "No file chosen"}
+        </span>
+      </div>
       <button
         onClick={handleFileUpload}
         disabled={!selectedFile || isUploading} // Disable if no file or uploading
@@ -76,19 +82,13 @@ const FileUpload = () => {
       >
         {isUploading ? "Uploading..." : "Upload File"}
       </button>
-      {uploadProgress > 0 && (
-        <p>Upload Progress: {uploadProgress}%</p>
-      )}
+      {uploadProgress > 0 && <p>Upload Progress: {uploadProgress}%</p>}
       {uploadedFile && (
         <p style={{ color: "green" }}>
           File uploaded successfully! <strong>{uploadedFile.name}</strong>
         </p>
       )}
-      {errorMessage && (
-        <p style={{ color: "red" }}>
-          {errorMessage}
-        </p>
-      )}
+      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
     </div>
   );
 };

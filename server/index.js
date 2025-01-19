@@ -6,11 +6,46 @@ const port = 5000;
 const mongoose = require("mongoose");
 const multer = require("multer");
 const TextData = require('./models/text');
+const fs = require('fs');
+const path = require('path');
 
+const folderPath = path.join(__dirname, 'uploads'); // Path to the folder containing files
 
-// Enable CORS for all routes
-app.use(cors());  // This will allow cross-origin requests from any domain
+app.use(cors()); // Enable CORS
 
+// Endpoint to get a list of files
+app.get('/files', (req, res) => {
+  fs.readdir(folderPath, (err, files) => {
+    if (err) {
+      console.error('Error reading directory:', err);
+      return res.status(500).send('Unable to fetch files');
+    }
+    res.json(files);
+  });
+});
+
+// Serve static files with custom headers
+app.get('/files/:fileName', (req, res) => {
+  const { fileName } = req.params;
+  const filePath = path.join(folderPath, fileName); // Resolve the full file path
+  console.log('Request for file:', fileName); // Debugging log
+
+  if (fs.existsSync(filePath)) {
+    const fileExtension = path.extname(fileName).toLowerCase();
+
+    // Check file type and set headers accordingly
+    if (fileExtension === '.pdf') {
+      res.sendFile(filePath); // Serve PDFs inline
+    } else {
+      // For non-PDF files, suggest opening in a new tab
+      res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+      res.sendFile(filePath);
+    }
+  } else {
+    console.log('File not found:', filePath); // Debugging log
+    res.status(404).send('File not found');
+  }
+});
 // Enable JSON parsing
 app.use(express.json());
 // MongoDB connection
@@ -38,13 +73,14 @@ const upload = multer({ storage });
 // Endpoint for file upload
 app.post("/upload", upload.single("file"), async (req, res) => {
   if (!req.file) return res.status(400).send("No file uploaded.");
+  console.log(req.file.path)
 
   try {
     // Send request to Flask API to extract text from the file
     const response = await axios.post('http://127.0.0.1:5000/extract', {
       file_path: req.file.path
     });
-
+              
     // Get the extracted text from the response
     const extractedText = response.data.text;
 
@@ -56,7 +92,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
     // Add the extracted text to the array
     textData.texts.push(extractedText);
-
+    console.log(extractedText)
     // Save the updated TextData document
     await textData.save();
 
@@ -80,7 +116,7 @@ app.post('/submit-query', async (req, res) => {
     // Fetch the global array of texts
     const textData = await TextData.findOne();
     if (!textData) {
-      return res.status(404).send("No text data found.");
+      return res.json({ answer: "No files in the storage" });
     }
 
     // Extract the texts array from the global collection

@@ -1,233 +1,166 @@
-/* App.css */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f7fc;
-  color: #ffffff;
   margin: 0;
-  padding: 0;
-}
-
-h1 {
-  text-align: center;
-  margin-top: 50px;
-}
-
-input, button {
-  padding: 10px;
-  margin: 10px;
-  font-size: 16px;
-}
-
-input {
-  width: 200px;
-  margin-right: 10px;
-}
-
-button {
-  cursor: pointer;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
-  font-size: 16px;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-h3 {
-  text-align: center;
-}
-
-.fee-table {
-  width: 80%;
-  margin: 20px auto;
-  border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.fee-table th, .fee-table td {
-  padding: 12px;
-  text-align: left;
-  font-size: 16px;
-}
-
-.fee-table th {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.fee-table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.fee-table tr:hover {
-  background-color: #ddd;
-}
-
-.fee-table td {
-  border-bottom: 1px solid #ddd;
-}
-
-.fee-table td, .fee-table th {
-  text-align: center;
-}
-
-.fee-table td {
-  font-weight: normal;
-}
-
-/* New styling for normal text output */
-pre {
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  font-family: 'Courier New', monospace;
-  white-space: pre-wrap; /* Ensures the text wraps correctly */
-  word-wrap: break-word; /* Prevents text overflow */
-  margin: 20px auto;
-  width: 80%;
-  font-size: 14px;
-  color: #333;
-}
-
-pre code {
-  font-size: 14px;
-  color: #333;
-}
-/* App.css */
-body {
   font-family: Arial, sans-serif;
-  background-color: #f4f7fc;
-  color: #333;
-  margin: 0;
-  padding: 0;
+  background: #434d50;
+  max-width: 100%;
+  overflow-x: hidden; /* Prevent horizontal overflow of the body */
 }
 
-h1 {
-  text-align: center;
-  margin-top: 50px;
-}
-
-input, button {
-  padding: 10px;
-  margin: 10px;
-  font-size: 16px;
-}
-
-input {
-  width: 200px;
-  margin-right: 10px;
-}
-
-button {
-  cursor: pointer;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
-  font-size: 16px;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
-h3 {
-  text-align: center;
-}
-
-.fee-table {
-  width: 80%;
-  margin: 20px auto;
-  border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.fee-table th, .fee-table td {
-  padding: 12px;
-  text-align: left;
-  font-size: 16px;
-}
-
-.fee-table th {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.fee-table tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.fee-table tr:hover {
-  background-color: #ddd;
-}
-
-.fee-table td {
-  border-bottom: 1px solid #ddd;
-}
-
-.fee-table td, .fee-table th {
-  text-align: center;
-}
-
-.fee-table td {
-  font-weight: normal;
-}
-
-/* New styling for normal text output */
-pre {
-  background-color: #4CAF50; /* Green background */
-  color: white; /* White text */
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  font-family: 'Courier New', monospace;
-  white-space: pre-wrap; /* Ensures the text wraps correctly */
-  word-wrap: break-word; /* Prevents text overflow */
-  margin: 20px auto;
-  width: 80%;
-  font-size: 18px; /* Large font size */
-}
-
-pre code {
-  font-size: 18px;
-  color: white;
-}
-.sections-container {
+.app {
   display: flex;
-  gap: 20px;
+  height: 100vh;
+  width: 100%;
 }
 
-.file-upload-section,
-.query-section {
-  flex: 1;
+.dashboard {
+  width: 60px;
+  background: #89d0ce;
+  color: rgb(16, 14, 14);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  transition: width 0.3s;
+  border-top-right-radius: 15px;
 }
 
-.fee-table {
-  margin-top: 20px;
-  width: 100%;
-  border-collapse: collapse;
+.dashboard.open {
+  width: 200px;
 }
 
-.fee-table th,
-.fee-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
+.dashboard-toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px;
+  transition: transform 0.3s;
+}
+
+.dashboard-toggle.rotated .toggle-image {
+  transform: rotate(180deg);
+}
+
+.dashboard-toggle .app-name {
+  margin-right: 10px;
+  font-size: 18px;
+  color: rgb(4, 3, 3);
+  font-weight: bold;
+}
+
+.toggle-image {
+  width: 30px;
+  height: 30px;
+  transition: transform 0.3s;
+}
+
+.dashboard-options {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0;
   text-align: left;
+  width: 100%;
 }
 
-.normal-text {
-  white-space: pre-wrap;
+.dashboard-options li {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dashboard-options li:hover {
+  background: #34495e;
+}
+
+.icon-image {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.chat-container {
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  background: #434d50;
+  overflow: hidden; /* Prevent content from overflowing the container */
+}
+
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  max-width: 100%; /* Ensures the width stays within the parent container */
+}
+
+.message-bubble {
+  max-width: 70%;  /* Limits the bubble's width */
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word; /* Allows long words to break and wrap */
+  overflow-wrap: break-word; /* Prevents horizontal overflow */
+  word-break: break-word; /* Prevents long unbreakable words from overflowing */
+  white-space: normal; /* Ensures content wraps correctly */
+  box-sizing: border-box; /* Prevents padding from increasing width */
+}
+
+/* User's message bubble */
+.user-bubble {
+  background: #3498db;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 0;
+}
+
+/* Bot's message bubble */
+.bot-bubble {
+  background: #b6d5dd;
+  color: black;
+  align-self: flex-start;
+  border-bottom-left-radius: 0;
+  word-wrap: break-word; /* Ensure the bot's bubble text also wraps */
+  overflow-wrap: break-word; /* Prevents horizontal overflow in bot's bubble */
+  word-break: break-word; /* Prevents long unbreakable words from overflowing */
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  padding: 5px; /* Adjusted padding */
+  background: #bdc3c7;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px;
+  border: solid rgb(49, 92, 63);
+  border-radius: 7.5px;
+  margin-right: 5px;
+  box-sizing: border-box; /* Prevents padding from affecting width */
+}
+
+.chat-input button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.send-image {
+  width: 30px;
+  height: 30px;
+}
+
+.upload-icon {
+  cursor: pointer;
+}
+
+.attach-image {
+  width: 30px;
+  height: 30px;
+  padding: 10px;
 }

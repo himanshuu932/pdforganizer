@@ -5,10 +5,10 @@
     "concurrently": "^9.1.2"
   },
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\" \"npm run python\"",
+    "start": "concurrently \"npm run server\" \"npm run client\" ",
     "client": "npm start --prefix client",
-    "server": "npm start --prefix server",
-    "python": "cd server && python app.py"
+    "server": "npm start --prefix server"
+   
   },
   "dependencies": {
     "@google-cloud/aiplatform": "^3.34.0",
