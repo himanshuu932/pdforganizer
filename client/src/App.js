@@ -1,135 +1,70 @@
-import React, { useState } from "react";
-import FileUpload from "./components/FileUpload";
+import React, { useState, useEffect } from 'react';
 import "./App.css";
+import chatIcon from "./icons/chat.png";
+import filesIcon from "./icons/files.png";
+import settingsIcon from "./icons/settings.png";
+import toggleIcon from "./icons/toggle.png";
+import attachIcon from "./icons/attach.png";
+import sendIcon from "./icons/send.png";
 
-const App = () => {
-  const [filePath, setFilePath] = useState('');
-  const [query, setQuery] = useState('');
-  const [result, setResult] = useState(null);
+function App() {
+  const [files, setFiles] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [isBotThinking, setIsBotThinking] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  // Fetch files from the backend
+  useEffect(() => {
+    fetch('http://localhost:5000/files')
+      .then((res) => res.json())
+      .then((data) => {
+        console.log('Files fetched:', data); // Debug log
+        setFiles(data);
+      })
+      .catch((err) => console.error('Error fetching files:', err));
+  }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'file_path') {
-      setFilePath(value);
-    } else if (name === 'query') {
-      setQuery(value);
-    }
-  };
-
-  const handleQuerySubmit = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/submit-query', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setResult(data.answer);
-      } else {
-        alert('Error: Unable to get query response from backend');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error: Something went wrong with the query request');
-    }
-  };
-
-  const parseTableData = (data) => {
-    const rows = data.split('\n')
-      .filter(row => row.trim() !== '' && row.includes('|'))
-      .map(row => row.split('|').map(col => col.trim()));
-
-    const headers = rows[0];
-    const tableData = rows.slice(1);
-
-    return { headers, tableData };
-  };
-
-  const renderTable = (data) => {
-    const { headers, tableData } = parseTableData(data);
-    return (
-      <table className="fee-table">
-        <thead>
-          <tr>
-            {headers.map((header, index) => (
-              <th key={index}>{header}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((row, index) => (
-            <tr key={index}>
-              {row.map((cell, cellIndex) => (
-                <td key={cellIndex}>{cell}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  };
-
-  const checkAndRenderResult = (data) => {
-    const tableStartIndex = data.indexOf('table-starts');
-    const tableEndIndex = data.indexOf('table-ends');
-
-    if (tableStartIndex !== -1 && tableEndIndex !== -1) {
-      const beforeTable = data.slice(0, tableStartIndex).trim();
-      const tableContent = data
-        .slice(tableStartIndex + 'table-starts'.length, tableEndIndex)
-        .trim();
-      const afterTable = data.slice(tableEndIndex + 'table-ends'.length).trim();
-
-      return (
-        <div>
-          {beforeTable && <pre className="normal-text">{beforeTable}</pre>}
-          {renderTable(tableContent)}
-          {afterTable && <pre className="normal-text">{afterTable}</pre>}
-        </div>
-      );
-    }
-
-    // No table structure, display as plain text
-    return <pre className="normal-text">{data}</pre>;
+  // Handle file click to open in a new tab
+  const handleFileClick = (fileName) => {
+    const fileUrl = `http://localhost:5000/files/${fileName}`;
+    window.open(fileUrl, '_blank'); // Open file in a new browser tab
   };
 
   return (
-    <div className="app-container">
-      <header>
-        <h1>Smart PDF Search & Management</h1>
-      </header>
-      <main>
-        <FileUpload />
-        <h1>Query</h1>
-        <div className="sections-container">
-          {/* Query Section */}
-          <div className="query-section">
-            <h2>Query</h2>
-            <input
-              type="text"
-              name="query"
-              value={query}
-              onChange={handleInputChange}
-              placeholder="Enter query"
-            />
-            <button onClick={handleQuerySubmit}>Send Query</button>
-          </div>
-        </div>
-
-        {result && (
-          <div>
-            <h3>Backend Output:</h3>
-            {checkAndRenderResult(result)}
-          </div>
+    <div style={{ padding: '20px' }}>
+      <h1 style={{ fontFamily: 'Arial, sans-serif', fontSize: '24px', marginBottom: '20px' }}>
+        Files
+      </h1>
+      <ul style={{ listStyleType: 'none', padding: 0 }}>
+        {files.length > 0 ? (
+          files.map((file, index) => (
+            <li
+              key={index}
+              onClick={() => handleFileClick(file)}
+              style={{
+                cursor: 'pointer',
+                width: '100px',
+                padding: '10px 15px',
+                margin: '5px 0',
+               
+                backgroundColor: 'transparent',
+                fontFamily: 'Arial, sans-serif',
+                fontSize: '13px',
+                //transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = '#f0f0f0')}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = '#f9f9f9')}
+            >
+              {file}
+            </li>
+          ))
+        ) : (
+          <p>No files available.</p>
         )}
-      </main>
+      </ul>
     </div>
   );
-
-};
+}
 
 export default App;
