@@ -75,8 +75,8 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
 app.post('/submit-query', async (req, res) => {
   const { query } = req.body;
-
-  try {
+   console.log(query)
+;  try {
     // Fetch the global array of texts
     const textData = await TextData.findOne();
     if (!textData) {
