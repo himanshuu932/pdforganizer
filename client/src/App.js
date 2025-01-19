@@ -3,6 +3,7 @@ import FileUpload from "./components/FileUpload";
 import SearchBar from "./components/SearchBar";
 import SearchResults from "./components/SearchResults";
 import "./App.css";
+import Main from "./components/Main";
 
 const App = () => {
  const [filePath, setFilePath] = useState('');
@@ -133,6 +134,7 @@ const App = () => {
       </main>
     </div>
   );
+
 };
 
 export default App;
