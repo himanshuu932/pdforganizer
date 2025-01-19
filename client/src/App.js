@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import FileUpload from "./components/FileUpload";
 import "./App.css";
+import Main from "./components/Main";
 
 const App = () => {
   const [filePath, setFilePath] = useState('');
@@ -129,6 +130,7 @@ const App = () => {
       </main>
     </div>
   );
+
 };
 
 export default App;
