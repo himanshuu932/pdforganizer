@@ -85,7 +85,7 @@ app.post('/submit-query', async (req, res) => {
 
     // Extract the texts array from the global collection
     const texts = textData.texts;
-    console.log(texts)
+    //console.log(texts)
     // Send request to Flask API with the query and texts array
     const response = await axios.post('http://127.0.0.1:5000/pdf-query', {
       query: query,
@@ -94,6 +94,7 @@ app.post('/submit-query', async (req, res) => {
 
     // Return the response from the Flask API to the client
     res.json({ answer: response.data.answer });
+    console.log(response.data.answer)
   } catch (error) {
     console.error('Error during API call or text retrieval:', error);
     res.status(500).json({ error: 'Internal Server Error' });

@@ -1,13 +1,14 @@
-{  
+{
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/plugin-transform-private-property-in-object": "^7.25.9",
     "concurrently": "^9.1.2"
   },
   "scripts": {
-    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "concurrently \"npm run server\" \"npm run client\" \"npm run python\"",
     "client": "npm start --prefix client",
-    "server": "npm start --prefix server"
+    "server": "npm start --prefix server",
+    "python": "cd server && python app.py"
   },
   "dependencies": {
     "@google-cloud/aiplatform": "^3.34.0",
