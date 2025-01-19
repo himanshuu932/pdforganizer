@@ -156,8 +156,9 @@ function App() {
         sourcesHtml += '<div class="sources-text">Sources:</div><ul>';
         pdfFiles.forEach((file) => {
           sourcesHtml += `
-            <li><a href="#" onClick={"handleFileClick('${file}')+">${file}</a></li>
-          `;
+  <li><a href="http://localhost:5000/files/${file}">${file}</a></li>
+`;
+
         });
         sourcesHtml += '</ul>';
       }
