@@ -1,60 +1,233 @@
-.app-container {
+/* App.css */
+body {
   font-family: Arial, sans-serif;
-  padding: 20px;
-  max-width: 900px;
-  margin: 0 auto;
+  background-color: #f4f7fc;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
   text-align: center;
+  margin-top: 50px;
 }
 
-header {
-  margin-bottom: 20px;
-}
-
-.file-upload-container,
-.search-bar-container,
-.search-results-container {
-  margin: 20px 0;
-  text-align: left;
-}
-
-.file-input {
+input, button {
   padding: 10px;
+  margin: 10px;
   font-size: 16px;
 }
 
-.search-input {
-  width: 70%;
-  padding: 10px;
-  font-size: 16px;
+input {
+  width: 200px;
   margin-right: 10px;
 }
 
-.search-button {
-  padding: 10px 15px;
-  font-size: 16px;
-  background-color: #4caf50;
+button {
+  cursor: pointer;
+  background-color: #4CAF50;
   color: white;
   border: none;
-  cursor: pointer;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
 }
 
-.search-button:hover {
+button:hover {
   background-color: #45a049;
 }
 
-.result-item {
-  border: 1px solid #ddd;
+h3 {
+  text-align: center;
+}
+
+.fee-table {
+  width: 80%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fee-table th, .fee-table td {
+  padding: 12px;
+  text-align: left;
+  font-size: 16px;
+}
+
+.fee-table th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.fee-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.fee-table tr:hover {
+  background-color: #ddd;
+}
+
+.fee-table td {
+  border-bottom: 1px solid #ddd;
+}
+
+.fee-table td, .fee-table th {
+  text-align: center;
+}
+
+.fee-table td {
+  font-weight: normal;
+}
+
+/* New styling for normal text output */
+pre {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap; /* Ensures the text wraps correctly */
+  word-wrap: break-word; /* Prevents text overflow */
+  margin: 20px auto;
+  width: 80%;
+  font-size: 14px;
+  color: #333;
+}
+
+pre code {
+  font-size: 14px;
+  color: #333;
+}
+/* App.css */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f7fc;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 50px;
+}
+
+input, button {
   padding: 10px;
-  margin: 10px 0;
-  border-radius: 5px;
+  margin: 10px;
+  font-size: 16px;
+}
+
+input {
+  width: 200px;
+  margin-right: 10px;
+}
+
+button {
+  cursor: pointer;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+h3 {
+  text-align: center;
+}
+
+.fee-table {
+  width: 80%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fee-table th, .fee-table td {
+  padding: 12px;
+  text-align: left;
+  font-size: 16px;
+}
+
+.fee-table th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.fee-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.fee-table tr:hover {
+  background-color: #ddd;
+}
+
+.fee-table td {
+  border-bottom: 1px solid #ddd;
+}
+
+.fee-table td, .fee-table th {
+  text-align: center;
+}
+
+.fee-table td {
+  font-weight: normal;
+}
+
+/* New styling for normal text output */
+pre {
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap; /* Ensures the text wraps correctly */
+  word-wrap: break-word; /* Prevents text overflow */
+  margin: 20px auto;
+  width: 80%;
+  font-size: 18px; /* Large font size */
+}
+
+pre code {
+  font-size: 18px;
+  color: white;
+}
+.sections-container {
+  display: flex;
+  gap: 20px;
+}
+
+.file-upload-section,
+.query-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fee-table {
+  margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fee-table th,
+.fee-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
   text-align: left;
 }
 
-.result-item h3 {
-  margin: 0 0 5px 0;
-}
-
-.result-item p {
-  margin: 0;
-  color: #555;
+.normal-text {
+  white-space: pre-wrap;
 }

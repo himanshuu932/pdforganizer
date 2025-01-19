@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const FileUpload = ({st}) => {
+const FileUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -47,11 +47,11 @@ const FileUpload = ({st}) => {
       }
 
       const data = await response.json();
-//alert(data.extractedText);
-      st(data.extractedText);
+      //alert(data.extractedText);
+    //  st(data.extractedText);
       setUploadedFile(data.file);
       setUploadProgress(100); // Mark upload as complete
-      console.log("File uploaded successfully:", data.file);
+      //console.log("File uploaded successfully:", data.file);
     } catch (err) {
       setErrorMessage(`Error uploading file: ${err.message}`);
       console.error("Upload error:", err);

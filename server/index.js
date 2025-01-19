@@ -1,15 +1,18 @@
-const express = require("express");
+const express = require('express');
+const axios = require('axios');
+const cors = require('cors');  // Import cors
+const app = express();
+const port = 5000;
 const mongoose = require("mongoose");
 const multer = require("multer");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const fs = require("fs");
-const pdfParse = require("pdf-parse");
+const TextData = require('./models/text');
 
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
 
+// Enable CORS for all routes
+app.use(cors());  // This will allow cross-origin requests from any domain
+
+// Enable JSON parsing
+app.use(express.json());
 // MongoDB connection
 mongoose.connect("mongodb+srv://himanshuu932:88087408601@cluster0.lu2g8bw.mongodb.net/pdforganizer?retryWrites=true&w=majority&appName=Cluster0", {
   useNewUrlParser: true,
@@ -20,13 +23,6 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => console.log("Connected to MongoDB"));
 
 // Define a schema for storing file metadata
-const fileSchema = new mongoose.Schema({
-  name: String,
-  path: String,
-  uploadedAt: { type: Date, default: Date.now },
-  extractedText: String,
-});
-const File = mongoose.model("File", fileSchema);
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -34,67 +30,76 @@ const storage = multer.diskStorage({
     cb(null, "./uploads"); // Save files in 'uploads' directory
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    cb(null, `${file.originalname}`);
   },
 });
 const upload = multer({ storage });
-
-// Function to extract text from PDF
-async function extractTextFromPDF(pdfPath) {
-  try {
-    // Read the PDF file as a buffer
-    const pdfBuffer = fs.readFileSync(pdfPath);
-
-    // Parse the PDF and extract text
-    const data = await pdfParse(pdfBuffer);
-    console.log("Extracted Text: ", data.text); // Log extracted text for debugging
-    return data.text; // The extracted text
-  } catch (error) {
-    console.error("Error extracting text from PDF:", error);
-    return "Error extracting text."; // Return error message if extraction fails
-  }
-}
 
 // Endpoint for file upload
 app.post("/upload", upload.single("file"), async (req, res) => {
   if (!req.file) return res.status(400).send("No file uploaded.");
 
-  // Extract text from the uploaded PDF
-  const pdfPath = req.file.path;
-  const extractedText = await extractTextFromPDF(pdfPath); // Extract text
-
-  const file = new File({
-    name: req.file.originalname,
-    path: req.file.path,
-    extractedText: extractedText, // Save extracted text to MongoDB
-  });
-
   try {
-    const savedFile = await file.save();
-    console.log("File saved:", extractedText); // Log saved file details
-    res.status(200).json({
-      message: "File uploaded successfully",
-      file: savedFile,
-      extractedText: extractedText, // Return the extracted text
+    // Send request to Flask API to extract text from the file
+    const response = await axios.post('http://127.0.0.1:5000/extract', {
+      file_path: req.file.path
     });
-  } catch (err) {
-    console.error("Error saving file metadata:", err);
-    res.status(500).send("Error saving file metadata.");
+
+    // Get the extracted text from the response
+    const extractedText = response.data.text;
+
+    // Check if TextData document exists; if not, create a new one
+    let textData = await TextData.findOne();
+    if (!textData) {
+      textData = new TextData({ texts: [] }); // Create new document if none exists
+    }
+
+    // Add the extracted text to the array
+    textData.texts.push(extractedText);
+
+    // Save the updated TextData document
+    await textData.save();
+
+    res.status(200).json({
+      message: "File uploaded and text extracted successfully",
+      textData: textData,
+    });
+  } catch (error) {
+    console.error("Error during file upload or text extraction:", error);
+    res.status(500).send("Error uploading file or extracting text.");
   }
 });
 
-// Fetch uploaded files (for reference)
-app.get("/files", async (req, res) => {
+
+// Route to submit file and query
+
+app.post('/submit-query', async (req, res) => {
+  const { query } = req.body;
+
   try {
-    const files = await File.find();
-    res.status(200).json(files);
-  } catch (err) {
-    res.status(500).send("Error retrieving files.");
+    // Fetch the global array of texts
+    const textData = await TextData.findOne();
+    if (!textData) {
+      return res.status(404).send("No text data found.");
+    }
+
+    // Extract the texts array from the global collection
+    const texts = textData.texts;
+    console.log(texts)
+    // Send request to Flask API with the query and texts array
+    const response = await axios.post('http://127.0.0.1:5000/pdf-query', {
+      query: query,
+      texts: texts
+    });
+
+    // Return the response from the Flask API to the client
+    res.json({ answer: response.data.answer });
+  } catch (error) {
+    console.error('Error during API call or text retrieval:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Start the server
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Node.js server running at http://localhost:${port}`);
 });
