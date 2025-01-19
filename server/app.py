@@ -89,10 +89,31 @@ def pdf_query():
         )
 
         # Add texts and query to chat history
-        chat_history = [
-            {"role": "user", "parts": texts},
-            {"role": "user", "parts": [user_query]}
-        ]
+        chat_history =  [
+  { 
+    "role": "user", 
+    "parts": texts 
+  },
+  { 
+    "role": "user", 
+    "parts": [user_query] 
+  },
+  { 
+    "role": "model", 
+    "parts": [
+      "Always append filename in the answer also use only single * for bold", 
+      "Also when you make a table send the data starting with the word 'table' then just send the data linewise"
+    ]
+  },
+  { 
+    "role": "model", 
+    "parts": [
+     'example how to send a table ','make sure to add gap in between for those colums which doest have data in last row for some  but has for some example if total is in last column then keep previous columns empty',
+      'table-starts-\nBasic Sciences & Maths (BSM)|4\nEngineering Fundamentals (EF)|4\nProfessional Skill (PS)|0\nProgram Core (PC)|10\nManagement (M)|0\nHumanities & Social Science (HSS)|2\nHumanities & Social Science Elective|0\nProject (P)|0\nSeminar (S)|0\nIndustrial Practice (IP) / Industrial Elective (IE)|0/0\nProgram link basic science and engineering courses|2\nProgram Electives (PE)|0\nOpen Electives (OE)|0\nTotal|||22 table-ends'
+    ]
+  }
+];
+
 
         # Start the chat session
         chat_session = model.start_chat(history=chat_history)
