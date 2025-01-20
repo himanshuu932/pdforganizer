@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from "react";
-import "./App.css";
 import chatIcon from "./icons/chat.png";
 import filesIcon from "./icons/files.png";
 import settingsIcon from "./icons/settings.png";
 import toggleIcon from "./icons/toggle.png";
-import attachIcon from "./icons/attach.png";
-import sendIcon from "./icons/send.png";
 
-function App() {
+const DashBoard = () => {
+
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [isFilesVisible, setIsFilesVisible] = useState(false);
   const [files, setFiles] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const [isBotThinking, setIsBotThinking] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+
   // Fetch files when the dashboard opens
   useEffect(() => {
     if(!isDashboardOpen)
@@ -34,9 +28,18 @@ function App() {
     setIsDashboardOpen(!isDashboardOpen);
   };
 
+  const handleOptionClick = (option) => {
+    if (option === "files") {
+      setIsFilesVisible(!isFilesVisible);
+    }
+    setIsDashboardOpen(true);
+  };
+  const handleFileClick = (fileName) => {
+    const fileUrl = `http://localhost:5000/files/${fileName}`;
+    window.open(fileUrl, "_blank");
+  };
   return (
-    <div className="app">
-      <div className={`dashboard ${isDashboardOpen ? "open" : ""}`}>
+    <div className={`dashboard ${isDashboardOpen ? "open" : ""}`}>
         <div
           className={`dashboard-toggle ${isDashboardOpen ? "rotated" : ""}`}
           onClick={toggleDashboard}
@@ -59,7 +62,8 @@ function App() {
                 files.map((file, index) => (
                   <li
                     key={index}
-                      style={{
+                    onClick={() => handleFileClick(file)}
+                    style={{
                       cursor: "pointer",
                       backgroundColor: "#89d0ce   ",
                       fontSize: "14px",
@@ -76,54 +80,13 @@ function App() {
               )}
             </ul>
           )}
-          <li >
+          <li onClick={() => handleOptionClick("settings")}>
             <img src={settingsIcon} alt="Settings" className="icon-image" />
             {isDashboardOpen && <span>Settings</span>}
           </li>
         </ul>
       </div>
-      <div className="chat-container">
-        <div className="messages">
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`message-bubble ${
-                msg.sender === "user" ? "user-bubble" : "bot-bubble"
-              }`}
-            >
-              {msg.text}
-            </div>
-          ))}
-        </div>
-        <div className="chat-input">
-          <label htmlFor="file-upload" className="upload-icon">
-                     <img src={attachIcon} alt="Attach" className="attach-image" />
-                     <input
-                       id="file-upload"
-                       type="file"
-                       style={{ display: "none" }}
-                                         />
-                   </label>
-
-          <input
-            type="text"
-            placeholder="Type a message"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isSending}
-          />
-          <button
-            onClick={handleSendMessage}
-            className="send-icon"
-            disabled={isSending}
-          >
-            <img src={sendIcon} alt="Send" className="send-image" />
-          </button>
-        </div>
-      </div>
-    </div>
   );
-}
+};
 
-export default App;
+export default DashBoard;
