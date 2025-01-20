@@ -78,38 +78,57 @@ body {
   margin-right: 10px;
 }
 
+/* Chat Container */
+/* Chat Window Styles */
 .chat-container {
   flex: auto;
   display: flex;
   flex-direction: column;
   background: #434d50;
-  overflow: hidden; /* Prevent content from overflowing the container */
+  overflow: hidden;
+  height: 100vh;
+  position: relative;
 }
 
+/* Maximized State */
+.chat-container.maximized {
+  width: 80vw;
+  height: 80vh;
+  position: fixed;
+  top: 10%;
+  right: 10%;
+  z-index: 999;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Messages Section */
 .messages {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  max-width: 100%; /* Ensures the width stays within the parent container */
+  max-width: 100%;
+  padding-bottom: 50px; /* Ensure space for chat input */
 }
 
+/* Message Bubbles */
 .message-bubble {
-  max-width: 70%;  /* Limits the bubble's width */
+  max-width: 70%;
   margin: 10px 0;
   padding: 10px 15px;
   border-radius: 15px;
   font-size: 14px;
   line-height: 1.5;
-  word-wrap: break-word; /* Allows long words to break and wrap */
-  overflow-wrap: break-word; /* Prevents horizontal overflow */
-  word-break: break-word; /* Prevents long unbreakable words from overflowing */
-  white-space: normal; /* Ensures content wraps correctly */
-  box-sizing: border-box; /* Prevents padding from increasing width */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  box-sizing: border-box;
 }
 
-/* User's message bubble */
+/* User's Message Bubble */
 .user-bubble {
   background: #3498db;
   color: white;
@@ -117,50 +136,166 @@ body {
   border-bottom-right-radius: 0;
 }
 
-/* Bot's message bubble */
+/* Bot's Message Bubble */
 .bot-bubble {
   background: #b6d5dd;
   color: black;
   align-self: flex-start;
   border-bottom-left-radius: 0;
-  word-wrap: break-word; /* Ensure the bot's bubble text also wraps */
-  overflow-wrap: break-word; /* Prevents horizontal overflow in bot's bubble */
-  word-break: break-word; /* Prevents long unbreakable words from overflowing */
 }
 
+/* Chat Input Section */
 .chat-input {
   display: flex;
   align-items: center;
-  padding: 5px; /* Adjusted padding */
+  padding: 10px;
   background: #bdc3c7;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  z-index: 1;
 }
 
+/* Input Text Field */
 .chat-input input {
   flex: 1;
   padding: 10px;
   border: solid rgb(49, 92, 63);
   border-radius: 7.5px;
   margin-right: 5px;
-  box-sizing: border-box; /* Prevents padding from affecting width */
+  box-sizing: border-box;
 }
 
+/* Send Button */
 .chat-input button {
   background: none;
   border: none;
   cursor: pointer;
 }
 
+/* Send Icon Image */
 .send-image {
   width: 30px;
   height: 30px;
 }
 
+/* Attach Icon Button */
 .upload-icon {
   cursor: pointer;
 }
 
+/* Attach Icon Image */
 .attach-image {
   width: 30px;
   height: 30px;
   padding: 10px;
+}
+
+/* Maximize Icon */
+.maximize-icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+/* Button Styles */
+button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* PDF Files Section (Card Layout) */
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Individual File Cards */
+.card {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  width: 150px;
+  height: 150px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s, transform 0.3s;
+  cursor: pointer;
+  position: relative;
+}
+
+/* Hover Effects for File Cards */
+.card:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+}
+
+/* Selected State for File Cards */
+.card.selected {
+  border: 2px solid #007bff;
+}
+
+/* Card Header */
+.card-header {
+  font-size: 14px;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Checkbox on File Cards */
+.checkbox {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+/* Controls for File Selection (Top Right) */
+.top-right-controls {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Fixed Position Icon Button */
+.fixed-icon {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-size: cover;
+  cursor: pointer;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
