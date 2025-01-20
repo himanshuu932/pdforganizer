@@ -259,11 +259,21 @@ const checkAndRenderResult = (data) => {
             )
           );
         } else {
-          alert("Error: Unable to get query response from backend");
+         const text= `Something went wrong `;
+         setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.isThinking ? { ...msg, text: text, isThinking: false } : msg
+          )
+        );
+       
         }
       } catch (error) {
-        console.error("Error:", error);
-        alert("Error: Something went wrong with the query request");
+        const text= `Something went wrong `;
+         setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.isThinking ? { ...msg, text: text, isThinking: false } : msg
+          )
+        );
       } finally {
         setIsSending(false); // Re-enable sending after response
         setIsBotThinking(false); // Hide "thinking" message
