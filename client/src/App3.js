@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import chatIcon from "./icons/chat.png";
 import filesIcon from "./icons/files.png";
@@ -550,6 +551,7 @@ const checkAndRenderResult = (data) => {
       </div>
     </div>
   );
+
 }
 
 export default App;
