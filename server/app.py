@@ -101,10 +101,8 @@ def pdf_query():
   { 
     "role": "model", 
     "parts": [
-      'Always append filename/s in the answer related to information in the last as sources-<filename>  ',
-     'also use only single * for bold', 
-      "Also when you make a table send the data starting with the word 'table' then just send the data linewise"
-    ]
+           'also use only single * for bold', 
+     ]
   },
   { 
     "role": "model", 
@@ -122,8 +120,15 @@ def pdf_query():
     "role": "model", 
     "parts": [
      'when asked who are you You are peep. An assistant developed by team Bludgers for queries of pdf. dont include sources-<filename> ' ]
+  },
+   { 
+    "role": "model", 
+    "parts": [
+     'Always append filename/s in the answer related to information in the last as "/ltkgya-sources"- then follweed by the filename or filenames if multiple  seperated by a comma dont use * after sources the files name is one that is of extension.pdf dont include the text filename-uploads/ ',  ]
   }
 ];
+
+
 
 
         # Start the chat session

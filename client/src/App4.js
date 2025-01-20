@@ -135,61 +135,91 @@ function App() {
     );
   };
 
-  const checkAndRenderResult = (data) => {
-    const tableStartIndex = data.indexOf('table-starts');
-    const tableEndIndex = data.indexOf('table-ends');
-    const sourcesStartIndex = data.indexOf('sources-');
-  
-    let sources = '';
-    if (sourcesStartIndex !== -1) {
-      sources = data.slice(sourcesStartIndex + 'sources-'.length).trim();
-    //  alert(sources); // Display sources for debugging
-    }
-  
-    let sourcesHtml = '';
-    if (sources) {
-      // Split the sources by line break and check for .pdf files
-      const files = sources.split('\n').map(file => file.trim());
-      const pdfFiles = files.filter(file => file.endsWith('.pdf'));
-  
-      if (pdfFiles.length > 0) {
-        sourcesHtml += '<div class="sources-text">Sources:</div><ul>';
-        pdfFiles.forEach((file) => {
-          sourcesHtml += `
-  <li><a href="http://localhost:5000/files/${file}">${file}</a></li>
-`;
+  // Function to handle table-related logic
+const handleTable = (data) => {
+  const tableStartIndex = data.indexOf('table-starts');
+  const tableEndIndex = data.indexOf('table-ends');
 
-        });
-        sourcesHtml += '</ul>';
-      }
-    }
-  
-    
-    if (tableStartIndex !== -1 && tableEndIndex !== -1) {
-      const beforeTable = data.slice(0, tableStartIndex).trim();
-      const tableContent = data
-        .slice(tableStartIndex + 'table-starts'.length, tableEndIndex)
-        .trim();
-      const afterTable = data.slice(tableEndIndex + 'table-ends'.length).trim();
-  
-      return (
-        <div>
-          {beforeTable && <div className="normal-text">{beforeTable}</div>}
-          <div dangerouslySetInnerHTML={{ __html: sourcesHtml }} />
-          {renderTable(tableContent)}
-          {afterTable && <div className="normal-text">{afterTable}</div>}
-        </div>
-      );
-    }
-  
-    // No table structure, display as plain text
-    return (
+  if (tableStartIndex !== -1 && tableEndIndex !== -1) {
+    const beforeTable = data.slice(0, tableStartIndex).trim();
+    const tableContent = data
+      .slice(tableStartIndex + 'table-starts'.length, tableEndIndex)
+      .trim();
+    const afterTable = data.slice(tableEndIndex + 'table-ends'.length).trim();
+
+    return { hasTable: true, beforeTable, tableContent, afterTable };
+  }
+
+  return { hasTable: false }; // No table found
+};
+
+// Main function to handle overall rendering
+const checkAndRenderResult = (data) => {
+  // Split the content into two parts using the /ltkgya- marker
+  const ltkgyaIndex = data.indexOf('/ltkgya-');
+  let beforeLtkgya = '';
+  let afterLtkgya = '';
+
+  if (ltkgyaIndex !== -1) {
+    beforeLtkgya = data.slice(0, ltkgyaIndex).trim(); // Text before /ltkgya-
+    afterLtkgya = data.slice(ltkgyaIndex + '/ltkgya-'.length).trim(); // Text after /ltkgya-
+  } else {
+    beforeLtkgya = data.trim(); // If no marker is found, treat all as beforeLtkgya
+  }
+
+  // Remove 'sources-' from afterLtkgya if it exists
+  if (afterLtkgya.startsWith('sources-')) {
+    afterLtkgya = afterLtkgya.slice('sources-'.length).trim();
+  }
+
+  // Remove symbols /, \, *, and filename-uploads\ from afterLtkgya
+  afterLtkgya = afterLtkgya.replace(/sources/g,'')
+    .replace(/[\/\\\*]/g, '') // Remove /, \, *
+    .replace(/filename-uploads\\/g, ''); // Remove all instances of filename-uploads\
+
+  // Process the content before /ltkgya- for table handling
+  const tableData = handleTable(beforeLtkgya);
+
+  let tableSection = null;
+  if (tableData.hasTable) {
+    const { beforeTable, tableContent, afterTable } = tableData;
+    tableSection = (
       <div>
-        <div className="normal-text">{data}</div>
-        <div dangerouslySetInnerHTML={{ __html: sourcesHtml }} />
+        {beforeTable && <div className="normal-text">{beforeTable}</div>}
+        {renderTable(tableContent)}
+        {afterTable && <div className="normal-text">{afterTable}</div>}
       </div>
     );
-  };
+  } else {
+    tableSection = <div className="normal-text">{beforeLtkgya}</div>;
+  }
+
+  // Process the content after /ltkgya- for sources
+  let sourcesHtml = '';
+  if (afterLtkgya) {
+    const files = afterLtkgya.split(',').map((file) => file.trim());
+    const pdfFiles = files.filter((file) => file.endsWith('.pdf'));
+
+    if (pdfFiles.length > 0) {
+      sourcesHtml += '<div class="sources-text">Sources:</div><ul>';
+      pdfFiles.forEach((file) => {
+        sourcesHtml += `
+          <li><a href="http://localhost:5000/files/${file}">${file}</a></li>
+        `;
+      });
+      sourcesHtml += '</ul>';
+    }
+  }
+
+  // Render the final structure
+  return (
+    <div>
+      {tableSection}
+      <div dangerouslySetInnerHTML={{ __html: sourcesHtml }} />
+    </div>
+  );
+};
+
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() !== "") {
