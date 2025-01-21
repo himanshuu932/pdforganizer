@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
+import plusIcon from "../icons/add.png";
 
 const DocumentModal = ({ onClose }) => {
   const [files, setFiles] = useState([]);
@@ -8,18 +9,16 @@ const DocumentModal = ({ onClose }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch files when the component mounts
   useEffect(() => {
     fetch("http://localhost:5000/files")
       .then((res) => res.json())
       .then((data) => {
         setFiles(data);
-        setFilteredFiles(data); // Initialize filtered files with the full list
+        setFilteredFiles(data);
       })
       .catch((err) => console.error("Error fetching files:", err));
   }, []);
 
-  // Filter files based on search query
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
       const query = searchQuery.toLowerCase();
@@ -28,7 +27,7 @@ const DocumentModal = ({ onClose }) => {
       );
       setFilteredFiles(filtered);
     } else {
-      setFilteredFiles(files); // Reset to the full list if no query
+      setFilteredFiles(files);
     }
   }, [searchQuery, files]);
 
@@ -38,7 +37,7 @@ const DocumentModal = ({ onClose }) => {
     );
   };
 
-  const selectAll = () => setSelectedFiles(files);
+  const selectAll = () => setSelectedFiles(filteredFiles);
   const deselectAll = () => setSelectedFiles([]);
   const deleteSelected = () => {
     setFiles(files.filter((file) => !selectedFiles.includes(file)));
@@ -47,7 +46,13 @@ const DocumentModal = ({ onClose }) => {
 
   const handleFileDoubleClick = (fileName) => {
     const fileUrl = `http://localhost:5000/files/${fileName}`;
-    window.open(fileUrl, "_blank"); // Open the PDF in a new tab
+    window.open(fileUrl, "_blank");
+  };
+
+  const handleFileUpload = (event) => {
+    const uploadedFiles = Array.from(event.target.files).map((file) => file.name);
+    setFiles((prevFiles) => [...uploadedFiles, ...prevFiles]);
+    setFilteredFiles((prevFiles) => [...uploadedFiles, ...prevFiles]);
   };
 
   return (
@@ -55,11 +60,6 @@ const DocumentModal = ({ onClose }) => {
       <div className="modal-content">
         <div className="modal-header">
           <h2>Documents</h2>
-          <button className="close-button" onClick={onClose}>
-            &times;
-          </button>
-        </div>
-        <div className="modal-body">
           <div className="search-container">
             <input
               type="text"
@@ -69,16 +69,35 @@ const DocumentModal = ({ onClose }) => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+         
+        </div>
+        <div className="modal-body">
           <div className="file-grid">
+            <div className="file-card upload-card">
+              <label htmlFor="file-upload" className="upload-label">
+                <img src={plusIcon} alt="Upload Icon" className="file-icon" />
+                <div className="file-name">Upload</div>
+              </label>
+              <input
+                id="file-upload"
+                type="file"
+                multiple
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+              />
+            </div>
+
             {filteredFiles.length > 0 ? (
               filteredFiles.map((file) => (
                 <div
                   key={file}
-                  className={`file-card ${selectedFiles.includes(file) ? "selected" : ""}`}
-                  onClick={() => toggleSelection(file)} // Toggle selection on single-click
-                  onDoubleClick={() => handleFileDoubleClick(file)} // Open the PDF on double-click
+                  className={`file-card ${
+                    selectedFiles.includes(file) ? "selected" : ""
+                  }`}
+                  onClick={() => toggleSelection(file)}
+                  onDoubleClick={() => handleFileDoubleClick(file)}
                 >
-                  <img src={pdfIcon} alt="PDF Icon" className="file-icon" />
+                  <img src={pdfIcon} alt="PDF Icon" className="file-icon-i" />
                   <div className="file-name">
                     <span>{file}</span>
                   </div>
