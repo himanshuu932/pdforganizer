@@ -41,7 +41,9 @@ const DocumentModal = ({ onClose }) => {
   const selectAll = () => setSelectedFiles(filteredFiles);
   const deselectAll = () => setSelectedFiles([]);
   const deleteSelected = () => {
-    setFiles(files.filter((file) => !selectedFiles.includes(file)));
+    const updatedFiles = files.filter((file) => !selectedFiles.includes(file));
+    setFiles(updatedFiles);
+    setFilteredFiles(updatedFiles);
     setSelectedFiles([]);
   };
 
@@ -52,8 +54,10 @@ const DocumentModal = ({ onClose }) => {
 
   const handleFileUpload = (event) => {
     const uploadedFiles = Array.from(event.target.files).map((file) => file.name);
-    setFiles((prevFiles) => [...uploadedFiles, ...prevFiles]);
-    setFilteredFiles((prevFiles) => [...uploadedFiles, ...prevFiles]);
+    const newFiles = uploadedFiles.filter((file) => !files.includes(file));
+    const updatedFiles = [...newFiles, ...files];
+    setFiles(updatedFiles);
+    setFilteredFiles(updatedFiles);
   };
 
   return (
@@ -70,7 +74,6 @@ const DocumentModal = ({ onClose }) => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-         
         </div>
         <div className="modal-body">
           <div className="file-grid">
@@ -87,7 +90,6 @@ const DocumentModal = ({ onClose }) => {
                 style={{ display: "none" }}
               />
             </div>
-
             {filteredFiles.length > 0 ? (
               filteredFiles.map((file) => (
                 <div
