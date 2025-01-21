@@ -1,22 +1,22 @@
 /* General Navbar Styles */
 .navbar {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.7); /* Use rgba with alpha for transparency */
   color: #000;
   padding: 0.8rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  opacity: 1;
+  opacity: 1; /* Full opacity for navbar content */
 }
 
 .navbar.light {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white for light mode */
   color: #000;
 }
 
 .navbar.dark {
-  background-color: rgba(34, 31, 31, 0.8);
+  background-color: rgba(34, 31, 31, 0.8); /* Semi-transparent dark background */
   color: white;
 }
 
@@ -31,9 +31,10 @@
 .navbar-links {
   list-style: none;
   display: flex;
-  gap: 2rem;
+  gap: 2rem; /* Space between links */
   margin: 0;
   padding: 0;
+  justify-content: center; /* Centering the menu items */
 }
 
 .nav-item .nav-link {
@@ -41,32 +42,36 @@
   text-decoration: none;
   font-size: 1rem;
   font-weight: bold;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease; /* Transition for color and transform */
 }
 
 .nav-item .nav-link:hover {
-  color: #007bff;
-  transform: translateY(-2px);
+  color: #007bff; /* Change color on hover */
+  transform: translateY(-2px); /* Slight upward movement on hover */
 }
 
 /* Mode Toggle Button */
 .mode-toggle {
+
   color: #007bff;
   border: 2px solid #007bff;
   border-radius: 4px;
   padding: 0.5rem;
   cursor: pointer;
   font-weight: bold;
-  height: 2.5rem;
-  width: 2.5rem;
+  height: 2.5rem; /* Set the height of the button */
+  width: 2.5rem;  /* Set the width of the button equal to input size */
   display: flex;
   justify-content: center;
-  align-items: center;
-  transition: transform 0.2s;
+  align-items: center; /* Center the icon inside the button */
 }
 
-.mode-toggle:hover {
-  transform: scale(1.1);
+/* Dark Mode Styles for the Button */
+body.dark-mode .mode-toggle,
+body.light-mode .mode-toggle {
+  background-color: transparent; /* Ensures no background */
+  color: inherit; /* Inherit text color (if applicable) */
+  border: none; /* Removes any border */
 }
 
 /* Search Section */
@@ -88,7 +93,7 @@
   font-size: 1rem;
   border-radius: 4px;
   border: 1px solid #ddd;
-  width: 200px;
+  width: 200px; /* Adjust the width as needed */
 }
 
 /* Dark Mode Styles */
@@ -98,7 +103,7 @@ body.dark-mode {
 }
 
 body.dark-mode .navbar {
-  background-color: rgba(51, 51, 51, 0.9);
+  background-color: rgba(51, 51, 51, 0.9); /* More opaque dark background */
 }
 
 body.dark-mode .navbar-links .nav-link {
@@ -111,63 +116,20 @@ body.dark-mode .navbar-links .nav-link:hover {
 
 /* Image styling to prevent overflow */
 .icon-image {
-  height: 100%;
-  width: 100%;
-  object-fit: contain;
+  height: 100%; /* Set image height to 100% of the button height */
+  width: 100%;  /* Set image width to 100% of the button width */
+  object-fit: contain; /* Ensure the image fits within the container without distortion */
 }
 
-/* Responsive Styles */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .navbar-links {
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-  }
-
-  .navbar-links .nav-item {
-    width: 100%;
-    text-align: left;
-  }
-
-  .search-form {
-    width: 100%;
-    margin-top: 1rem;
-    justify-content: space-between;
-  }
-
-  .search-input {
-    width: calc(100% - 50px);
-  }
-
-  .mode-toggle {
-    margin-top: 1rem;
-  }
+.mode-toggle {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  outline: none; /* Removes the focus outline */
+  border: none; /* Ensures no border is applied */
+  transition: transform 0.2s; /* Optional hover effect */
 }
 
-@media (max-width: 480px) {
-  .navbar-brand {
-    font-size: 1.2rem;
-  }
-
-  .navbar-links {
-    gap: 0.5rem;
-  }
-
-  .nav-item .nav-link {
-    font-size: 0.9rem;
-  }
-
-  .search-input {
-    width: 100%;
-  }
-
-  .mode-toggle {
-    width: 35px;
-    height: 35px;
-  }
+.mode-toggle:hover {
+  transform: scale(1.1); /* Slightly enlarges the icon on hover */
 }
