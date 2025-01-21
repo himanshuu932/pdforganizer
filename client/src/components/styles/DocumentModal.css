@@ -1,4 +1,5 @@
 /* modal-overlay adjustments */
+
 .modal-overlay {
   position: fixed;
   top: 80px; /* Adjust based on your navbar height */
@@ -23,16 +24,23 @@
   height: calc(100vh - 80px); /* Full height minus navbar */
   overflow-y: auto; /* Allows scrolling if content overflows */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  background-image: url('../../icons/43534.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
 }
 
 /* Light mode styles */
 body.light-mode .modal-overlay {
   background: rgba(0, 0, 0, 0.6);
+  
 }
 
 body.light-mode .modal-content {
   background: #fff;
   color: #000;
+
 }
 
 /* Dark mode styles */
@@ -43,6 +51,7 @@ body.dark-mode .modal-overlay {
 body.dark-mode .modal-content {
   background: #333;
   color: #f1f1f1;
+
 }
 
 /* modal header and body */

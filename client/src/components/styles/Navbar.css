@@ -1,21 +1,22 @@
 /* General Navbar Styles */
 .navbar {
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.7); /* Use rgba with alpha for transparency */
   color: #000;
   padding: 0.8rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  opacity: 1; /* Full opacity for navbar content */
 }
 
 .navbar.light {
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white for light mode */
   color: #000;
 }
 
 .navbar.dark {
-  background-color: #221f1f;
+  background-color: rgba(34, 31, 31, 0.8); /* Semi-transparent dark background */
   color: white;
 }
 
@@ -102,7 +103,7 @@ body.dark-mode {
 }
 
 body.dark-mode .navbar {
-  background-color: #333;
+  background-color: rgba(51, 51, 51, 0.9); /* More opaque dark background */
 }
 
 body.dark-mode .navbar-links .nav-link {

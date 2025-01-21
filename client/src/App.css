@@ -14,3 +14,17 @@
   justify-content: center;
   align-items: center;
 }
+
+/* Light mode background */
+body {
+  background-image: url('./icons/43534.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+body.dark-mode {
+  background-color: black;
+  background-image: none;
+
+}
+
