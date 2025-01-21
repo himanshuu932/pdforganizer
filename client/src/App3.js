@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import React, { useState, useEffect } from "react";
 import "./App.css";
 import chatIcon from "./icons/chat.png";
 import filesIcon from "./icons/files.png";
@@ -9,7 +8,7 @@ import attachIcon from "./icons/attach.png";
 import sendIcon from "./icons/send.png";
 import maximizeIcon from "./icons/maximize.png";
 import pdfIcon from "./icons/pdf.png";
-
+import ChatSection from "./components/ChatSection";
 function App() {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
   const [isFilesVisible, setIsFilesVisible] = useState(false);
@@ -90,99 +89,7 @@ function App() {
     setIsDashboardOpen(true);
   };
 
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
   
-    if (file) {
-      // Check if the file is a PDF
-      if (file.type !== "application/pdf") {
-        //alert("Please upload a valid PDF file.");
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: `Only PDF files are allowed.`, sender: "bot" },
-        ]);
-        return;
-      }
-  
-      setSelectedFile(file);
-      //alert(`Selected file: ${file.name}`);
-  
-      const formData = new FormData();
-      formData.append("file", file);
-  
-      try {
-       // alert("Starting file upload...");
-  
-        const response = await fetch("http://localhost:5000/upload", {
-          method: "POST",
-          body: formData,
-        });
-  
-        if (!response.ok) {
-          throw new Error(`Upload failed with status: ${response.status}`);
-        }
-  
-        //alert("File uploaded successfully");
-  
-        // Handle additional logic with the response here
-        const data = await response.json();
-        console.log("Upload response:", data);
-  
-        // Send a success message from the bot
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: `File "${file.name}" uploaded successfully.`, sender: "bot" },
-        ]);
-      } catch (err) {
-        console.error("Upload error:", err);
-        //alert(`Error uploading file: ${err.message}`);
-  
-        // Send a failure message from the bot
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: `Failed to upload file "${file.name}".`, sender: "bot" },
-        ]);
-      }
-    } else {
-      alert("Please select a file to upload");
-    }
-  };
-  
-
-  const parseTableData = (data) => {
-    const rows = data.split('\n')
-      .filter(row => row.trim() !== '' && row.includes('|'))
-      .map(row => row.split('|').map(col => col.trim()));
-
-    const headers = rows[0];
-    const tableData = rows.slice(1);
-
-    return { headers, tableData };
-  };
-
-  const renderTable = (data) => {
-    const { headers, tableData } = parseTableData(data);
-    return (
-      <table className="fee-table">
-        <thead>
-          <tr>
-            {headers.map((header, index) => (
-              <th key={index}>{header}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((row, index) => (
-            <tr key={index}>
-              {row.map((cell, cellIndex) => (
-                <td key={cellIndex}>{cell}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  };
 
   // Function to handle table-related logic
 const handleTable = (data) => {
@@ -202,129 +109,7 @@ const handleTable = (data) => {
   return { hasTable: false }; // No table found
 };
 
-// Main function to handle overall rendering
-const checkAndRenderResult = (data) => {
-  // Split the content into two parts using the /ltkgya- marker
-  const ltkgyaIndex = data.indexOf('/ltkgya-');
-  let beforeLtkgya = '';
-  let afterLtkgya = '';
 
-  if (ltkgyaIndex !== -1) {
-    beforeLtkgya = data.slice(0, ltkgyaIndex).trim(); // Text before /ltkgya-
-    afterLtkgya = data.slice(ltkgyaIndex + '/ltkgya-'.length).trim(); // Text after /ltkgya-
-  } else {
-    beforeLtkgya = data.trim(); // If no marker is found, treat all as beforeLtkgya
-  }
-
-  // Remove 'sources-' from afterLtkgya if it exists
-  if (afterLtkgya.startsWith('sources-')) {
-    afterLtkgya = afterLtkgya.slice('sources-'.length).trim();
-  }
-
-  // Remove symbols /, \, *, and filename-uploads\ from afterLtkgya
-  afterLtkgya = afterLtkgya.replace(/sources/g,'')
-    .replace(/[\/\\\*]/g, '') // Remove /, \, *
-    .replace(/filename-uploads\\/g, ''); // Remove all instances of filename-uploads\
-
-  // Process the content before /ltkgya- for table handling
-  const tableData = handleTable(beforeLtkgya);
-
-  let tableSection = null;
-  if (tableData.hasTable) {
-    const { beforeTable, tableContent, afterTable } = tableData;
-    tableSection = (
-      <div>
-        {beforeTable && <div className="normal-text">{beforeTable}</div>}
-        {renderTable(tableContent)}
-        {afterTable && <div className="normal-text">{afterTable}</div>}
-      </div>
-    );
-  } else {
-    tableSection = <div className="normal-text">{beforeLtkgya}</div>;
-  }
-
-  // Process the content after /ltkgya- for sources
-  let sourcesHtml = '';
-  if (afterLtkgya) {
-    const files = afterLtkgya.split(',').map((file) => file.trim());
-    const pdfFiles = files.filter((file) => file.endsWith('.pdf'));
-
-    if (pdfFiles.length > 0) {
-      sourcesHtml += '<div class="sources-text">Sources:</div><ul>';
-      pdfFiles.forEach((file) => {
-        sourcesHtml += `
-          <li><a href="http://localhost:5000/files/${file}">${file}</a></li>
-        `;
-      });
-      sourcesHtml += '</ul>';
-    }
-  }
-
-  // Render the final structure
-  return (
-    <div>
-      {tableSection}
-      <div dangerouslySetInnerHTML={{ __html: sourcesHtml }} />
-    </div>
-  );
-};
-
-
-  const handleSendMessage = async () => {
-    if (inputMessage.trim() !== "") {
-      // Add the user message to the chat
-      setMessages([...messages, { text: inputMessage, sender: "user" }]);
-      setInputMessage("");
-      setIsSending(true); // Disable sending while waiting for bot response
-      setIsBotThinking(true); // Show the bot's thinking message
-
-      // Simulate a "thinking..." message from the bot before making the request
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: "Bot is thinking...", sender: "bot", isThinking: true },
-      ]);
-
-      try {
-        // Simulate a delay to show the bot is thinking
-        await new Promise(resolve => setTimeout(resolve, 1500)); // Delay for "thinking" effect
-
-        // Call the backend API
-        const response = await fetch("http://localhost:5000/submit-query", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ query: inputMessage }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const result = checkAndRenderResult(data.answer); // Pass the bot's answer here
-
-          // Add the bot's actual response to the chat
-          setMessages((prevMessages) =>
-            prevMessages.map((msg) =>
-              msg.isThinking ? { ...msg, text: result, isThinking: false } : msg
-            )
-          );
-        } else {
-          alert("Error: Unable to get query response from backend");
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Error: Something went wrong with the query request");
-      } finally {
-        setIsSending(false); // Re-enable sending after response
-        setIsBotThinking(false); // Hide "thinking" message
-      }
-    }
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter" && !isSending) {
-      handleSendMessage();
-    }
-  };
 
   const handleFileClick = (fileName) => {
     const fileUrl = `http://localhost:5000/files/${fileName}`;
@@ -333,7 +118,9 @@ const checkAndRenderResult = (data) => {
 
   return (
     <div className="app">
+      
       <div className={`dashboard ${isDashboardOpen ? "open" : ""}`}>
+        
         <div
           className={`dashboard-toggle ${isDashboardOpen ? "rotated" : ""}`}
           onClick={toggleDashboard}
@@ -390,48 +177,65 @@ const checkAndRenderResult = (data) => {
         </ul>
       </div>
       <div className="chat-container">
+      <nav className="navbar navbar-expand-lg bg-body-tertiary">
+      <div className="container-fluid">
+        <a className="navbar-brand" href="#">Navbar</a>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <li className="nav-item">
+              <a className="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="#">Link</a>
+            </li>
+            <li className="nav-item dropdown">
+              <a
+                className="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Dropdown
+              </a>
+              <ul className="dropdown-menu">
+                <li><a className="dropdown-item" href="#">Action</a></li>
+                <li><a className="dropdown-item" href="#">Another action</a></li>
+                <li><hr className="dropdown-divider" /></li>
+                <li><a className="dropdown-item" href="#">Something else here</a></li>
+              </ul>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link disabled" aria-disabled="true">Disabled</a>
+            </li>
+          </ul>
+          <form className="d-flex" role="search">
+            <input
+              className="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button className="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </nav>
       {!isWindowMaximized && (
         <div className="chat-window">
-          <div className="messages">
-            {messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`message-bubble ${
-                  msg.sender === "user" ? "user-bubble" : "bot-bubble"
-                }`}
-              >
-                {msg.text}
-              </div>
-            ))}
-          </div>
-          <div className="chat-input">
-            <label htmlFor="file-upload" className="upload-icon">
-              <img src={attachIcon} alt="Attach" className="attach-image" />
-              <input
-                id="file-upload"
-                type="file"
-                style={{ display: "none" }}
-                // Handle file upload if needed
-              />
-            </label>
-
-            <input
-              type="text"
-              placeholder="Type a message"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={handleKeyDown}
-              disabled={isSending}
-            />
-            <button
-              onClick={handleSendMessage}
-              className="send-icon"
-              disabled={isSending}
-            >
-              <img src={sendIcon} alt="Send" className="send-image" />
-            </button>
-          </div>
-        </div>
+          <ChatSection/>
+           </div>
       )}
       {isWindowMaximized && (
   <div style={{ position: 'relative', padding: '20px' }}>

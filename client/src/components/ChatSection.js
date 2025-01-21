@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import attachIcon from "./icons/attach.png";
-import sendIcon from "./icons/send.png";
+import attachIcon from "../icons/attach.png";
+import sendIcon from "../icons/send.png";
 
 const ChatSection = () => {
  
