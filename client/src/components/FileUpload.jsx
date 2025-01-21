@@ -18,7 +18,9 @@ const FileUpload = () => {
     const uploadedFiles = Array.from(e.dataTransfer.files);
     setFiles(prevFiles => [...prevFiles, ...uploadedFiles]); // Add new files to the existing ones
   };
-
+  const handleDragAreaClick = () => {
+    fileInputRef.current.click();
+  };
   // Handle drag over
   const handleDragOver = (e) => {
     e.preventDefault();
