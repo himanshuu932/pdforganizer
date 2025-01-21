@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import attachIcon from "./icons/attach.png";
-import sendIcon from "./icons/send.png";
+import attachIcon from "../icons/attach.png";
+import sendIcon from "../icons/send.png";
 
 const ChatSection = () => {
  
@@ -9,7 +9,7 @@ const ChatSection = () => {
   const [isSending, setIsSending] = useState(false);
   const [isBotThinking, setIsBotThinking] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-   const [files, setFiles] = useState([]);
+  
 
 
 

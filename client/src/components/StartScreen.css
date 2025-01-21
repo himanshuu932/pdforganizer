@@ -1,0 +1,52 @@
+.start-screen {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.logo-section {
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 1.8rem;
+  color: #333;
+}
+
+p {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.button-section {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.action-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #000;
+  color: #fff;
+  transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: #555;
+}
+.icon-image {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}

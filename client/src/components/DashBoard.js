@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import chatIcon from "./icons/chat.png";
-import filesIcon from "./icons/files.png";
-import settingsIcon from "./icons/settings.png";
-import toggleIcon from "./icons/toggle.png";
+import chatIcon from "../icons/chat.png";
+import filesIcon from "../icons/files.png";
+import settingsIcon from "../icons/settings.png";
+import toggleIcon from "../icons/toggle.png";
 
 const DashBoard = () => {
 

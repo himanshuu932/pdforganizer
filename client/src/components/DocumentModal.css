@@ -1,0 +1,104 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 10px;
+  width: 600px;
+  max-width: 90%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.modal-filters button,
+.search-input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-input {
+  flex-grow: 1;
+}
+
+.modal-body {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.empty-icon {
+  width: 100px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.upload-button {
+  background-color: #000;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 20px;
+}
+
+.footer-button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+.cancel-button {
+  background: #ccc;
+}
+
+.start-button {
+  background: #000;
+  color: #fff;
+}
+
+.start-button:disabled {
+  background: #888;
+  cursor: not-allowed;
+}
