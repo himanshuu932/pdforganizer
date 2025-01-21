@@ -14,11 +14,16 @@
 .modal-content {
   background: #fff;
   border-radius: 10px;
-  width: 600px;
+  width: 800px;
   max-width: 90%;
   padding: 20px;
   display: flex;
   flex-direction: column;
+  height: 80vh;
+  /*Fixedheightforthemodal*/max-height: 80vh;
+  /*Maximumheight*/box-shadow: 5px 5px 15px 5px rgb(109, 108, 108);
+  filter:brightness(1.1) ;
+  -webkit-filter:brightness(1.1) ;
 }
 
 .modal-header {
@@ -58,6 +63,8 @@
 
 .modal-body {
   text-align: center;
+  flex: 1;
+  overflow-y: auto; /* Enable scrolling for the body */
   padding: 20px 0;
 }
 
@@ -101,4 +108,143 @@
 .start-button:disabled {
   background: #888;
   cursor: not-allowed;
+}
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 5px;
+  max-height: 300px; /* Set max height for the grid */
+  overflow-y: auto; /* Enable scrolling if there are too many files */
+}
+
+.file-card {
+  width: 120px;
+  height: 160px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #f9f9f9;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.file-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.file-card.selected {
+  background-color: #f0f8ff;
+  border-color: #007bff;
+}
+
+.file-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.file-name {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+}
+
+.file-name span {
+  display: inline-block;
+  animation: scroll-text 8s linear infinite;
+}
+
+@keyframes scroll-text {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.selection-options {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+.pdf-preview {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.search-container {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-input {
+  width: 80%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #007bff;
+}
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  max-height: 300px; /* Ensure the grid is scrollable */
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.file-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.file-card.selected {
+  border-color: #007bff;
+  background-color: #e6f7ff;
+}
+
+.selection-options {
+  margin: 10px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.selection-options button {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.selection-options button:hover {
+  background-color: #0056b3;
 }

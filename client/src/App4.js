@@ -7,6 +7,7 @@ import toggleIcon from "./icons/toggle.png";
 import attachIcon from "./icons/attach.png";
 import sendIcon from "./icons/send.png";
 import SearchFiles from "./components/SearchFiles"; 
+import SearchFiles from "./components/SearchFiles"; 
 
 function App() {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
@@ -320,11 +321,21 @@ const checkAndRenderResult = (data) => {
 </li>
           {/* {isFilesVisible && (
           
+         <li> <SearchFiles
+  isVisible={isFilesVisible}
+ 
+  onFileClick={handleFileClick}
+/>
+</li>
+          {/* {isFilesVisible && (
+          
             <ul className="file-list">
               {files.length > 0 ? (
                 files.map((file, index) => (
                   <li
                     key={index}
+                    onClick={() => handleFileClick(file)}
+                    style={{
                     onClick={() => handleFileClick(file)}
                     style={{
                       cursor: "pointer",
@@ -342,6 +353,8 @@ const checkAndRenderResult = (data) => {
                 <li>No files available.</li>
               )}
             </ul>
+          )} */}
+          <li onClick={() => handleOptionClick("settings")}>
           )} */}
           <li onClick={() => handleOptionClick("settings")}>
             <img src={settingsIcon} alt="Settings" className="icon-image" />
@@ -369,6 +382,8 @@ const checkAndRenderResult = (data) => {
                        id="file-upload"
                        type="file"
                        style={{ display: "none" }}
+                       onChange={handleFileUpload} // Trigger file upload on file selection
+                     />
                        onChange={handleFileUpload} // Trigger file upload on file selection
                      />
                    </label>
