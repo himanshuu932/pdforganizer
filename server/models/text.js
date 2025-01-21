@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const textSchema = new mongoose.Schema({
-  texts: [String], // Array of extracted texts from all files
+const textDataSchema = new mongoose.Schema({
+  text: { type: String, required: true },
+  filename: { type: String, required: true },
+  date: { type: Date, required: true },
 });
 
-const TextData = mongoose.model("TextData", textSchema);
-
-module.exports = TextData;
+module.exports = mongoose.model("TextData", textDataSchema);

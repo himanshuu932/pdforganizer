@@ -4,6 +4,7 @@ import pdfIcon from "../icons/pdf-file.png";
 import plusIcon from "../icons/add.png";
 
 import SearchFiles from "./SearchFiles";
+
 const DocumentModal = ({ setActiveScreen }) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
@@ -40,11 +41,31 @@ const DocumentModal = ({ setActiveScreen }) => {
 
   const selectAll = () => setSelectedFiles(filteredFiles);
   const deselectAll = () => setSelectedFiles([]);
+
   const deleteSelected = () => {
-    const updatedFiles = files.filter((file) => !selectedFiles.includes(file));
-    setFiles(updatedFiles);
-    setFilteredFiles(updatedFiles);
-    setSelectedFiles([]);
+    const promises = selectedFiles.map((file) =>
+      fetch(`http://localhost:5000/files/${file}`, {
+        method: "DELETE",
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`Failed to delete ${file}`);
+          }
+        })
+        .catch((err) => {
+          console.error(`Error deleting file ${file}:`, err);
+          return null;
+        })
+    );
+
+    Promise.all(promises)
+      .then(() => {
+        const updatedFiles = files.filter((file) => !selectedFiles.includes(file));
+        setFiles(updatedFiles);
+        setFilteredFiles(updatedFiles);
+        setSelectedFiles([]);
+      })
+      .catch((err) => console.error("Error during bulk deletion:", err));
   };
 
   const handleFileDoubleClick = (fileName) => {
@@ -119,7 +140,10 @@ const DocumentModal = ({ setActiveScreen }) => {
           </div>
         )}
         <div className="modal-footer">
-          <button className="footer-button cancel-button" onClick={()=>setActiveScreen(1)}>
+          <button
+            className="footer-button cancel-button"
+            onClick={() => setActiveScreen(1)}
+          >
             Home
           </button>
         </div>
