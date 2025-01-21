@@ -70,9 +70,7 @@ const FileUpload = () => {
   };
 
   // Trigger file input click when drag area is clicked
-  const handleDragAreaClick = () => {
-    fileInputRef.current.click();
-  };
+ 
 
   return (
     <section id="file-upload" style={styles.container}>
