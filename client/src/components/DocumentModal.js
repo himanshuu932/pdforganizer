@@ -1,7 +1,14 @@
 import React from "react";
 import "./DocumentModal.css";
 
+import SearchFiles from "./SearchFiles";
 const DocumentModal = ({ onClose }) => {
+
+  const handleFileClick = (fileName) => {
+    const fileUrl = `http://localhost:5000/files/${fileName}`;
+    window.open(fileUrl, "_blank");
+  };
+
   return (
     <div className="modal-overlay">
       <div className="modal-content">
@@ -15,11 +22,7 @@ const DocumentModal = ({ onClose }) => {
           <button>All Folders</button>
           <button>File type</button>
           <button>Date range</button>
-          <input
-            type="text"
-            placeholder="Search for files"
-            className="search-input"
-          />
+         <SearchFiles isVisible={true} onFileClick={handleFileClick} />
         </div>
         <div className="modal-body">
           <div className="empty-state">

@@ -3,7 +3,7 @@ import attachIcon from "../icons/attach.png";
 import chatIcon from "../icons/chat.png";
 import "./StartScreen.css";
 
-const StartScreen = ({ onDocumentClick }) => {
+const StartScreen = ({ onDocumentClick ,onConversationClick}) => {
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (event) => {
@@ -70,7 +70,12 @@ const StartScreen = ({ onDocumentClick }) => {
             onChange={handleFileUpload}
             disabled={isUploading} // Disable during upload
           />
+       
         </label>
+        <button className="action-button" onClick={onConversationClick}>
+         Start Conversation
+        </button>
+
       </div>
     </div>
   );

@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import StartScreen from "./components/StartScreen";
 import DocumentModal from "./components/DocumentModal";
 import './App.css';
+import ChatSection from "./components/ChatSection";
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -13,7 +15,10 @@ function App() {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
+  
+  const handlechat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
   return (
     <div className="app">
       {/* Navbar */}
@@ -99,8 +104,9 @@ function App() {
 
       {/* Start Screen */}
       <div className="start-screen-section">
-        <StartScreen onDocumentClick={openModal} />
+        <StartScreen onDocumentClick={openModal} onConversationClick={handlechat}/>
         {isModalOpen && <DocumentModal onClose={closeModal} />}
+        {isChatOpen && <ChatSection onConversationClick={handlechat} />}
       </div>
     </div>
   );
