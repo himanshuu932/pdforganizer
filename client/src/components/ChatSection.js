@@ -9,7 +9,7 @@ const ChatSection = () => {
   const [isSending, setIsSending] = useState(false);
   const [isBotThinking, setIsBotThinking] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-   const [files, setFiles] = useState([]);
+  
 
 
 

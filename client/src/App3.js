@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import "./App.css";
 import chatIcon from "./icons/chat.png";
 import filesIcon from "./icons/files.png";
@@ -333,20 +334,22 @@ const handleTable = (data) => {
       )}
       {isWindowMaximized && (
         <div
-          onClick={toggleFilesAndChat}
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            width: '50px',
-            height: '50px',
-            borderRadius: '50%',
-            background: `url(${chatIcon}) no-repeat center/contain`,
-            cursor: 'pointer',
-            backgroundColor: '#fff',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-          }}
-        />
+        onClick={toggleFilesAndChat}
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          width: "50px",
+          height: "50px",
+          borderRadius: "50%",
+          background: `url(${chatIcon}) no-repeat center/contain`,
+          cursor: "pointer",
+          backgroundColor: "#fff",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+          zIndex: 1000, // Ensures the button appears above other elements
+        }}
+      />
+      
       )}
     </div>
   </div>
