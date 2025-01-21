@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import "./DocumentModal.css";
+import "./styles/DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
 import plusIcon from "../icons/add.png";
 
 import SearchFiles from "./SearchFiles";
-const DocumentModal = ({ onClose }) => {
+const DocumentModal = ({ setActiveScreen }) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -119,7 +119,7 @@ const DocumentModal = ({ onClose }) => {
           </div>
         )}
         <div className="modal-footer">
-          <button className="footer-button cancel-button" onClick={onClose}>
+          <button className="footer-button cancel-button" onClick={()=>setActiveScreen(1)}>
             Home
           </button>
         </div>

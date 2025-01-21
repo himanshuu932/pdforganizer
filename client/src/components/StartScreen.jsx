@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import attachIcon from "../icons/attach.png";
 import chatIcon from "../icons/chat.png";
-import "./StartScreen.css";
+import "./styles/StartScreen.css";
 
 const StartScreen = ({ onDocumentClick ,onConversationClick,setActiveScreen}) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -58,7 +58,7 @@ const StartScreen = ({ onDocumentClick ,onConversationClick,setActiveScreen}) =>
 
       {/* Buttons */}
       <div className="button-section">
-        <button className="action-button" onClick={setActiveScreen(2)}>
+        <button className="action-button" onClick={()=>setActiveScreen(2)}>
           Documents
         </button>
         <label htmlFor="file-upload" className="action-button">

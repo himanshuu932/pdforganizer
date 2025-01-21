@@ -4,18 +4,14 @@ import StartScreen from "./components/StartScreen";
 import DocumentModal from "./components/DocumentModal";
 import ChatSection from "./components/ChatSection";
 import "./App.css";
+import FileUpload from "./components/FileUpload";
+import AboutUs from "./components/AboutUs";
 
 function App() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const [isChatOpen, setIsChatOpen] = useState(false);
   const[activeScreen, setActiveScreen] = useState(1);
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  
 
   const handlechat = () => {
     setIsChatOpen(!isChatOpen);
@@ -24,11 +20,14 @@ function App() {
   return (
     <div className="app">
       {/* Navbar */}
-      <Navbar/>
+      <Navbar setActiveScreen={setActiveScreen}/>
       {/* Start Screen */}
       <div className="start-screen-section">
-       { activeScreen==1 && <StartScreen onDocumentClick={openModal} onConversationClick={handlechat} setActiveScreen={setActiveScreen}/>}
-        {activeScreen==2 && <DocumentModal onClose={closeModal} />}
+       {activeScreen==1 && <StartScreen onConversationClick={handlechat} setActiveScreen={setActiveScreen}/>}
+        {activeScreen==2 && <DocumentModal setActiveScreen={setActiveScreen} />}
+        {activeScreen==3 && <FileUpload />}
+        {activeScreen==4 && <AboutUs/>}
+
         {isChatOpen && <ChatSection onConversationClick={handlechat} />}
       </div>
     </div>

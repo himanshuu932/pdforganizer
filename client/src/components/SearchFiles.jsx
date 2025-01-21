@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import './sf.css';
+import './styles/sf.css';
 
 const SearchFiles = ({ isVisible, onFileClick }) => {
   const [files, setFiles] = useState([]);

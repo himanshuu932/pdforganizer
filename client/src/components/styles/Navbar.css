@@ -44,7 +44,8 @@
 }
 
 .nav-item .nav-link:hover {
-  text-decoration: underline;
+  cursor: pointer;
+  font-size: 1.2rem;
 }
 
 /* Mode Toggle Button */

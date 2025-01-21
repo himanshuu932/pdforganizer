@@ -1,0 +1,100 @@
+/* Light and Dark Mode styles for the file search component */
+.file-search-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input-container {
+  position: relative;
+}
+
+.file-search-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Light Mode Styles */
+body.light-mode .file-search-input {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+body.light-mode .file-list {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .file-item {
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+body.light-mode .file-item:hover {
+  background-color: #e0f7fa;
+}
+
+body.light-mode .file-item:active {
+  background-color: #89d0ce;
+}
+
+/* Dark Mode Styles */
+body.dark-mode .file-search-input {
+  background-color: #333;
+  color: #f1f1f1;
+  border: 1px solid #444;
+}
+
+body.dark-mode .file-list {
+  background-color: #444;
+  border: 1px solid #555;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .file-item {
+  background-color: #555;
+  color: #f1f1f1;
+}
+
+body.dark-mode .file-item:hover {
+  background-color: #3a8a99;
+}
+
+body.dark-mode .file-item:active {
+  background-color: #276f7a;
+}
+
+/* General Styles for the file-list */
+.file-list {
+  position: absolute;
+  top: 35px; /* Adjust this to position dropdown relative to the input */
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 999;
+  padding: 0; /* Remove default padding for the list */
+  margin: 0;  /* Remove default margin for the list */
+  list-style-type: none; /* Remove bullets */
+  border-top: none; /* Remove border at the top */
+}
+
+.file-item {
+  padding: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.file-item:hover {
+  background-color: #e0f7fa;
+}
+
+.file-item:active {
+  background-color: #89d0ce;
+}

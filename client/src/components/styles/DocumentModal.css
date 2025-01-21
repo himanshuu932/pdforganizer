@@ -25,8 +25,29 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
-/* Ensure the modal header and body are correctly sized */
-.modal-header, .modal-body {
+/* Light mode styles */
+body.light-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+body.light-mode .modal-content {
+  background: #fff;
+  color: #000;
+}
+
+/* Dark mode styles */
+body.dark-mode .modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode .modal-content {
+  background: #333;
+  color: #f1f1f1;
+}
+
+/* modal header and body */
+.modal-header,
+.modal-body {
   width: 100%;
 }
 
@@ -35,9 +56,6 @@
   overflow-y: auto;
   padding: 10px 0;
 }
-
-/* Other file card and search-container styles remain the same */
-
 
 .modal-header {
   display: flex;
@@ -49,7 +67,7 @@
 .modal-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #333;
+  color: inherit;
 }
 
 .close-button {
@@ -60,6 +78,7 @@
   color: #666;
 }
 
+/* Search Container */
 .search-container {
   flex: 1;
   display: flex;
@@ -75,12 +94,7 @@
   border-radius: 5px;
 }
 
-.modal-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 15px 0;
-}
-
+/* File Grid and File Cards */
 .file-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -105,16 +119,19 @@
   position: relative;
 }
 
+/* Selected file card */
 .file-card.selected {
   border: 2px solid #007bff; /* Highlight selected files */
   box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); /* Subtle glow */
 }
 
+/* Hover effect */
 .file-card:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Upload card */
 .file-card.upload-card {
   background-color: #e6f7ff;
   border: 2px dashed #007bff;
@@ -125,6 +142,7 @@
   height: 150px;
 }
 
+/* Icon and file name */
 .file-icon,
 .file-icon-i {
   width: 40px;
@@ -142,14 +160,7 @@
   max-width: 100%;
 }
 
-.pdf-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 20px;
-  height: 20px;
-}
-
+/* Selection options */
 .selection-options {
   display: flex;
   justify-content: flex-start;
@@ -172,6 +183,7 @@
   background-color: #0056b3;
 }
 
+/* modal-footer adjustments */
 .modal-footer {
   display: flex;
   justify-content: flex-end;
@@ -190,6 +202,7 @@
   background: #ccc;
 }
 
+/* Scrollbar styles */
 ::-webkit-scrollbar {
   width: 8px;
 }

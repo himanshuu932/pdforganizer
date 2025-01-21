@@ -50,3 +50,15 @@ p {
   height: 50px;
   margin-right: 10px;
 }
+body.dark-mode h1,
+body.dark-mode p {
+  color: #fff;  /* White text for heading and paragraph in dark mode */
+}
+
+body.dark-mode .action-button {
+  background-color: #444; /* Dark button in dark mode */
+  color: #fff;
+}
+body.dark-mode .logo {
+  filter: brightness(0) invert(1); /* Adjust logo for dark mode */
+}

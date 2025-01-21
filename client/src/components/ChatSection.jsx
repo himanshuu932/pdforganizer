@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import attachIcon from "../icons/attach.png";
 import sendIcon from "../icons/send.png";
-import './Chat.css'
+import './styles/Chat.css'
 const ChatSection = ({onConversationClick}) => {
  
   const [messages, setMessages] = useState([]);
