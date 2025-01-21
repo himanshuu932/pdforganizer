@@ -2,8 +2,8 @@
 .chat-container {
   display: flex;
   flex-direction: column;
-  background: #434d50;
-  overflow: hidden;
+  background: var(--bg-color);
+  color: var(--text-color);
   width: 80%;
   height: 100%;
   position: fixed;
@@ -11,38 +11,61 @@
   right: 0;
   border-radius: 10px 0 0 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
   z-index: 1100;
+  transition: all 0.3s ease-in-out;
 }
 
-/* Close Button */
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: white;
-  cursor: pointer;
-  z-index: 1000;
+/* Theme Variables */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --header-bg: #f0f0f0;
+  --bubble-user: #3498db;
+  --bubble-bot: #e5e5e5;
+  --table-border: #cccccc;
 }
 
-.close-btn:hover {
-  color: #ff4d4d;
+.dark-mode {
+  --bg-color: #1f1f1f;
+  --text-color: #f5f5f5;
+  --header-bg: #292929;
+  --bubble-user: #2b84d4;
+  --bubble-bot: #555555;
+  --table-border: #555555;
 }
 
-/* "Peep" Label */
+/* Header */
+.chat-header {
+  background-color: var(--header-bg);
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  padding: 10px 15px;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .peep-label {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  color: white;
   font-size: 20px;
   font-weight: bold;
-  background: rgba(0, 0, 0, 0.5);
+}
+
+.close-btn,
+.toggle-mode-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--text-color);
+  cursor: pointer;
   padding: 5px 10px;
   border-radius: 5px;
-  z-index: 1000;
+  transition: background 0.3s ease-in-out;
+}
+
+.close-btn:hover,
+.toggle-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* Messages Section */
@@ -53,15 +76,9 @@
   display: flex;
   flex-direction: column;
   max-width: 100%;
-  padding-bottom: 70px; /* Ensure space for chat input */
+  padding-bottom: 70px;
 }
 
-/* Ensure Messages Auto-Scroll */
-.messages {
-  scroll-behavior: smooth;
-}
-
-/* Message Bubbles */
 .message-bubble {
   max-width: 70%;
   margin: 10px 0;
@@ -70,146 +87,94 @@
   font-size: 14px;
   line-height: 1.5;
   word-wrap: break-word;
-  overflow-wrap: break-word;
   word-break: break-word;
   white-space: normal;
-  box-sizing: border-box;
+  color: var(--text-color); /* Dynamic text color */
 }
 
 .user-bubble {
-  background: #3498db;
-  color: white;
+  background: var(--bubble-user);
+  color: white; /* User message text stays white for contrast */
   align-self: flex-end;
   border-bottom-right-radius: 0;
 }
 
 .bot-bubble {
-  background: #b6d5dd;
-  color: black;
+  background: var(--bubble-bot);
+  color: var(--text-color); /* Bot messages adjust to theme text color */
   align-self: flex-start;
   border-bottom-left-radius: 0;
 }
 
-/* Chat Input Section */
+
+/* Input Section */
 .chat-input {
   display: flex;
   align-items: center;
   padding: 10px;
-  background: #bdc3c7;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  z-index: 1;
+  background: var(--header-bg);
   box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Input Text Field */
 .chat-input input {
   flex: 1;
   padding: 10px;
-  border: solid rgb(49, 92, 63);
+  border: none;
   border-radius: 7.5px;
   margin-right: 5px;
   box-sizing: border-box;
+  outline: none;
+  background: var(--bg-color);
+  color: var(--text-color);
 }
 
-/* Send Button */
 .chat-input button {
   background: none;
   border: none;
   cursor: pointer;
 }
 
-.send-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.send-image {
-  width: 30px;
-  height: 30px;
-}
-
-/* Attach Icon Button */
-.upload-icon {
-  cursor: pointer;
-}
-
+.send-icon img,
 .attach-image {
   width: 30px;
   height: 30px;
-  padding: 10px;
 }
 
-/* Table Styles (Retained from Previous Code) */
-.fee-table {
+/* Upload Icon */
+.upload-icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* Table Styling */
+table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  background-color: #f9f9f9;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-}
-
-.fee-table thead th {
-  background-color: #007BFF;
-  color: white;
-  padding: 10px;
-  text-align: left;
-  border: 1px solid #ddd;
-}
-
-.fee-table tbody tr {
-  border: 1px solid #ddd;
-}
-
-.fee-table tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.fee-table tbody tr:nth-child(odd) {
-  background-color: white;
-}
-
-.fee-table td {
-  padding: 10px;
-  text-align: left;
-  border: 1px solid #ddd;
-}
-
-.fee-table tbody tr:hover {
-  background-color: #e0f3ff;
-}
-
-.fee-table th,
-.fee-table td {
-  font-size: 14px;
-}
-
-/* Sources Link */
-.sources-text {
-  margin-top: 20px;
-  font-weight: bold;
-  color: #333;
+  margin: 20px 0;
+  background: var(--bg-color);
+  color: var(--text-color);
   font-size: 16px;
+  border: 1px solid var(--table-border);
 }
 
-.sources-text ul {
-  list-style-type: none;
-  padding: 0;
+th,
+td {
+  text-align: left;
+  padding: 10px;
+  border: 1px solid var(--table-border);
 }
 
-.sources-text ul li {
-  margin: 5px 0;
+th {
+  background-color: var(--header-bg);
+  color: var(--text-color);
+  font-weight: bold;
 }
 
-.sources-text ul li a {
-  color: #007BFF;
-  text-decoration: none;
+tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-.sources-text ul li a:hover {
-  text-decoration: underline;
+tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }

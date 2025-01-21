@@ -6,9 +6,8 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay */
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  justify-content: flex-start; /* Aligns content to the start */
+  align-items: flex-start; /* Aligns content to the top */
 }
 
 .modal-content {
@@ -136,6 +135,7 @@
 
 .selection-options {
   display: flex;
+  justify-content: flex-start;
   gap: 10px;
   margin: 10px 0;
   justify-content: center;

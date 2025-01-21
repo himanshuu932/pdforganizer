@@ -111,17 +111,17 @@ const DocumentModal = ({ onClose }) => {
           </div>
         </div>
         {selectedFiles.length > 0 && (
-          <div className="selection-options">
+          <>
             <button onClick={selectAll}>Select All</button>
             <button onClick={deselectAll}>Deselect All</button>
             <button onClick={deleteSelected}>Delete</button>
-          </div>
+          </>
         )}
-        <div className="modal-footer">
-          <button className="footer-button cancel-button" onClick={onClose}>
-            Cancel
-          </button>
-        </div>
+      </div>
+      <div className="document-modal-footer">
+        <button className="footer-button cancel-button" onClick={onClose}>
+          Home
+        </button>
       </div>
     </div>
   );
