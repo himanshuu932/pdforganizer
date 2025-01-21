@@ -140,6 +140,9 @@
   height: 30px;
 }
 
+.dark-mode .attach-image ,.dark-mode .send-icon img {
+  filter: brightness(0) invert(1); /* Inverts the color to white */
+}
 /* Upload Icon */
 .upload-icon {
   cursor: pointer;

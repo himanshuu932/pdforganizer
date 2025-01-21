@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./styles/Navbar.css";
 import SearchFiles from "./SearchFiles";
 import darkmode from '../icons/dark.png';
-import lightmode from '../icons/light2.png';
+import lightmode from '../icons/light.png';
 
 function Navbar({setActiveScreen}) {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -39,13 +39,13 @@ function Navbar({setActiveScreen}) {
 
       {/* Mode Toggle Button and Search Section */}
       <div className="search-form">
-        <button className="mode-toggle" onClick={toggleTheme}>
-          {isDarkMode ? (
-            <img src={lightmode} alt="Light Mode" className="icon-image" />
-          ) : (
-            <img src={darkmode} alt="Dark Mode" className="icon-image" />
-          )}
-        </button>
+      <img
+  src={isDarkMode ? lightmode : darkmode}
+  alt={isDarkMode ? "Light Mode" : "Dark Mode"}
+  className="mode-toggle icon-image"
+  onClick={toggleTheme}
+/>
+
 
         {/* Search Input Section */}
        

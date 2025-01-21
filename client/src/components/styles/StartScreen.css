@@ -62,3 +62,6 @@ body.dark-mode .action-button {
 body.dark-mode .logo {
   filter: brightness(0) invert(1); /* Adjust logo for dark mode */
 }
+.dark-mode .icon-image {
+  filter: brightness(0) invert(1); /* Inverts the color to white */
+}

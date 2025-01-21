@@ -15,7 +15,7 @@
 }
 
 .navbar.dark {
-  background-color: #333;
+  background-color: #221f1f;
   color: white;
 }
 
@@ -41,11 +41,12 @@
   text-decoration: none;
   font-size: 1rem;
   font-weight: bold;
+  transition: color 0.2s ease, transform 0.2s ease; /* Transition for color and transform */
 }
 
 .nav-item .nav-link:hover {
-  cursor: pointer;
-  font-size: 1.2rem;
+  color: #007bff; /* Change color on hover */
+  transform: translateY(-2px); /* Slight upward movement on hover */
 }
 
 /* Mode Toggle Button */
@@ -65,17 +66,11 @@
 }
 
 /* Dark Mode Styles for the Button */
-body.dark-mode .mode-toggle {
-  background-color: #000;
-  color: #fff;
-  border: 2px solid #fff;
-}
-
-/* Light Mode Styles for the Button */
+body.dark-mode .mode-toggle,
 body.light-mode .mode-toggle {
-  background-color: #fff;
-  color: #007bff;
-  border: 2px solid #007bff;
+  background-color: transparent; /* Ensures no background */
+  color: inherit; /* Inherit text color (if applicable) */
+  border: none; /* Removes any border */
 }
 
 /* Search Section */
@@ -123,4 +118,17 @@ body.dark-mode .navbar-links .nav-link:hover {
   height: 100%; /* Set image height to 100% of the button height */
   width: 100%;  /* Set image width to 100% of the button width */
   object-fit: contain; /* Ensure the image fits within the container without distortion */
+}
+
+.mode-toggle {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  outline: none; /* Removes the focus outline */
+  border: none; /* Ensures no border is applied */
+  transition: transform 0.2s; /* Optional hover effect */
+}
+
+.mode-toggle:hover {
+  transform: scale(1.1); /* Slightly enlarges the icon on hover */
 }
