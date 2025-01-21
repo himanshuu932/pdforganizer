@@ -23,17 +23,15 @@ const SearchFiles = ({ isVisible, onFileClick }) => {
   }, [isVisible]);
 
   useEffect(() => {
-    // Show filtered files only if searchQuery has at least one character
-    if (searchQuery.trim().length > 0) {
-      const query = searchQuery.toLowerCase();
-      const filtered = files.filter((file) =>
-        file.toLowerCase().includes(query)
-      );
-      setFilteredFiles(filtered);
+    // Filter only when the search query changes
+    if (searchQuery.trim() === "") {
+      setFilteredFiles(files); // Reset to the full list
     } else {
-      setFilteredFiles([]); // Clear the filtered list if no query
+      const query = searchQuery.toLowerCase();
+      const filtered = files.filter((file) => file.toLowerCase().includes(query));
+      setFilteredFiles(filtered); // Update filtered list
     }
-  }, [searchQuery, files]); // Run when searchQuery or files change
+  }, [searchQuery]); // Only run this effect when searchQuery changes
 
   if (!isVisible) return null;
 
