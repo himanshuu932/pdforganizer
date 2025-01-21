@@ -1,27 +1,43 @@
+/* modal-overlay adjustments */
 .modal-overlay {
   position: fixed;
-  top: 0;
+  top: 80px; /* Adjust based on your navbar height */
   left: 0;
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: flex-start; /* Aligns content to the start */
-  align-items: flex-start; /* Aligns content to the top */
+  justify-content: flex-start;
+  align-items: flex-start;
+  overflow-y: auto; /* Allows scrolling if content overflows */
 }
 
+/* modal-content adjustments */
 .modal-content {
   background: #fff;
   border-radius: 10px;
   width: 100%;
- 
   padding: 20px;
   display: flex;
   flex-direction: column;
-  height: 100%;
- 
+  height: calc(100vh - 80px); /* Full height minus navbar */
+  overflow-y: auto; /* Allows scrolling if content overflows */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
+
+/* Ensure the modal header and body are correctly sized */
+.modal-header, .modal-body {
+  width: 100%;
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+/* Other file card and search-container styles remain the same */
+
 
 .modal-header {
   display: flex;

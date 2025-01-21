@@ -8,7 +8,7 @@ import "./App.css";
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-
+  const[activeScreen, setActiveScreen] = useState(1);
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -27,8 +27,8 @@ function App() {
       <Navbar/>
       {/* Start Screen */}
       <div className="start-screen-section">
-      { !isModalOpen && <StartScreen onDocumentClick={openModal} onConversationClick={handlechat} />}
-        {isModalOpen && <DocumentModal onClose={closeModal} />}
+       { activeScreen==1 && <StartScreen onDocumentClick={openModal} onConversationClick={handlechat} setActiveScreen={setActiveScreen}/>}
+        {activeScreen==2 && <DocumentModal onClose={closeModal} />}
         {isChatOpen && <ChatSection onConversationClick={handlechat} />}
       </div>
     </div>

@@ -1,31 +1,14 @@
-/* Global styles */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-}
-
 /* App container styles */
 .app {
   display: flex;
   flex-direction: column;
   height: 100vh; /* Full viewport height */
-}
-
-/* Navbar styles (optional customization) */
-.navbar {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  overflow: hidden; /* Prevent scrolling on main app if modal is open */
 }
 
 /* Start screen section styles */
 .start-screen-section {
-  flex-grow: 1; /* Allow this section to take remaining space */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.document {
+  top: 80px; /* Adjust based on your navbar height */
   flex-grow: 1; /* Allow this section to take remaining space */
   display: flex;
   justify-content: center;

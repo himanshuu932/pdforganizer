@@ -12,10 +12,7 @@ function Navbar() {
     document.body.classList.toggle('dark-mode', !isDarkMode);
   };
 
-  const handleFileClick = (fileName) => {
-    const fileUrl = `http://localhost:5000/files/${fileName}`;
-    window.open(fileUrl, "_blank");
-  };
+  
 
   return (
     <nav className={`navbar ${isDarkMode ? "dark" : "light"}`}>
@@ -51,9 +48,7 @@ function Navbar() {
         </button>
 
         {/* Search Input Section */}
-        <div className="search-input-container">
-          <SearchFiles isVisible={true} onFileClick={handleFileClick} />
-        </div>
+       
       </div>
     </nav>
   );

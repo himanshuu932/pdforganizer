@@ -3,6 +3,7 @@ import "./DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
 import plusIcon from "../icons/add.png";
 
+import SearchFiles from "./SearchFiles";
 const DocumentModal = ({ onClose }) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
@@ -109,17 +110,17 @@ const DocumentModal = ({ onClose }) => {
           </div>
         </div>
         {selectedFiles.length > 0 && (
-          <>
+          <div className="selection-options">
             <button onClick={selectAll}>Select All</button>
             <button onClick={deselectAll}>Deselect All</button>
             <button onClick={deleteSelected}>Delete</button>
-          </>
+          </div>
         )}
-      </div>
-      <div className="document-modal-footer">
-        <button className="footer-button cancel-button" onClick={onClose}>
-          Home
-        </button>
+        <div className="modal-footer">
+          <button className="footer-button cancel-button" onClick={onClose}>
+            Home
+          </button>
+        </div>
       </div>
     </div>
   );
