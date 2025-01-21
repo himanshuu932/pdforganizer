@@ -7,6 +7,7 @@ import toggleIcon from "./icons/toggle.png";
 import attachIcon from "./icons/attach.png";
 import sendIcon from "./icons/send.png";
 import SearchFiles from "./components/SearchFiles"; 
+import SearchFiles from "./components/SearchFiles"; 
 
 function App() {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
@@ -57,7 +58,7 @@ function App() {
       }
   
       setSelectedFile(file);
-      //alert(`Selected file: ${file.name}`);
+      //alert(Selected file: ${file.name});
   
       const formData = new FormData();
       formData.append("file", file);
@@ -87,12 +88,12 @@ function App() {
         ]);
       } catch (err) {
         console.error("Upload error:", err);
-        //alert(`Error uploading file: ${err.message}`);
+        //alert(Error uploading file: ${err.message});
   
         // Send a failure message from the bot
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: `Failed to upload file "${file.name}".`, sender: "bot" },
+          { text:`Failed to upload file "${file.name}".`, sender: "bot" },
         ]);
       }
     } else {
@@ -289,7 +290,7 @@ const checkAndRenderResult = (data) => {
   };
 
   const handleFileClick = (fileName) => {
-    const fileUrl = `http://localhost:5000/files/${fileName}`;
+    const fileUrl =` http://localhost:5000/files/${fileName}`;
     window.open(fileUrl, "_blank");
   };
 
@@ -320,11 +321,21 @@ const checkAndRenderResult = (data) => {
 </li>
           {/* {isFilesVisible && (
           
+         <li> <SearchFiles
+  isVisible={isFilesVisible}
+ 
+  onFileClick={handleFileClick}
+/>
+</li>
+          {/* {isFilesVisible && (
+          
             <ul className="file-list">
               {files.length > 0 ? (
                 files.map((file, index) => (
                   <li
                     key={index}
+                    onClick={() => handleFileClick(file)}
+                    style={{
                     onClick={() => handleFileClick(file)}
                     style={{
                       cursor: "pointer",
@@ -342,6 +353,8 @@ const checkAndRenderResult = (data) => {
                 <li>No files available.</li>
               )}
             </ul>
+          )} */}
+          <li onClick={() => handleOptionClick("settings")}>
           )} */}
           <li onClick={() => handleOptionClick("settings")}>
             <img src={settingsIcon} alt="Settings" className="icon-image" />
@@ -369,6 +382,8 @@ const checkAndRenderResult = (data) => {
                        id="file-upload"
                        type="file"
                        style={{ display: "none" }}
+                       onChange={handleFileUpload} // Trigger file upload on file selection
+                     />
                        onChange={handleFileUpload} // Trigger file upload on file selection
                      />
                    </label>

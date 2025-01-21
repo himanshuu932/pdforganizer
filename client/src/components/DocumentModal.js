@@ -3,6 +3,7 @@ import "./DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
 import plusIcon from "../icons/add.png";
 
+import SearchFiles from "./SearchFiles";
 const DocumentModal = ({ onClose }) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);

@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import attachIcon from "../icons/attach.png";
 import sendIcon from "../icons/send.png";
-
-const ChatSection = () => {
+import './Chat.css'
+const ChatSection = ({onConversationClick}) => {
  
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isBotThinking, setIsBotThinking] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  
+  const [isChatOpen, setIsChatOpen] = useState(true); // Manage chat visibility
+
+  const handleCloseChat = () => {
+    onConversationClick(false); // Close the chat
+  };
 
 
 
@@ -264,7 +268,13 @@ const checkAndRenderResult = (data) => {
 
   return (
     <div className="chat-container">
-    <div className="messages">
+    <div className="chat-header">
+      <span className="chat-title">Peep</span>
+      <button className="close-btn" onClick={handleCloseChat}>
+        ×
+      </button>
+    </div>
+    <div className="messages" id="chatMessages">
       {messages.map((msg, index) => (
         <div
           key={index}
@@ -278,15 +288,14 @@ const checkAndRenderResult = (data) => {
     </div>
     <div className="chat-input">
       <label htmlFor="file-upload" className="upload-icon">
-                 <img src={attachIcon} alt="Attach" className="attach-image" />
-                 <input
-                   id="file-upload"
-                   type="file"
-                   style={{ display: "none" }}
-                   onChange={handleFileUpload} // Trigger file upload on file selection
-                 />
-               </label>
-
+        <img src={attachIcon} alt="Attach" className="attach-image" />
+        <input
+          id="file-upload"
+          type="file"
+          style={{ display: "none" }}
+          onChange={handleFileUpload}
+        />
+      </label>
       <input
         type="text"
         placeholder="Type a message"
@@ -304,6 +313,7 @@ const checkAndRenderResult = (data) => {
       </button>
     </div>
   </div>
+  
   );
 };
 
