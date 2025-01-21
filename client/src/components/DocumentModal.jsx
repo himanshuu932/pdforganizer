@@ -3,13 +3,12 @@ import "./styles/DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
 import plusIcon from "../icons/add.png";
 
-import SearchFiles from "./SearchFiles";
-
 const DocumentModal = ({ setActiveScreen }) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:5000/files")
@@ -73,12 +72,57 @@ const DocumentModal = ({ setActiveScreen }) => {
     window.open(fileUrl, "_blank");
   };
 
+  const uploadFiles = async (fileList) => {
+    const uploadedFiles = Array.from(fileList);
+    const newFiles = [];
+
+    for (const file of uploadedFiles) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("http://localhost:5000/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.ok) {
+          const { textData } = await res.json();
+          newFiles.push(textData.filename);
+        } else {
+          console.error(`Failed to upload file: ${file.name}`);
+        }
+      } catch (err) {
+        console.error(`Error uploading file ${file.name}:`, err);
+      }
+    }
+
+    if (newFiles.length > 0) {
+      const updatedFiles = [...newFiles, ...files];
+      setFiles(updatedFiles);
+      setFilteredFiles(updatedFiles);
+    }
+  };
+
   const handleFileUpload = (event) => {
-    const uploadedFiles = Array.from(event.target.files).map((file) => file.name);
-    const newFiles = uploadedFiles.filter((file) => !files.includes(file));
-    const updatedFiles = [...newFiles, ...files];
-    setFiles(updatedFiles);
-    setFilteredFiles(updatedFiles);
+    const fileList = event.target.files;
+    uploadFiles(fileList);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const fileList = e.dataTransfer.files;
+    uploadFiles(fileList);
   };
 
   return (
@@ -96,40 +140,47 @@ const DocumentModal = ({ setActiveScreen }) => {
             />
           </div>
         </div>
-        <div className="modal-body">
-          <div className="file-grid">
-            <div className="file-card upload-card">
-              <label htmlFor="file-upload" className="upload-label">
-                <img src={plusIcon} alt="Upload Icon" className="file-icon" />
-                <div className="file-name">Upload</div>
-              </label>
-              <input
-                id="file-upload"
-                type="file"
-                multiple
-                onChange={handleFileUpload}
-                style={{ display: "none" }}
-              />
-            </div>
-            {filteredFiles.length > 0 ? (
-              filteredFiles.map((file) => (
-                <div
-                  key={file}
-                  className={`file-card ${
-                    selectedFiles.includes(file) ? "selected" : ""
-                  }`}
-                  onClick={() => toggleSelection(file)}
-                  onDoubleClick={() => handleFileDoubleClick(file)}
-                >
-                  <img src={pdfIcon} alt="PDF Icon" className="file-icon-i" />
-                  <div className="file-name">
-                    <span>{file}</span>
+        <div
+          className={`dropzone ${isDragging ? "dragging" : ""}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <div className="modal-body">
+            <div className="file-grid">
+              <div className="file-card upload-card">
+                <label htmlFor="file-upload" className="upload-label">
+                  <img src={plusIcon} alt="Upload Icon" className="file-icon" />
+                  <div className="file-name">Upload</div>
+                </label>
+                <input
+                  id="file-upload"
+                  type="file"
+                  multiple
+                  onChange={handleFileUpload}
+                  style={{ display: "none" }}
+                />
+              </div>
+              {filteredFiles.length > 0 ? (
+                filteredFiles.map((file) => (
+                  <div
+                    key={file}
+                    className={`file-card ${
+                      selectedFiles.includes(file) ? "selected" : ""
+                    }`}
+                    onClick={() => toggleSelection(file)}
+                    onDoubleClick={() => handleFileDoubleClick(file)}
+                  >
+                    <img src={pdfIcon} alt="PDF Icon" className="file-icon-i" />
+                    <div className="file-name">
+                      <span>{file}</span>
+                    </div>
                   </div>
-                </div>
-              ))
-            ) : (
-              <p>No files found.</p>
-            )}
+                ))
+              ) : (
+                <p>No files found.</p>
+              )}
+            </div>
           </div>
         </div>
         {selectedFiles.length > 0 && (
