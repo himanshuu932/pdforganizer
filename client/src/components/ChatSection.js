@@ -10,7 +10,12 @@ const ChatSection = ({onConversationClick}) => {
   const [isBotThinking, setIsBotThinking] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(true); // Manage chat visibility
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
+  const toggleDarkMode = () => {
+    setIsDarkMode((prevMode) => !prevMode);
+  };
+  
   const handleCloseChat = () => {
     onConversationClick(false); // Close the chat
   };
@@ -267,12 +272,15 @@ const checkAndRenderResult = (data) => {
   };
 
   return (
-    <div className="chat-container">
+    <div className={`chat-container ${isDarkMode ? "dark-mode" : "light-mode"}`}>
     <div className="chat-header">
-      <span className="chat-title">Peep</span>
-      <button className="close-btn" onClick={handleCloseChat}>
-        ×
+     
+      <button className="toggle-mode-btn" onClick={toggleDarkMode}>
+        {isDarkMode ? "Light Mode" : "Dark Mode"}
       </button>
+      <button className="close-btn" onClick={handleCloseChat}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+</svg></button>
     </div>
     <div className="messages" id="chatMessages">
       {messages.map((msg, index) => (
@@ -313,6 +321,7 @@ const checkAndRenderResult = (data) => {
       </button>
     </div>
   </div>
+  
   
   );
 };

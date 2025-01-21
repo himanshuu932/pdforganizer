@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import './sf.css';
 
 const SearchFiles = ({ isVisible, onFileClick }) => {
   const [files, setFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredFiles, setFilteredFiles] = useState([]);
+  const searchRef = useRef(null); // Reference for the search container
 
   const fetchFiles = async () => {
     try {
       const res = await fetch("http://localhost:5000/files");
       const data = await res.json();
-      setFiles(data); // Set the full files list
-      setFilteredFiles(data); // Initialize filteredFiles with the full list
+      setFiles(data);
+      setFilteredFiles(data);
     } catch (err) {
       console.error("Error fetching files:", err);
     }
@@ -23,7 +25,7 @@ const SearchFiles = ({ isVisible, onFileClick }) => {
   }, [isVisible]);
 
   useEffect(() => {
-    // Show filtered files only if searchQuery has at least one character
+    // Filter the files based on the search query
     if (searchQuery.trim().length > 0) {
       const query = searchQuery.toLowerCase();
       const filtered = files.filter((file) =>
@@ -31,15 +33,28 @@ const SearchFiles = ({ isVisible, onFileClick }) => {
       );
       setFilteredFiles(filtered);
     } else {
-      setFilteredFiles([]); // Clear the filtered list if no query
+      setFilteredFiles([]);
     }
-  }, [searchQuery, files]); // Run when searchQuery or files change
+  }, [searchQuery, files]);
+
+  useEffect(() => {
+    // Close the search dropdown if the click is outside the search component
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchQuery(''); // Optional: Clear the search input
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   if (!isVisible) return null;
 
   return (
-    <div className="file-search-container">
-      <h2>Search Files</h2>
+    <div ref={searchRef} className="file-search-container">
       <input
         type="text"
         className="file-search-input"
@@ -47,25 +62,25 @@ const SearchFiles = ({ isVisible, onFileClick }) => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <ul className="file-list">
-        {filteredFiles.length > 0 ? (
-          filteredFiles.map((file, index) => (
-            <li
-              key={index}
-              onClick={() => onFileClick(file)}
-              style={{
-                cursor: "pointer",
-                backgroundColor: "#89d0ce",
-                fontSize: "14px",
-              }}
-            >
-              {file}
+      {searchQuery.trim().length > 0 && (
+        <ul className="file-list">
+          {filteredFiles.length > 0 ? (
+            filteredFiles.map((file, index) => (
+              <li
+                key={index}
+                onClick={() => onFileClick(file)}
+                className="file-item"
+              >
+                {file}
+              </li>
+            ))
+          ) : (
+            <li className="file-item" style={{ color: "gray" }}>
+              No files found.
             </li>
-          ))
-        ) : (
-         console.log("hu")
-        )}
-      </ul>
+          )}
+        </ul>
+      )}
     </div>
   );
 };

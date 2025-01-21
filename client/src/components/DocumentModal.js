@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import "./DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
 
-import SearchFiles from "./SearchFiles";
 const DocumentModal = ({ onClose }) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
@@ -52,56 +51,44 @@ const DocumentModal = ({ onClose }) => {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2>Documents</h2>
-          <button className="close-button" onClick={onClose}>
-            &times;
-          </button>
-        </div>
-        <div className="modal-body">
-          <div className="search-container">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search files..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="file-grid">
-            {filteredFiles.length > 0 ? (
-              filteredFiles.map((file) => (
-                <div
-                  key={file}
-                  className={`file-card ${selectedFiles.includes(file) ? "selected" : ""}`}
-                  onClick={() => toggleSelection(file)} // Toggle selection on single-click
-                  onDoubleClick={() => handleFileDoubleClick(file)} // Open the PDF on double-click
-                >
-                  <img src={pdfIcon} alt="PDF Icon" className="file-icon" />
-                  <div className="file-name">
-                    <span>{file}</span>
-                  </div>
+    <div className="document-modal">
+      <div className="document-modal-header">
+        <h2>Documents</h2>
+      </div>
+      <div className="document-modal-body">
+        <div className="file-grid">
+          {filteredFiles.length > 0 ? (
+            filteredFiles.map((file) => (
+              <div
+                key={file}
+                className={`file-card ${selectedFiles.includes(file) ? "selected" : ""}`}
+                onClick={() => toggleSelection(file)}
+                onDoubleClick={() => handleFileDoubleClick(file)}
+              >
+                <img src={pdfIcon} alt="PDF Icon" className="file-icon" />
+                <div className="file-name">
+                  <span>{file}</span>
                 </div>
-              ))
-            ) : (
-              <p>No files found.</p>
-            )}
-          </div>
+              </div>
+            ))
+          ) : (
+            <p>No files found.</p>
+          )}
         </div>
+      </div>
+      <div className="selection-options">
         {selectedFiles.length > 0 && (
-          <div className="selection-options">
+          <>
             <button onClick={selectAll}>Select All</button>
             <button onClick={deselectAll}>Deselect All</button>
             <button onClick={deleteSelected}>Delete</button>
-          </div>
+          </>
         )}
-        <div className="modal-footer">
-          <button className="footer-button cancel-button" onClick={onClose}>
-            Cancel
-          </button>
-        </div>
+      </div>
+      <div className="document-modal-footer">
+        <button className="footer-button cancel-button" onClick={onClose}>
+          Home
+        </button>
       </div>
     </div>
   );

@@ -25,3 +25,9 @@ body {
   justify-content: center;
   align-items: center;
 }
+.document {
+  flex-grow: 1; /* Allow this section to take remaining space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

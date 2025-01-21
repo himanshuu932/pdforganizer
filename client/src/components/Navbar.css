@@ -1,0 +1,125 @@
+/* General Navbar Styles */
+.navbar {
+  background-color: #fff;
+  color: #000;
+  padding: 0.8rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar.light {
+  background-color: #fff;
+  color: #000;
+}
+
+.navbar.dark {
+  background-color: #333;
+  color: white;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Center Links Section */
+.navbar-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem; /* Space between links */
+  margin: 0;
+  padding: 0;
+  justify-content: center; /* Centering the menu items */
+}
+
+.nav-item .nav-link {
+  color: inherit;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.nav-item .nav-link:hover {
+  text-decoration: underline;
+}
+
+/* Mode Toggle Button */
+.mode-toggle {
+  background-color: #fff;
+  color: #007bff;
+  border: 2px solid #007bff;
+  border-radius: 4px;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  height: 2.5rem; /* Set the height of the button */
+  width: 2.5rem;  /* Set the width of the button equal to input size */
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Center the icon inside the button */
+}
+
+/* Dark Mode Styles for the Button */
+body.dark-mode .mode-toggle {
+  background-color: #000;
+  color: #fff;
+  border: 2px solid #fff;
+}
+
+/* Light Mode Styles for the Button */
+body.light-mode .mode-toggle {
+  background-color: #fff;
+  color: #007bff;
+  border: 2px solid #007bff;
+}
+
+/* Search Section */
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.search-input-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Search Input and Button Styles */
+.search-input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  width: 200px; /* Adjust the width as needed */
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background-color: #121212;
+  color: #f1f1f1;
+}
+
+body.dark-mode .navbar {
+  background-color: #333;
+}
+
+body.dark-mode .navbar-links .nav-link {
+  color: #f1f1f1;
+}
+
+body.dark-mode .navbar-links .nav-link:hover {
+  text-decoration: underline;
+}
+
+/* Image styling to prevent overflow */
+.icon-image {
+  height: 100%; /* Set image height to 100% of the button height */
+  width: 100%;  /* Set image width to 100% of the button width */
+  object-fit: contain; /* Ensure the image fits within the container without distortion */
+}
