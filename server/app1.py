@@ -11,9 +11,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Flask App Setup
 app = Flask(__name__)
+CORS(app)
 
-# Enable CORS for all routes
-CORS(app)  # This will allow cross-origin requests from any domain
+# Storage for the most recently stored texts
+texts_storage = []
 
 # Configure the GenAI API
 genai.configure(api_key="AIzaSyBZM6dTMcLhZ-nY7Uetow2JbxTsAP4lqxg")
@@ -29,19 +30,16 @@ def download_pdf(pdf_url):
     else:
         raise Exception(f"Failed to download PDF. Status code: {response.status_code}")
 
-# Route to handle file processing and querying
-@app.route('/process-pdf', methods=['POST'])
-def process_pdf():
+# Route to extract text from PDF
+@app.route('/extract', methods=['POST'])
+def extract_text():
     try:
         # Get the JSON data from the request
         data = request.get_json()
-
-        # Extract file path (could be URL or local path) and query from the request
         pdf_path = data.get('file_path')
-        user_query = data.get('query')
 
-        if not pdf_path or not user_query:
-            return jsonify({"error": "Both 'file_path' and 'query' are required."}), 400
+        if not pdf_path:
+            return jsonify({"error": "'file_path' is required."}), 400
 
         # Check if the file path is a URL or local file path
         if pdf_path.startswith("http://") or pdf_path.startswith("https://"):
@@ -50,12 +48,53 @@ def process_pdf():
         
         # Read the PDF file
         pdf_reader = PdfReader(pdf_path)
-        raw_text = 'filename-' + pdf_path + '\\n'
-        
+        raw_text = ""
         for page in pdf_reader.pages:
             content = page.extract_text()
             if content:
                 raw_text += content.replace('\n', '\\n') + '\\n'
+
+        # Return the extracted text
+        return jsonify({"text": raw_text})
+
+    except Exception as e:
+        logging.error(f"Error extracting text from PDF: {e}")
+        return jsonify({"error": str(e)}), 500
+
+# Route to store texts
+@app.route('/store-texts', methods=['POST'])
+def store_texts():
+    global texts_storage
+    try:
+        # Get the JSON data from the request
+        data = request.get_json()
+        texts = data.get('texts', [])
+
+        if not texts:
+            return jsonify({"error": "'texts' field is required."}), 400
+
+        # Overwrite the global storage with the new texts
+        texts_storage = texts
+
+        return jsonify({"message": "Texts stored successfully."})
+
+    except Exception as e:
+        logging.error(f"Error storing texts: {e}")
+        return jsonify({"error": str(e)}), 500
+
+# Route to query the texts
+@app.route('/pdf-query', methods=['POST'])
+def pdf_query():
+    try:
+        # Get the JSON data from the request
+        data = request.get_json()
+        user_query = data.get('query')
+
+        if not texts_storage:
+            return jsonify({"error": "No texts stored. Please use /store-texts to store texts first."}), 400
+
+        if not user_query:
+            return jsonify({"error": "'query' field is required."}), 400
 
         # Configure the generation settings
         generation_config = {
@@ -72,10 +111,54 @@ def process_pdf():
             generation_config=generation_config,
         )
 
-        # Add extracted text and query to chat history
+        # Prepare the chat history
         chat_history = [
-            {"role": "user", "parts": [raw_text]},
-            {"role": "user", "parts": [user_query]}
+            {"role": "user", "parts": texts_storage},
+            {"role": "user", "parts": [user_query]},
+            
+  { 
+    "role": "model", 
+    "parts": [
+           'also use only single * for bold', 
+     ]
+  },
+  { 
+    "role": "model", 
+    "parts": [
+     'example how to send a table ','make sure to add gap in between for those colums which doest have data in last row for some  but has for some example if total is in last column then keep previous columns empty',
+      'table-starts\nBasic Sciences & Maths (BSM)|4\nEngineering Fundamentals (EF)|4\nProfessional Skill (PS)|0\nProgram Core (PC)|10\nManagement (M)|0\nHumanities & Social Science (HSS)|2\nHumanities & Social Science Elective|0\nProject (P)|0\nSeminar (S)|0\nIndustrial Practice (IP) / Industrial Elective (IE)|0/0\nProgram link basic science and engineering courses|2\nProgram Electives (PE)|0\nOpen Electives (OE)|0\nTotal|||22 table-ends'
+    ]
+  },
+   { 
+    "role": "model", 
+    "parts": [
+    'while replying for a query related to table always send table data enclosed between table-starts and  table-ends'
+    ]
+  },
+
+  { 
+    "role": "model", 
+    "parts": [
+     'when replying to general convertsstion talk normally' ]
+  },
+  { 
+    "role": "model", 
+    "parts": [
+     'when asked who are you You are peep. An assistant developed by team Bludgers for queries of pdf. dont include sources-<filename> ' ]
+  },
+   { 
+    "role": "model", 
+    "parts": [
+     'Always append filename/s in the answer related to information in the last as "/ltkgya-sources"- then follweed by the filename or filenames if multiple  seperated by a comma dont use * after sources the files name is one that is of extension.pdf dont include the text filename-uploads/ ',  ]
+  },{ 
+    "role": "model", 
+    "parts": [
+     'if relevant include tables in it ','while sending links make them clickable '  ]
+  },{ 
+    "role": "user", 
+    "parts": [user_query] 
+  },
+
         ]
 
         # Start the chat session
@@ -88,7 +171,7 @@ def process_pdf():
         return jsonify({"answer": response.text})
 
     except Exception as e:
-        logging.error(f"Error processing PDF: {e}")
+        logging.error(f"Error querying text: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

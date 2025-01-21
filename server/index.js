@@ -1,6 +1,6 @@
 const express = require('express');
 const axios = require('axios');
-const cors = require('cors');  // Import cors
+const cors = require('cors'); // Import cors
 const app = express();
 const port = 5000;
 const mongoose = require("mongoose");
@@ -12,6 +12,11 @@ const path = require('path');
 const folderPath = path.join(__dirname, 'uploads'); // Path to the folder containing files
 
 app.use(cors()); // Enable CORS
+
+// Ensure the uploads folder exists
+if (!fs.existsSync(folderPath)) {
+  fs.mkdirSync(folderPath);
+}
 
 // Endpoint to get a list of files
 app.get('/files', (req, res) => {
@@ -46,8 +51,10 @@ app.get('/files/:fileName', (req, res) => {
     res.status(404).send('File not found');
   }
 });
+
 // Enable JSON parsing
 app.use(express.json());
+
 // MongoDB connection
 mongoose.connect("mongodb+srv://himanshuu932:88087408601@cluster0.lu2g8bw.mongodb.net/pdforganizer?retryWrites=true&w=majority&appName=Cluster0", {
   useNewUrlParser: true,
@@ -56,8 +63,6 @@ mongoose.connect("mongodb+srv://himanshuu932:88087408601@cluster0.lu2g8bw.mongod
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => console.log("Connected to MongoDB"));
-
-// Define a schema for storing file metadata
 
 // Multer configuration
 const storage = multer.diskStorage({
@@ -134,11 +139,7 @@ app.delete('/files/:fileName', async (req, res) => {
   }
 });
 
-
-
-
 // Route to submit file and query
-
 app.post('/submit-query', async (req, res) => {
   const { query } = req.body;
   console.log(query);
@@ -151,10 +152,9 @@ app.post('/submit-query', async (req, res) => {
       return res.json({ answer: "No files in the storage" });
     }
 
-    // Extract the `text` field from each document in the collection
+    // Extract the text field from each document in the collection
     const texts = textDataArray.map((doc) => doc.text);
   
-
     // Send request to Flask API with the query and texts array
     const response = await axios.post('http://127.0.0.1:5000/pdf-query', {
       query: query,
@@ -169,8 +169,6 @@ app.post('/submit-query', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-
 
 app.listen(port, () => {
   console.log(`Node.js server running at http://localhost:${port}`);

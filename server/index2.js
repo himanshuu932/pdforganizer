@@ -55,7 +55,7 @@ mongoose.connect("mongodb+srv://himanshuu932:88087408601@cluster0.lu2g8bw.mongod
 });
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
-db.once("open", () => console.log("Connected to MongoDB"));
+
 
 // Define a schema for storing file metadata
 
@@ -70,35 +70,64 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+const store = async () => {
+  try {
+    const textDataArray = await TextData.find();
+    if (textDataArray.length === 0) {
+      console.log("No files in the storage");
+      return;
+    }
+
+    const texts =await  textDataArray.map((doc) => doc.text);
+   
+    axios.post('http://127.0.0.1:5000/store-texts', {
+      texts: texts,
+  }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  });
+  
+    
+  } catch (error) {
+    console.error("Error during store operation:", error);
+  }
+};
+
+db.once("open", () => {
+  console.log("Connected to MongoDB");
+  store(); // Ensure this is used only for initial setup
+});
+
 // Endpoint for file upload
 app.post("/upload", upload.single("file"), async (req, res) => {
   if (!req.file) return res.status(400).send("No file uploaded.");
-  console.log(req.file.path)
+  console.log(req.file.path);
 
   try {
     // Send request to Flask API to extract text from the file
-    const response = await axios.post('http://127.0.0.1:5000/extract', {
-      file_path: req.file.path
+    const response = await axios.post("http://127.0.0.1:5000/extract", {
+      file_path: req.file.path,
     });
-              
+
     // Get the extracted text from the response
     const extractedText = response.data.text;
 
-    // Check if TextData document exists; if not, create a new one
-    let textData = await TextData.findOne();
-    if (!textData) {
-      textData = new TextData({ texts: [] }); // Create new document if none exists
-    }
+    // Create a new TextData document for each upload
+    const newTextData = new TextData({
+      text: extractedText,
+      filename: req.file.originalname,
+      date: new Date(), // Add the current date and time
+    });
 
-    // Add the extracted text to the array
-    textData.texts.push(extractedText);
-    console.log(extractedText)
-    // Save the updated TextData document
-    await textData.save();
+    console.log(extractedText);
+
+    // Save the new TextData document
+    await newTextData.save();
 
     res.status(200).json({
       message: "File uploaded and text extracted successfully",
-      textData: textData,
+      textData: newTextData,
     });
   } catch (error) {
     console.error("Error during file upload or text extraction:", error);
@@ -106,37 +135,63 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   }
 });
 
+// Route to delete a file
+app.delete('/files/:fileName', async (req, res) => {
+  const { fileName } = req.params;
+  const filePath = path.join(folderPath, fileName); // Path to the file in storage
+
+  try {
+    // Check if the file exists in the storage folder
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: "File not found in storage" });
+    }
+
+    // Delete the file from the storage folder
+    fs.unlinkSync(filePath);
+
+    // Delete the corresponding document from the MongoDB collection
+    const deletedDocument = await TextData.findOneAndDelete({ filename: fileName });
+
+    if (!deletedDocument) {
+      return res.status(404).json({ message: "File metadata not found in the database" });
+    }
+
+    res.status(200).json({ message: "File and metadata deleted successfully" });
+  } catch (error) {
+    console.error("Error during file deletion:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+
+
 
 // Route to submit file and query
 
 app.post('/submit-query', async (req, res) => {
   const { query } = req.body;
-   console.log(query)
-;  try {
-    // Fetch the global array of texts
-    const textData = await TextData.findOne();
-    if (!textData) {
-      return res.json({ answer: "No files in the storage" });
-    }
+  console.log(query);
 
-    // Extract the texts array from the global collection
-    const texts = textData.texts;
-    //console.log(texts)
+  try {
+    // Fetch all objects (documents) in the TextData collection
     // Send request to Flask API with the query and texts array
     const response = await axios.post('http://127.0.0.1:5000/pdf-query', {
       query: query,
-      texts: texts
+      
     });
 
     // Return the response from the Flask API to the client
     res.json({ answer: response.data.answer });
-    console.log(response.data.answer)
+    console.log(response.data.answer);
   } catch (error) {
     console.error('Error during API call or text retrieval:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-app.listen(port, () => {
+
+
+app.listen(port, async () => {
   console.log(`Node.js server running at http://localhost:${port}`);
+  
 });

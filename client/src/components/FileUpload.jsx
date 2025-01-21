@@ -131,7 +131,8 @@ const styles = {
     display: 'none',
   },
   button: {
-    padding: '10px 20px',
+    padding: '10px 20px', 
+    
     backgroundColor: '#4CAF50',
     color: 'white',
     border: 'none',

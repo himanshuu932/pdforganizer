@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 # Flask App Setup
-app = Flask(__name__)
+app = Flask(_name_)
 
 # Enable CORS for all routes
 CORS(app)
@@ -151,5 +151,5 @@ def pdf_query():
         logging.error(f"Error querying text: {e}")
         return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     app.run(debug=False)
