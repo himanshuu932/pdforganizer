@@ -4,7 +4,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -13,47 +13,48 @@
 
 .modal-content {
   background: #fff;
-  border-radius: 10px;
+  border-radius: 12px;
   width: 100%;
- 
+  /* max-width: 900px; */
   padding: 20px;
   display: flex;
   flex-direction: column;
-  height: 100%;
- 
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  height: 100%; /* Adjusted height */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .modal-header h2 {
   margin: 0;
+  font-size: 1.5rem;
+  color: #333;
 }
 
 .close-button {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   cursor: pointer;
+  color: #666;
 }
 
 .search-container {
-  
-  padding-left: 10px;
-  padding-right: 10px;
-  margin-top: 10px;
-  margin-bottom: 15px;
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5px;
 }
 
 .search-input {
-  width:200px;
+  width: 250px;
   padding: 10px;
-  font-size: 16px;
+  font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
@@ -61,37 +62,41 @@
 .modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 10px 0;
+  padding: 15px 0;
 }
 
 .file-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* Reduced min width */
-  gap: 10px; /* Smaller gap between cards */
-  overflow-y: auto;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
   padding: 10px;
 }
 
 .file-card {
   border: 1px solid #ddd;
-  border-radius: 6px; /* Slightly smaller border radius */
-  padding: 8px; /* Reduced padding */
+  border-radius: 6px;
+  padding: 10px;
   background-color: #f9f9f9;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s, box-shadow 0.15s; /* Subtle hover effect */
   text-align: center;
-  width: 120px; /* Fixed width */
-  height: 140px; /* Fixed height */
-  position: relative; /* Needed for positioning PDF icon */
+  width: 130px;
+  height: 150px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.file-card.selected {
+  border: 2px solid #007bff; /* Highlight selected files */
+  box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); /* Subtle glow */
 }
 
 .file-card:hover {
-  transform: scale(1.02); /* Less aggressive hover scale */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Softer shadow */
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .file-card.upload-card {
@@ -100,32 +105,31 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 120px; /* Matches card size */
-  height: 140px; /* Matches card size */
+  width: 130px;
+  height: 150px;
 }
 
 .file-icon,
 .file-icon-i {
-  width: 40px; /* Reduced size */
-  height: 40px; /* Reduced size */
-  margin-bottom: 5px;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
 }
 
 .file-name {
-  font-size: 12px; /* Slightly smaller font */
+  font-size: 12px;
   color: #333;
   word-wrap: break-word;
-  text-align: center;
-  overflow: hidden; /* Hide overflow text */
-  text-overflow: ellipsis; /* Truncate text with ellipsis */
-  white-space: nowrap; /* Prevent text from wrapping */
-  max-width: 100%; /* Ensure text does not overflow the container */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
 }
 
 .pdf-icon {
   position: absolute;
-  top: 5px; /* Adjust position as needed */
-  right: 5px; /* Adjust position as needed */
+  top: 10px;
+  right: 10px;
   width: 20px;
   height: 20px;
 }
@@ -133,17 +137,18 @@
 .selection-options {
   display: flex;
   gap: 10px;
-  margin: 15px 0;
+  margin: 10px 0;
   justify-content: center;
 }
 
 .selection-options button {
-  padding: 8px 12px;
+  padding: 8px 14px;
   background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .selection-options button:hover {
@@ -161,6 +166,7 @@
   border-radius: 5px;
   border: none;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .cancel-button {
