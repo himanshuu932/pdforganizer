@@ -30,10 +30,13 @@ function Navbar({setActiveScreen}) {
           <a className="nav-link"onClick={()=>setActiveScreen(2)}>Documents</a>
         </li>
         <li className="nav-item">
-          <a className="nav-link" onClick={()=>setActiveScreen(3)}>Upload</a>
+          <a className="nav-link" onClick={()=>setActiveScreen(3)}>Chat</a>
         </li>
         <li className="nav-item">
-          <a className="nav-link" onClick={()=>setActiveScreen(4)}>About Us</a>
+          <a className="nav-link" onClick={()=>setActiveScreen(4)}>Upload</a>
+        </li>
+        <li className="nav-item">
+          <a className="nav-link" onClick={()=>setActiveScreen(5)}>About Us</a>
         </li>
       </ul>
 

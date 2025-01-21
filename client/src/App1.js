@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, act } from "react";
 import Navbar from "./components/Navbar";
 import StartScreen from "./components/StartScreen";
 import DocumentModal from "./components/DocumentModal";
@@ -16,11 +16,22 @@ function App() {
   // Save activeScreen to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("activeScreen", activeScreen);
+    activeScreen==3? openChat():closeChat();
   }, [activeScreen]);
+  const body = document.body;
 
-  const handlechat = () => {
-    setIsChatOpen(!isChatOpen);
-  };
+  // Function to open the chat
+  function openChat() {
+    // Show the chat container
+    body.classList.add('blurred');       // Add blur effect
+  }
+  
+  // Function to close the chat
+  function closeChat() {
+   // chatContainer.style.display = 'none'; // Hide the chat container
+    body.classList.remove('blurred');    // Remove blur effect
+  }
+  
 
   return (
     <div className="app">
@@ -28,12 +39,12 @@ function App() {
       <Navbar setActiveScreen={setActiveScreen} />
       {/* Start Screen */}
       <div className="start-screen-section">
-        {activeScreen === 1 && <StartScreen onConversationClick={handlechat} setActiveScreen={setActiveScreen} />}
+        {activeScreen === 1 && <StartScreen  setActiveScreen={setActiveScreen} />}
         {activeScreen === 2 && <DocumentModal setActiveScreen={setActiveScreen} />}
-        {activeScreen === 3 && <FileUpload />}
-        {activeScreen === 4 && <AboutUs />}
+        {activeScreen === 4 && <FileUpload />}
+        {activeScreen === 5 && <AboutUs />}
 
-        {isChatOpen && <ChatSection onConversationClick={handlechat} />}
+        {activeScreen === 3 && <ChatSection setActiveScreen={setActiveScreen} />}
       </div>
     </div>
   );

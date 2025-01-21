@@ -3,7 +3,7 @@ import attachIcon from "../icons/attach.png";
 import chatIcon from "../icons/chat.png";
 import "./styles/StartScreen.css";
 
-const StartScreen = ({ onDocumentClick ,onConversationClick,setActiveScreen}) => {
+const StartScreen = ({setActiveScreen}) => {
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (event) => {
@@ -72,7 +72,7 @@ const StartScreen = ({ onDocumentClick ,onConversationClick,setActiveScreen}) =>
           />
        
         </label>
-        <button className="action-button" onClick={onConversationClick}>
+        <button className="action-button" onClick={()=>setActiveScreen(3)}>
          Start Conversation
         </button>
 

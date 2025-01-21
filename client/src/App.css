@@ -28,3 +28,16 @@ body.dark-mode {
 
 }
 
+/* Full-Page Blur Effect */
+body.blurred::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(176, 175, 175, 0.5); /* Semi-transparent overlay */
+  backdrop-filter: blur(2px); /* Blur the background */
+  z-index: 0; /* Make sure it sits below the chat container */
+}
+
