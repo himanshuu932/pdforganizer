@@ -1,0 +1,126 @@
+/* General Container Styles */
+.container {
+    padding: 20px;
+    background-color: #e9e9e9;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    text-align: center;
+    max-width: 600px; /* Adjust the container size */
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Align items in the center */
+    justify-content: center; /* Align content to the top */
+  }
+  
+  /* Heading Styles */
+  .heading {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Drag Area Styles */
+  .drag-area {
+    width: 100%;
+    height: 200px; /* Adjusted size */
+    border: 2px dashed #bbb;
+    border-radius: 8px;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  /* Active Drag Area Styles */
+  .drag-area-active {
+    width: 100%;
+    height: 200px; /* Adjusted size */
+    border: 2px dashed #4CAF50;
+    border-radius: 8px;
+    background-color: #e8f5e9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #4CAF50;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  /* Input Styles */
+  .input {
+    display: none;
+  }
+  
+  /* Button Styles */
+  .button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+  }
+  
+  .button:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+  }
+  
+  /* File List Styles */
+  /* File List Styles */
+.file-list {
+    text-align: left;
+    margin-top: 20px;
+  }
+  
+  
+  /* File Item Styles */
+  .file-item {
+    font-size: 1rem;
+    color: #333;
+    list-style-type: none;
+    margin-bottom: 10px; /* Space between each file item */
+  }
+  
+  /* Dark Mode Styles */
+  body.dark-mode {
+    background-color: #121212;
+    color: #f1f1f1;
+  }
+  
+  body.dark-mode .container {
+    background-color: #333;
+    color: #f1f1f1;
+  }
+  
+  body.dark-mode .drag-area {
+    background-color: #333;
+    border: 2px dashed #888;
+    color: #bbb;
+  }
+  
+  body.dark-mode .drag-area-active {
+    background-color: #444;
+    border: 2px dashed #4CAF50;
+    color: #4CAF50;
+  }
+  
+  body.dark-mode .button {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  body.dark-mode .button:hover {
+    background-color: #45a049;
+  }
+  
+  body.dark-mode .file-item {
+    color: #ddd;
+  }
+  

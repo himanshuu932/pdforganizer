@@ -130,6 +130,13 @@ const DocumentModal = ({ setActiveScreen }) => {
       <div className="modal-content">
         <div className="modal-header">
           <h2>Documents</h2>
+          {selectedFiles.length > 0 && (
+          <div className="selection-options">
+            <button onClick={selectAll}>Select All</button>
+            <button onClick={deselectAll}>Deselect All</button>
+            <button onClick={deleteSelected}>Delete</button>
+          </div>
+        )}
           <div className="search-container">
             <input
               type="text"
@@ -182,21 +189,6 @@ const DocumentModal = ({ setActiveScreen }) => {
               )}
             </div>
           </div>
-        </div>
-        {selectedFiles.length > 0 && (
-          <div className="selection-options">
-            <button onClick={selectAll}>Select All</button>
-            <button onClick={deselectAll}>Deselect All</button>
-            <button onClick={deleteSelected}>Delete</button>
-          </div>
-        )}
-        <div className="modal-footer">
-          <button
-            className="footer-button cancel-button"
-            onClick={() => setActiveScreen(1)}
-          >
-            Home
-          </button>
         </div>
       </div>
     </div>

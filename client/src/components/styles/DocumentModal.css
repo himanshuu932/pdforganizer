@@ -163,10 +163,11 @@ body.dark-mode .modal-content {
 /* Selection options */
 .selection-options {
   display: flex;
-  justify-content: flex-start;
-  gap: 10px;
-  margin: 10px 0;
   justify-content: center;
+  align-items: center; /* Centers content vertically */
+  gap: 10px;
+  margin: 0; /* Removes any extra margin */
+  width: 100%; /* Ensures full viewport width */
 }
 
 .selection-options button {

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import './styles/FileUpload.css';
 
 const FileUpload = () => {
   const [files, setFiles] = useState([]); // Store multiple files in an array
@@ -47,12 +48,13 @@ const FileUpload = () => {
  
 
   return (
-    <section id="file-upload" style={styles.container}>
+    <section id="file-upload" className='container'>
       <h2 style={styles.heading}>Upload Files</h2>
       
       {/* Drag-and-Drop Area */}
       <div
-        style={dragging ? styles.dragAreaActive : styles.dragArea}
+        
+        className="drag-area"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -78,10 +80,9 @@ const FileUpload = () => {
       {/* Display selected file names */}
       {files.length > 0 && (
         <div style={styles.fileList}>
-          <h3>Selected Files:</h3>
           <ul>
             {files.map((file, index) => (
-              <li key={index} style={styles.fileItem}>{file.name}</li>
+              <li key={index} className='file-item'>{file.name}</li>
             ))}
           </ul>
         </div>
