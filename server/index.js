@@ -97,7 +97,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       date: new Date(), // Add the current date and time
     });
 
-   // console.log(extractedText);
+   console.log(extractedText);
     //console.log(md);
 
     // Save the new TextData document
