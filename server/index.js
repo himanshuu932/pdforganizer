@@ -88,6 +88,7 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
     // Get the extracted text from the response
     const extractedText = response.data.text;
+    //const md = response.data.md;
 
     // Create a new TextData document for each upload
     const newTextData = new TextData({
@@ -96,7 +97,8 @@ app.post("/upload", upload.single("file"), async (req, res) => {
       date: new Date(), // Add the current date and time
     });
 
-    console.log(extractedText);
+   // console.log(extractedText);
+    //console.log(md);
 
     // Save the new TextData document
     await newTextData.save();
