@@ -40,7 +40,7 @@
 .chat-header {
   background-color: var(--header-bg);
   display: flex;
-  justify-content: right;
+  justify-content: space-between;
   align-items: center;
   padding: 10px 15px;
   border-radius: 10px 10px 0 0;

@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import attachIcon from "../icons/attach.png";
 import sendIcon from "../icons/send.png";
 import './styles/Chat.css'
+import chatIcon from "../icons/chat.png";
 const ChatSection = ({setActiveScreen}) => {
- 
+
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -274,7 +275,7 @@ const checkAndRenderResult = (data) => {
   return (
     <div className={`chat-container `}>
     <div className="chat-header">
-     
+      <img src={chatIcon} alt="Chat Icon" className="icon-image" />
       
       <button className="close-btn" onClick={handleCloseChat}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
   <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>

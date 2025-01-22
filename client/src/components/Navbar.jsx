@@ -18,7 +18,7 @@ function Navbar({setActiveScreen}) {
     <nav className={`navbar ${isDarkMode ? "dark" : "light"}`}>
       {/* Brand Section */}
       <div className="navbar-brand">
-        My App
+        PeeP
       </div>
 
       {/* Center Links Section */}
