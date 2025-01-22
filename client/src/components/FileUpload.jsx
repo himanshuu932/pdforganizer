@@ -3,7 +3,8 @@ import axios from "axios";
 import "./styles/FileUpload.css";
 
 const FileUpload = () => {
-  const [files, setFiles] = useState([]); // Store files with status, progress
+  const [files, setFiles] = useState([]); // Store files with status
+  const [overallProgress, setOverallProgress] = useState(0); // Track overall progress
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -11,7 +12,6 @@ const FileUpload = () => {
     const selectedFiles = Array.from(e.target.files).map((file) => ({
       file,
       status: "pending", // Status: 'pending', 'uploading', 'success'
-      progress: 0, // Individual file progress
     }));
     setFiles((prev) => [...prev, ...selectedFiles]); // Append new files
   };
@@ -22,7 +22,6 @@ const FileUpload = () => {
     const droppedFiles = Array.from(e.dataTransfer.files).map((file) => ({
       file,
       status: "pending",
-      progress: 0,
     }));
     setFiles((prev) => [...prev, ...droppedFiles]);
   };
@@ -35,9 +34,16 @@ const FileUpload = () => {
   const handleDragLeave = () => setDragging(false);
 
   const handleFileUpload = async () => {
+    if (files.length === 0) {
+      alert("No files selected!");
+      return;
+    }
+
+    let totalUploaded = 0;
+    const totalFiles = files.length;
     const updatedFiles = [...files];
 
-    for (let i = 0; i < updatedFiles.length; i++) {
+    for (let i = 0; i < totalFiles; i++) {
       if (updatedFiles[i].status === "pending") {
         updatedFiles[i].status = "uploading";
         setFiles([...updatedFiles]);
@@ -46,25 +52,33 @@ const FileUpload = () => {
         formData.append("file", updatedFiles[i].file);
 
         try {
-          const response = await axios.post("http://localhost:5000/upload", formData, {
+          await axios.post("http://localhost:5000/upload", formData, {
             headers: { "Content-Type": "multipart/form-data" },
             onUploadProgress: (progressEvent) => {
-              const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              updatedFiles[i].progress = progress;
-              setFiles([...updatedFiles]);
+              const fileProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              const overallProgress = Math.round(
+                ((totalUploaded + fileProgress / 100) / totalFiles) * 100
+              );
+              setOverallProgress(overallProgress);
             },
           });
 
-          console.log("Upload response:", response.data);
           updatedFiles[i].status = "success";
+          totalUploaded++;
         } catch (error) {
           console.error("Error uploading file:", error);
           updatedFiles[i].status = "failed";
         }
 
-        updatedFiles[i].progress = 100; // Ensure progress is complete
         setFiles([...updatedFiles]);
       }
+    }
+
+    if (totalUploaded === totalFiles) {
+      setOverallProgress(100);
+      alert("All files uploaded successfully!");
+    } else {
+      alert("Some files failed to upload.");
     }
   };
 
@@ -105,42 +119,39 @@ const FileUpload = () => {
           <ul>
             {files.map((fileObj, index) => (
               <li key={index} style={styles.fileItem}>
-                <div>
-                  <strong>{fileObj.file.name}</strong> -{" "}
-                  <span
-                    style={{
-                      color:
-                        fileObj.status === "success"
-                          ? "#4CAF50"
-                          : fileObj.status === "uploading"
-                          ? "#2196F3"
-                          : fileObj.status === "failed"
-                          ? "#FF0000"
-                          : "#888",
-                    }}
-                  >
-                    {fileObj.status === "success"
-                      ? "Uploaded"
-                      : fileObj.status === "uploading"
-                      ? `${fileObj.progress}%`
-                      : fileObj.status === "failed"
-                      ? "Failed"
-                      : "Pending"}
-                  </span>
-                </div>
-                {fileObj.status === "uploading" && (
-                  <div style={styles.progressBarContainer}>
-                    <div
-                      style={{
-                        ...styles.progressBar,
-                        width: `${fileObj.progress}%`,
-                      }}
-                    ></div>
-                  </div>
-                )}
+                <strong>{fileObj.file.name}</strong> -{" "}
+                <span
+                  style={{
+                    color:
+                      fileObj.status === "success"
+                        ? "#4CAF50"
+                        : fileObj.status === "uploading"
+                        ? "#2196F3"
+                        : fileObj.status === "failed"
+                        ? "#FF0000"
+                        : "#888",
+                  }}
+                >
+                  {fileObj.status === "success"
+                    ? "Uploaded"
+                    : fileObj.status === "failed"
+                    ? "Failed"
+                    : "Pending"}
+                </span>
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {files.length > 0 && (
+        <div style={styles.progressBarContainer}>
+          <div
+            style={{
+              ...styles.progressBar,
+              width: `${overallProgress}%`,
+            }}
+          ></div>
         </div>
       )}
     </section>
@@ -189,7 +200,7 @@ const styles = {
     height: "8px",
     backgroundColor: "#ddd",
     borderRadius: "4px",
-    marginTop: "5px",
+    marginTop: "20px",
   },
   progressBar: {
     height: "100%",
