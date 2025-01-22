@@ -167,54 +167,7 @@ def pdf_query():
       "if possible try to send the information available in the form of table and texts both as it will properly describe and is visually appealing"
     ]
   },
-  {
-    "role": "model",
-    "parts": [
-      "if a document contains a multi-step process or instruction, break the response into bullet points or numbered steps for better clarity"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "for complex information, ensure to provide a concise summary first and then follow up with more detailed explanations or sections"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "in case of discrepancies between values in the same column, highlight the inconsistency with a note (e.g., 'check discrepancy between values')"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "if the query contains any multi-choice or select options, format the options in a bullet-point list for clarity"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "if the user query is about missing data or empty fields, indicate that as 'data unavailable' and make sure the response clearly states the absence"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "in case of any external links or resources, ensure to mark them clearly as references and ensure the user knows where to find them"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "for scientific, engineering, or technical content, use appropriate units of measurement and scientific notations where necessary"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "for PDF extraction queries, mention the method used (text extraction or OCR) and provide an appropriate message in case OCR wasn't successful"
-    ]
-  }
+  
 ]
 
 
