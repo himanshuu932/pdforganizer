@@ -1,19 +1,19 @@
 import React, { useState, useRef } from "react";
+import axios from "axios";
 import "./styles/FileUpload.css";
 
 const FileUpload = () => {
-  const [files, setFiles] = useState([]); // Store files with status and progress
-  const [currentFile, setCurrentFile] = useState(null); // File currently being uploaded
-  const [progress, setProgress] = useState(0); // Progress for single progress bar
+  const [files, setFiles] = useState([]); // Store files with status, progress
   const [dragging, setDragging] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files).map((file) => ({
       file,
-      status: "pending", // Status can be 'pending', 'uploading', 'success'
+      status: "pending", // Status: 'pending', 'uploading', 'success'
+      progress: 0, // Individual file progress
     }));
-    setFiles((prev) => [...prev, ...selectedFiles]); // Append new files to the list
+    setFiles((prev) => [...prev, ...selectedFiles]); // Append new files
   };
 
   const handleDrop = (e) => {
@@ -22,63 +22,50 @@ const FileUpload = () => {
     const droppedFiles = Array.from(e.dataTransfer.files).map((file) => ({
       file,
       status: "pending",
+      progress: 0,
     }));
     setFiles((prev) => [...prev, ...droppedFiles]);
   };
 
-  const handleDragAreaClick = () => {
-    fileInputRef.current.click();
-  };
-
+  const handleDragAreaClick = () => fileInputRef.current.click();
   const handleDragOver = (e) => {
     e.preventDefault();
     setDragging(true);
   };
-
-  const handleDragLeave = () => {
-    setDragging(false);
-  };
-
-  const uploadFile = (file) => {
-    return new Promise((resolve) => {
-      setCurrentFile(file);
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 10;
-        setProgress(progress);
-        if (progress >= 100) {
-          clearInterval(interval);
-          resolve();
-        }
-      }, 200); // Simulates upload time
-    });
-  };
+  const handleDragLeave = () => setDragging(false);
 
   const handleFileUpload = async () => {
-    for (let i = 0; i < files.length; i++) {
-      if (files[i].status === "pending") {
-        const file = files[i];
-        // Set file to uploading
-        setFiles((prev) =>
-          prev.map((f, index) =>
-            index === i ? { ...f, status: "uploading" } : f
-          )
-        );
+    const updatedFiles = [...files];
 
-        // Simulate upload
-        await uploadFile(file.file);
+    for (let i = 0; i < updatedFiles.length; i++) {
+      if (updatedFiles[i].status === "pending") {
+        updatedFiles[i].status = "uploading";
+        setFiles([...updatedFiles]);
 
-        // Set file to success
-        setFiles((prev) =>
-          prev.map((f, index) =>
-            index === i ? { ...f, status: "success" } : f
-          )
-        );
-        setProgress(0); // Reset progress for next file
+        const formData = new FormData();
+        formData.append("file", updatedFiles[i].file);
+
+        try {
+          const response = await axios.post("http://localhost:5000/upload", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            onUploadProgress: (progressEvent) => {
+              const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              updatedFiles[i].progress = progress;
+              setFiles([...updatedFiles]);
+            },
+          });
+
+          console.log("Upload response:", response.data);
+          updatedFiles[i].status = "success";
+        } catch (error) {
+          console.error("Error uploading file:", error);
+          updatedFiles[i].status = "failed";
+        }
+
+        updatedFiles[i].progress = 100; // Ensure progress is complete
+        setFiles([...updatedFiles]);
       }
     }
-    setCurrentFile(null);
-    alert("All files uploaded!");
   };
 
   return (
@@ -112,48 +99,45 @@ const FileUpload = () => {
         Upload
       </button>
 
-      {/* Single progress bar */}
-      {currentFile && (
-        <div style={styles.uploadStatus}>
-          <p style={styles.currentFile}>
-            Uploading: <strong>{currentFile.name}</strong>
-          </p>
-          <div style={styles.progressBarContainer}>
-            <div
-              style={{
-                ...styles.progressBar,
-                width: `${progress}%`,
-              }}
-            ></div>
-          </div>
-          <p style={styles.progressText}>{progress}%</p>
-        </div>
-      )}
-
-      {/* List of selected files with their status */}
       {files.length > 0 && (
         <div style={styles.fileList}>
           <h3>Selected Files:</h3>
           <ul>
             {files.map((fileObj, index) => (
               <li key={index} style={styles.fileItem}>
-                {fileObj.file.name} -{" "}
-                <span
-                  style={{
-                    color:
-                      fileObj.status === "success"
-                        ? "#4CAF50"
-                        : fileObj.status === "uploading"
-                        ? "#2196F3"
-                        : "#888",
-                  }}
-                >
-                  {fileObj.status === "success"
-                    ? "Uploaded"
-                    : fileObj.status === "uploading"
-                    ? "Uploading"
-                    : "Pending"}
-                </span>
+                <div>
+                  <strong>{fileObj.file.name}</strong> -{" "}
+                  <span
+                    style={{
+                      color:
+                        fileObj.status === "success"
+                          ? "#4CAF50"
+                          : fileObj.status === "uploading"
+                          ? "#2196F3"
+                          : fileObj.status === "failed"
+                          ? "#FF0000"
+                          : "#888",
+                    }}
+                  >
+                    {fileObj.status === "success"
+                      ? "Uploaded"
+                      : fileObj.status === "uploading"
+                      ? `${fileObj.progress}%`
+                      : fileObj.status === "failed"
+                      ? "Failed"
+                      : "Pending"}
+                  </span>
+                </div>
+                {fileObj.status === "uploading" && (
+                  <div style={styles.progressBarContainer}>
+                    <div
+                      style={{
+                        ...styles.progressBar,
+                        width: `${fileObj.progress}%`,
+                      }}
+                    ></div>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -193,37 +177,25 @@ const styles = {
     cursor: "pointer",
     marginTop: "10px",
   },
-  uploadStatus: {
+  fileList: {
     marginTop: "20px",
+    textAlign: "left",
   },
-  currentFile: {
-    marginBottom: "10px",
-    fontSize: "1rem",
+  fileItem: {
+    marginBottom: "15px",
   },
   progressBarContainer: {
     width: "100%",
-    height: "10px",
+    height: "8px",
     backgroundColor: "#ddd",
     borderRadius: "4px",
-    overflow: "hidden",
+    marginTop: "5px",
   },
   progressBar: {
     height: "100%",
     backgroundColor: "#2196F3",
     borderRadius: "4px",
     transition: "width 0.2s ease",
-  },
-  progressText: {
-    marginTop: "5px",
-    fontSize: "0.9rem",
-    color: "#888",
-  },
-  fileList: {
-    marginTop: "20px",
-    textAlign: "left",
-  },
-  fileItem: {
-    marginBottom: "10px",
   },
 };
 
