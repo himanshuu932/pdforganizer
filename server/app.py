@@ -12,7 +12,7 @@ import pytesseract
 logging.basicConfig(level=logging.DEBUG)
 
 # Path to Tesseract executable
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Update path as needed
+pytesseract.pytesseract.tesseract_cmd = r'Tesseract-OCR\tesseract.exe'  # Update path as needed
 
 # Flask App Setup
 app = Flask(__name__)  # Corrected _name_ to __name__
@@ -33,7 +33,7 @@ def extract_text_from_pdf(pdf_path):
         text += page.extract_text()
 
     # Extract text from images within the PDF using OCR
-    images = convert_from_path(pdf_path, dpi=300, poppler_path=r"C:\Program Files\poppler-24.08.0\Library\bin")  # Specify Poppler path if needed
+    images = convert_from_path(pdf_path, dpi=300, poppler_path=r"bin")  # Specify Poppler path if needed
     for i, image in enumerate(images):
         temp_image_path = f"temp_page_{i}.png"
         image.save(temp_image_path, "PNG")
