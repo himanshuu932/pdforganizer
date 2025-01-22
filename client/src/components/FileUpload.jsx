@@ -3,83 +3,70 @@ import axios from "axios";
 import "./styles/FileUpload.css";
 
 const FileUpload = () => {
-  const [files, setFiles] = useState([]); // Store files with status
-  const [overallProgress, setOverallProgress] = useState(0); // Track overall progress
-  const [dragging, setDragging] = useState(false);
+  const [files, setFiles] = useState([]); // Store files with status and progress
+  const [currentFile, setCurrentFile] = useState(null); // File currently being uploaded
+  const [progress, setProgress] = useState(0); // Overall progress
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files).map((file) => ({
       file,
-      status: "pending", // Status: 'pending', 'uploading', 'success'
+      status: "pending", // Status: 'pending', 'uploading', 'success', 'failed'
+      progress: 0, // Individual progress (for display)
     }));
-    setFiles((prev) => [...prev, ...selectedFiles]); // Append new files
+    setFiles((prev) => [...prev, ...selectedFiles]);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    setDragging(false);
     const droppedFiles = Array.from(e.dataTransfer.files).map((file) => ({
       file,
       status: "pending",
+      progress: 0,
     }));
     setFiles((prev) => [...prev, ...droppedFiles]);
   };
 
   const handleDragAreaClick = () => fileInputRef.current.click();
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setDragging(true);
-  };
-  const handleDragLeave = () => setDragging(false);
+  const handleDragOver = (e) => e.preventDefault();
+  const handleDragLeave = () => {};
 
   const handleFileUpload = async () => {
-    if (files.length === 0) {
-      alert("No files selected!");
-      return;
-    }
-
-    let totalUploaded = 0;
-    const totalFiles = files.length;
-    const updatedFiles = [...files];
-
-    for (let i = 0; i < totalFiles; i++) {
-      if (updatedFiles[i].status === "pending") {
-        updatedFiles[i].status = "uploading";
-        setFiles([...updatedFiles]);
+    for (let i = 0; i < files.length; i++) {
+      if (files[i].status === "pending") {
+        setCurrentFile(files[i].file.name);
+        setProgress(0);
 
         const formData = new FormData();
-        formData.append("file", updatedFiles[i].file);
+        formData.append("file", files[i].file);
 
         try {
           await axios.post("http://localhost:5000/upload", formData, {
             headers: { "Content-Type": "multipart/form-data" },
             onUploadProgress: (progressEvent) => {
-              const fileProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              const overallProgress = Math.round(
-                ((totalUploaded + fileProgress / 100) / totalFiles) * 100
+              const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              setProgress(percentage);
+              setFiles((prevFiles) =>
+                prevFiles.map((f, idx) =>
+                  idx === i ? { ...f, progress: percentage } : f
+                )
               );
-              setOverallProgress(overallProgress);
             },
           });
 
-          updatedFiles[i].status = "success";
-          totalUploaded++;
+          files[i].status = "success";
         } catch (error) {
-          console.error("Error uploading file:", error);
-          updatedFiles[i].status = "failed";
+          console.error("Upload failed:", error);
+          files[i].status = "failed";
         }
 
-        setFiles([...updatedFiles]);
+        setFiles([...files]); // Update state
+        setProgress(0); // Reset progress bar for the next file
       }
     }
 
-    if (totalUploaded === totalFiles) {
-      setOverallProgress(100);
-      alert("All files uploaded successfully!");
-    } else {
-      alert("Some files failed to upload.");
-    }
+    setCurrentFile(null);
+    alert("All files uploaded!");
   };
 
   return (
@@ -90,15 +77,10 @@ const FileUpload = () => {
         className="drag-area"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
         onClick={handleDragAreaClick}
-        style={dragging ? styles.dragAreaActive : styles.dragArea}
+        style={styles.dragArea}
       >
-        <p>
-          {dragging
-            ? "Release to upload files"
-            : "Drag & Drop your files here or click to select"}
-        </p>
+        <p>Drag & Drop your files here or click to select</p>
       </div>
 
       <input
@@ -113,45 +95,50 @@ const FileUpload = () => {
         Upload
       </button>
 
+      {currentFile && (
+        <div style={styles.progressContainer}>
+          <p>
+            Uploading: <strong>{currentFile}</strong>
+          </p>
+          <div style={styles.progressBarContainer}>
+            <div style={{ ...styles.progressBar, width: `${progress}%` }}></div>
+          </div>
+          <p>{progress}%</p>
+        </div>
+      )}
+
       {files.length > 0 && (
         <div style={styles.fileList}>
           <h3>Selected Files:</h3>
           <ul>
             {files.map((fileObj, index) => (
               <li key={index} style={styles.fileItem}>
-                <strong>{fileObj.file.name}</strong> -{" "}
-                <span
-                  style={{
-                    color:
-                      fileObj.status === "success"
-                        ? "#4CAF50"
-                        : fileObj.status === "uploading"
-                        ? "#2196F3"
-                        : fileObj.status === "failed"
-                        ? "#FF0000"
-                        : "#888",
-                  }}
-                >
-                  {fileObj.status === "success"
-                    ? "Uploaded"
-                    : fileObj.status === "failed"
-                    ? "Failed"
-                    : "Pending"}
-                </span>
+                <div>
+                  <strong>{fileObj.file.name}</strong> -{" "}
+                  <span
+                    style={{
+                      color:
+                        fileObj.status === "success"
+                          ? "#4CAF50"
+                          : fileObj.status === "uploading"
+                          ? "#2196F3"
+                          : fileObj.status === "failed"
+                          ? "#FF0000"
+                          : "#888",
+                    }}
+                  >
+                    {fileObj.status === "success"
+                      ? "Uploaded"
+                      : fileObj.status === "uploading"
+                      ? `${fileObj.progress}%`
+                      : fileObj.status === "failed"
+                      ? "Failed"
+                      : "Pending"}
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
-        </div>
-      )}
-
-      {files.length > 0 && (
-        <div style={styles.progressBarContainer}>
-          <div
-            style={{
-              ...styles.progressBar,
-              width: `${overallProgress}%`,
-            }}
-          ></div>
         </div>
       )}
     </section>
@@ -171,10 +158,17 @@ const styles = {
     fontSize: "2rem",
     marginBottom: "20px",
   },
-  dragAreaActive: {
-    border: "2px dashed #4CAF50",
-    backgroundColor: "#e8f5e9",
-    color: "#4CAF50",
+  dragArea: {
+    width: "100%",
+    height: "150px",
+    border: "2px dashed #bbb",
+    borderRadius: "8px",
+    backgroundColor: "#f4f4f4",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    color: "#888",
+    cursor: "pointer",
   },
   input: {
     display: "none",
@@ -188,25 +182,29 @@ const styles = {
     cursor: "pointer",
     marginTop: "10px",
   },
-  fileList: {
+  progressContainer: {
     marginTop: "20px",
-    textAlign: "left",
-  },
-  fileItem: {
-    marginBottom: "15px",
+    textAlign: "center",
   },
   progressBarContainer: {
     width: "100%",
     height: "8px",
     backgroundColor: "#ddd",
     borderRadius: "4px",
-    marginTop: "20px",
+    overflow: "hidden",
+    marginTop: "10px",
   },
   progressBar: {
     height: "100%",
     backgroundColor: "#2196F3",
-    borderRadius: "4px",
-    transition: "width 0.2s ease",
+    transition: "width 0.3s ease",
+  },
+  fileList: {
+    marginTop: "20px",
+    textAlign: "left",
+  },
+  fileItem: {
+    marginBottom: "10px",
   },
 };
 
