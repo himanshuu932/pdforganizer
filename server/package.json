@@ -4,7 +4,11 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "concurrently \"npm run server\" \"npm run client\" ",
+    
+    "client": "python app.py ",
+    "server": "nodemon index.js "
+   
   },
   "author": "",
   "license": "ISC",
