@@ -5,7 +5,7 @@ const app = express();
 const port = 5000;
 const mongoose = require("mongoose");
 const multer = require("multer");
-const TextData = require('./models/text');
+const {TextData,User} = require('./models/text');
 const fs = require('fs');
 const path = require('path');
 require("dotenv").config();
@@ -14,8 +14,9 @@ const session = require("express-session");
 const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
 const { google } = require("googleapis");
 const cookieParser = require("cookie-parser");
-const vision = require('@google-cloud/vision');
-const pdfToPng = require('pdf-to-png-converter');
+const bodyParser = require('body-parser');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
 
 app.use(cors({
   origin: "http://localhost:3000",
@@ -27,7 +28,7 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch(err => console.error("❌ MongoDB connection error:", err));
 
-// Enable JSON parsing
+// Enable JSON parsingy
 app.use(express.json());
 app.use(cookieParser());
 app.use(session({
@@ -43,12 +44,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 // User Schema
-const userSchema = new mongoose.Schema({
-  googleId: String,
-  name: String,
-});
-const User = mongoose.model("User", userSchema);
 
+let Usergoogleid='';
 // Multer configuration
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -62,10 +59,14 @@ passport.use(new GoogleStrategy({
     console.log("🔄 Google Profile Received:", profile.displayName);
     const existingUser = await User.findOne({ googleId: profile.id });
     if (existingUser) {
+      Usergoogleid=existingUser.googleId;
       console.log("✅ User found:", existingUser.name);
+      store();
       return done(null, existingUser);
     }
     const newUser = await User.create({ googleId: profile.id, name: profile.displayName });
+    Usergoogleid=profile.id;
+    store();
     console.log("✅ New User Created:", newUser.name);
     done(null, newUser);
   } catch (error) {
@@ -238,7 +239,12 @@ app.delete('/delete', async (req, res) => {
             return { fileId, status: "error", message: "File not in specified folder" };
           }
 
+          // Delete the file from Google Drive
           await drive.files.delete({ fileId });
+
+          // Delete the corresponding TextData entry from MongoDB
+          await TextData.deleteOne({ fileId });
+
           return { fileId, status: "success" };
         } catch (err) {
           console.error(`Error deleting file with ID ${fileId}:`, err.message);
@@ -253,7 +259,7 @@ app.delete('/delete', async (req, res) => {
     });
   } catch (err) {
     console.error("Error during bulk deletion:", err.message);
-    res.status(500).send("Error deleting files from Google Drive");
+    res.status(500).send("Error deleting files from Google Drive and MongoDB");
   }
 });
 
@@ -275,7 +281,7 @@ const auth = new google.auth.GoogleAuth({
 
  
   // Function to fetch file from Google Drive
-  const fetchFile = async (fileId) => {
+const fetchFile = async (fileId) => {
     const drive1 = google.drive({ version: 'v3', auth });
     return new Promise((resolve, reject) => {
       drive1.files.get(
@@ -302,13 +308,46 @@ const auth = new google.auth.GoogleAuth({
     });
   };
   
-  // Use Vision API to analyze PDF and extract text
+const { PDFDocument } = require('pdf-lib');
+
+
+const splitPdf = async (pdfPath, maxPages = 15) => {
+  const pdfBytes = fs.readFileSync(pdfPath);
+  const pdfDoc = await PDFDocument.load(pdfBytes);
+
+  const totalPages = pdfDoc.getPageCount();
+  const chunks = [];
+
+  for (let i = 0; i < totalPages; i += maxPages) {
+    const chunk = await PDFDocument.create();
+    const endPage = Math.min(i + maxPages, totalPages);
+
+    for (let j = i; j < endPage; j++) {
+      const [copiedPage] = await chunk.copyPages(pdfDoc, [j]);
+      chunk.addPage(copiedPage);
+    }
+
+    const chunkBytes = await chunk.save();
+
+    // Fix the file path by using the correct path without duplication
+    const chunkPath = path.join( `./chunk_${Math.floor(i / maxPages) + 1}.pdf`);
+    fs.writeFileSync(chunkPath, chunkBytes);
+    chunks.push(chunkPath);
+  }
+
+  return chunks;
+};
+
+
+// Usage
+
+// Use Vision API to analyze PDF and extract text
   const {DocumentProcessorServiceClient} = require('@google-cloud/documentai');
 
   
   // Create a client
   const client = new DocumentProcessorServiceClient({
-    keyFilename: 'ok.json',
+    keyFilename: './okk.json',
   });
   
   const processPdfWithDocumentAI = async (pdfPath) => {
@@ -369,50 +408,150 @@ const auth = new google.auth.GoogleAuth({
   
   // Route to handle PDF processing and text extraction
   app.get('/process-pdf', async (req, res) => {
-    const { fileId } = req.query;
+    const { fileId, filename } = req.query;
+  
     if (!fileId) {
-      return res.status(400).json({ message: 'File ID is required.' });
+      return res.status(400).json({ message: 'File ID and User Google ID are required.' });
     }
   
     try {
+      // Check if the user exists in the database
+      const user = await User.findOne({ googleId: Usergoogleid });
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found.' });
+      }
+  
+      // Check if the TextData with the same fileId already exists in the database
+      const existingTextData = await TextData.findOne({ fileId });
+  
+      if (existingTextData) {
+        // If the fileId already exists, return a message without extracting
+        return res.json({
+          message: 'PDF has already been processed and text extracted previously.',
+          text: existingTextData.text,
+        });
+      }
+  
       // Fetch the PDF file from Google Drive
       const pdfPath = await fetchFile(fileId);
   
-      // Analyze the PDF with Vision API
-      const extractedText = await processPdfWithDocumentAI('./downloaded-file.pdf');
+      // Split the PDF into smaller chunks (15 pages or fewer)
+      const chunkPaths = await splitPdf('./downloaded-file.pdf');
   
-      // Send response
+      let extractedText = `filename-${filename}\\nfileIdstarts-${fileId}-fileIdends\\n`;
+  
+      for (let chunkPath of chunkPaths) {
+        // Analyze the chunk with Document AI
+        const chunkText = await processPdfWithDocumentAI(chunkPath);
+        extractedText += chunkText.replace(/\n/g, '\\n') + '\\n';
+  
+        // Delete the chunk file after processing it
+        fs.unlink(chunkPath, (err) => {
+          if (err) {
+            console.error(`Error deleting chunk file: ${chunkPath}`, err);
+          } else {
+            console.log(`Chunk file deleted: ${chunkPath}`);
+          }
+        });
+      }
+  
+      // Final processed text (with proper newlines replaced)
+      extractedText = extractedText.replace(/\n/g, '\\n') + '\n';
+  
+      // Create new TextData document with a reference to the user
+      const newTextData = new TextData({
+        text: extractedText,
+        filename: req.query.filename, // Use the filename from query params
+        fileId: fileId,
+        user: user._id, // Reference the user
+      });
+  
+      // Save the new TextData document
+      await newTextData.save();
+  
+      // Send the response with the combined extracted text
       res.json({
-        message: 'PDF processed and text extracted successfully.ok',
+        message: 'PDF processed and text extracted successfully.',
         text: extractedText,
       });
+  
     } catch (error) {
       console.error('Error processing PDF:', error);
       res.status(500).json({ message: `Error processing PDF: ${error}` });
     }
+    finally{
+      store();
+    }
   });
+
+
+// Function to extract and return an array of text from all documents
+async function findtext() {
+  try {
+      // Find the user by Google ID
+      const user = await User.findOne({ googleId: Usergoogleid });
+
+      if (!user) {
+          throw new Error('User not found.');
+      }
+
+      // Retrieve all TextData documents where the user field matches the user's ID
+      const textDataDocs = await TextData.find({ user: user._id });
+
+      if (textDataDocs.length === 0) {
+          throw new Error('No documents found for this user.');
+      }
+
+      // Map over the documents to extract and return the text as an array
+      const textArray = textDataDocs.map(doc => doc.text.trim()); // Trim any extra spaces or newlines
+
+      return textArray; // Return the array of strings
+
+  } catch (error) {
+      console.error('Error retrieving text array:', error);
+      throw new Error(`Error retrieving text array: ${error.message}`);
+  }
+}
+
   
 
+
+
+
+const store = async () => {
+  try {
+    const textDataArray = await TextData.find();
+    if (textDataArray.length === 0) {
+      console.log("No files in the storage");
+      return;
+    }
+
+    const texts =await  findtext();
+   
+    axios.post('http://pythonpdf.vercel.app/store-texts', {
+      texts: texts,
+  }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  });
+  
+    
+  } catch (error) {
+    console.error("Error during store operation:", error);
+  }
+};
 
 app.post('/submit-query', async (req, res) => {
   const { query } = req.body;
   console.log(query);
-
+  store();
   try {
-    // Fetch all objects (documents) in the TextData collection
-    const textDataArray = await TextData.find(); // Retrieve all documents
-
-    if (textDataArray.length === 0) {
-      return res.json({ answer: "No files in the storage" });
-    }
-
-    // Extract the text field from each document in the collection
-    const texts = textDataArray.map((doc) => doc.text);
-  
-    // Send request to Flask API with the query and texts array
-    const response = await axios.post('http://127.0.0.1:5000/pdf-query', {
+    
+    const response = await axios.post('http://pythonpdf.vercel.app/pdf-query', {
       query: query,
-      texts: texts,
+      
     });
 
     // Return the response from the Flask API to the client
@@ -423,7 +562,10 @@ app.post('/submit-query', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+  
+
 
 app.listen(port, () => {
   console.log(`Node.js server running at http://localhost:${port}`);
+ 
 });

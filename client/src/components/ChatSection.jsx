@@ -146,6 +146,7 @@ const checkAndRenderResult = (data) => {
   } else {
     beforeLtkgya = data.trim(); // If no marker is found, treat all as beforeLtkgya
   }
+  
 
   // Remove 'sources-' from afterLtkgya if it exists
   if (afterLtkgya.startsWith('sources-')) {
@@ -177,19 +178,37 @@ const checkAndRenderResult = (data) => {
   // Process the content after /ltkgya- for sources
   let sourcesHtml = '';
   if (afterLtkgya) {
-    const files = afterLtkgya.split(',').map((file) => file.trim());
+    console.log("afterLtkgya\n" + afterLtkgya);
+  
+    const ids = afterLtkgya.indexOf('Ids');
+    const beforeids = afterLtkgya.slice(0, ids).trim(); // Text before /Ids
+    const afterids = afterLtkgya.slice(ids + 'Ids'.length).trim(); // Skip '/Ids'
+  
+    console.log("beforeids\n" + beforeids);
+    console.log("afterids\n" + afterids);
+  
+    const files = beforeids.split(',').map((file) => file.trim());
+    const fileIds = afterids.split(',').map((id) => id.trim());
+  
+    // Ensure we only process valid PDF files and match them with their IDs
     const pdfFiles = files.filter((file) => file.endsWith('.pdf'));
-
-    if (pdfFiles.length > 0) {
+  
+    if (pdfFiles.length > 0 && pdfFiles.length === fileIds.length) {
       sourcesHtml += '<div class="sources-text">Sources:</div><ul>';
-      pdfFiles.forEach((file) => {
+      pdfFiles.forEach((file, index) => {
+        console.log(file);
+        const fileId = fileIds[index]; // Match each file with its corresponding ID
         sourcesHtml += `
-          <li><a href="http://localhost:5000/files/${file}" target="_blank">${file}</a></li>
+          <li><a href="https://drive.google.com/file/d/${fileId}/view" target="_blank">${file}</a></li>
         `;
       });
       sourcesHtml += '</ul>';
+    } else {
+      console.error('Mismatch between file names and file IDs or no valid PDF files found.');
     }
   }
+  
+  
 
   // Render the final structure
   return (

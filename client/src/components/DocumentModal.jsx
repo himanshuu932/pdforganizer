@@ -65,7 +65,6 @@ const DocumentModal = ({ setActiveScreen }) => {
       setMessage(msg || "Failed to connect to Google Drive.");
     }
   }, []);
-
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
       const query = searchQuery.toLowerCase();
@@ -77,6 +76,34 @@ const DocumentModal = ({ setActiveScreen }) => {
       setFilteredFiles(files);
     }
   }, [searchQuery, files]);
+  useEffect(() => {
+   pp();
+  }, [files]);
+
+const pp= async ()=>{
+
+  const pdfFiles = files.filter((file) => file.name.endsWith('.pdf'));
+  
+      if (pdfFiles.length === 0) {
+        setMessage("No PDF files found.");
+      } else {
+        // Process PDFs sequentially
+        for (const file of pdfFiles) {
+          try {
+            const response = await axios.get("http://localhost:5000/process-pdf", {
+              params: { fileId: file.id, filename: file.name }
+            });
+            
+            // Log the extracted text for the current file
+            console.log(`Extracted text for file ${file.name}:`, response.data.text);
+          } catch (err) {
+            console.error(`Error processing PDF for file ${file.name}:`, err);
+          }
+        }
+      
+        setMessage("PDF files processed successfully.");
+      }
+}
 
   const handleSelectAll = () => {
     const allFileIds = filteredFiles.map((file) => file.id);
@@ -112,25 +139,8 @@ const DocumentModal = ({ setActiveScreen }) => {
       setMessage(response.data.message || "Files fetched successfully.");
   
       // Filter PDF files
-      const pdfFiles = fetchedFiles.filter((file) => file.name.endsWith('.pdf'));
-  
-      if (pdfFiles.length === 0) {
-        setMessage("No PDF files found.");
-      } else {
-        // Process PDFs concurrently
-        const pdfProcessingPromises = pdfFiles.map((file) =>
-          axios.get("http://localhost:5000/process-pdf", { params: { fileId: file.id } })
-            .then((response) => {
-              console.log(`Extracted text for file ${file.name}:`, response.data.text);
-            })
-            .catch((err) => {
-              console.error(`Error processing PDF for file ${file.name}:`, err);
-            })
-        );
-  
-        await Promise.all(pdfProcessingPromises); // Wait for all PDF processing to complete
-        setMessage("PDF files processed successfully.");
-      }
+      
+      
     } catch (err) {
       console.error("❌ Error fetching files:", err);
       setMessage("Failed to fetch files. Please try again.");

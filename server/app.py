@@ -1,105 +1,61 @@
-import os
-import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
-from PyPDF2 import PdfReader
 import logging
-from pdf2image import convert_from_path
-import pytesseract
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Path to Tesseract executable
-pytesseract.pytesseract.tesseract_cmd = r'Tesseract-OCR\tesseract.exe'  # Update path as needed
-
 # Flask App Setup
-app = Flask(__name__)  # Corrected _name_ to __name__
-
-# Enable CORS for all routes
+app = Flask(__name__)
 CORS(app)
+
+# Storage for the most recently stored texts
+texts_storage = []
 
 # Configure the GenAI API
 genai.configure(api_key="AIzaSyBZM6dTMcLhZ-nY7Uetow2JbxTsAP4lqxg")
 
-# Function to extract text from PDF (including OCR)
-def extract_text_from_pdf(pdf_path):
-    text = ""
-    reader = PdfReader(pdf_path)
-    
-    # Extract text from the textual content of the PDF
-    for page in reader.pages:
-        text += page.extract_text()
 
-    # Extract text from images within the PDF using OCR
-    images = convert_from_path(pdf_path, dpi=300, poppler_path=r"bin")  # Specify Poppler path if needed
-    for i, image in enumerate(images):
-        temp_image_path = f"temp_page_{i}.png"
-        image.save(temp_image_path, "PNG")
-        text += "\n" + pytesseract.image_to_string(temp_image_path)  # OCR to extract text from image
-        os.remove(temp_image_path)  # Clean up the temporary image file
-
-    return text
-
-# Function to download PDF from a URL
-def download_pdf(pdf_url):
-    response = requests.get(pdf_url)
-    if response.status_code == 200:
-        filename = pdf_url.split("/")[-1]  # Extract filename from URL
-        with open(filename, "wb") as f:
-            f.write(response.content)
-        return filename
-    else:
-        raise Exception(f"Failed to download PDF. Status code: {response.status_code}")
-
-# Route to extract text from PDF
-# Route to extract text from PDF
-@app.route('/extract', methods=['POST'])
-def extract_text():
+# Route to store texts
+@app.route('/store-texts', methods=['POST'])
+def store_texts():
+    global texts_storage
     try:
         # Get the JSON data from the request
         data = request.get_json()
-        pdf_path = data.get('file_path')
+        texts = data.get('texts', [])
 
-        if not pdf_path:
-            return jsonify({"error": "'file_path' is required."}), 400
+        if not texts:
+            return jsonify({"error": "'texts' field is required."}), 400
 
-        # Check if the file path is a URL or local file path
-        if pdf_path.startswith("http://") or pdf_path.startswith("https://"):
-            # If the path is a URL, download the PDF
-            pdf_path = download_pdf(pdf_path)
-        
-        raw_text = f'filename-{pdf_path}'
-        raw_text += '\\n'
-        # Extract text from the uploaded or downloaded PDF
-        extracted_text = extract_text_from_pdf(pdf_path)
-        
-        if extracted_text:
-            raw_text += extracted_text.replace('\n', '\\n') + '\n'
-        
-        # Return the extracted text
-        return jsonify({"text": raw_text})
+        # Overwrite the global storage with the new texts
+        texts_storage = texts
+
+        return jsonify({"message": "Texts stored successfully."})
 
     except Exception as e:
-        logging.error(f"Error extracting text from PDF: {e}")
+        logging.error(f"Error storing texts: {e}")
         return jsonify({"error": str(e)}), 500
 
-# Route to query text with GenAI
+
+# Route to query the texts
 @app.route('/pdf-query', methods=['POST'])
 def pdf_query():
     try:
         # Get the JSON data from the request
         data = request.get_json()
-        texts = data.get('texts', [])
         user_query = data.get('query')
 
-        if not texts or not user_query:
-            return jsonify({"error": "Both 'texts' and 'query' are required."}), 400
+        if not texts_storage:
+            return jsonify({"error": "No texts stored. Please use /store-texts to store texts first."}), 400
+
+        if not user_query:
+            return jsonify({"error": "'query' field is required."}), 400
 
         # Configure the generation settings
         generation_config = {
-            "temperature": 2,
+            "temperature": 0.9,
             "top_p": 0.95,
             "top_k": 40,
             "max_output_tokens": 8192,
@@ -112,33 +68,49 @@ def pdf_query():
             generation_config=generation_config,
         )
 
-        # Add texts and query to chat history
+        # Prepare the chat history
         chat_history = [
-            { 
-                "role": "user", 
-                "parts": texts 
-            },
-            { 
-                "role": "user", 
-                "parts": [user_query] 
-            },
-            { 
-                "role": "model", 
-                "parts": [
-                    'also use only single * for bold',                 
-      "example how to send a table",
-      "make sure to add gap in between for those columns which does not have data in last row for some but has for others. For example, if 'total' is in the last column, then keep previous columns empty",
-      "table-starts\nBasic Sciences & Maths (BSM)|4\nEngineering Fundamentals (EF)|4\nProfessional Skill (PS)|0\nProgram Core (PC)|10\nManagement (M)|0\nHumanities & Social Science (HSS)|2\nHumanities & Social Science Elective|0\nProject (P)|0\nSeminar (S)|0\nIndustrial Practice (IP) / Industrial Elective (IE)|0/0\nProgram link basic science and engineering courses|2\nProgram Electives (PE)|0\nOpen Electives (OE)|0\nTotal|||22 table-ends",
-        "while replying for a query related to table always send table data enclosed between table-starts and table-ends",
-        "when replying to general conversation talk normally",
-         "when asked who are you? You are peep. An assistant developed by team Bludgers for queries of pdf. Don’t include sources-<filename>",
-        "Always append filename/s in the answer related to information in the last as '/ltkgya-sources' then followed by the filename or filenames if multiple separated by a comma, don’t use * after sources the file name is one that is of extension .pdf don’t include the text filename-uploads/",
-        "if possible try to send the information available in the form of table and texts both as it will properly describe and is visually appealing"
-    ]
-  },
-  
-]
-
+            {"role": "user", "parts": texts_storage},
+            {"role": "user", "parts": [user_query]},
+            {"role": "model", "parts": ["When replying to general conversation, talk normally."]},
+            {"role": "model", "parts": ["For queries related to tables, always respond in Markdown table format enclosed between table-starts and table-ends."]},
+            {"role": "model", "parts": ["If the query specifies a language, respond in that language."]},
+            {"role": "model", "parts": ["For random facts or jokes, include one based on the query type."]},
+            {"role": "model", "parts": ["Keep responses concise and user-friendly."]},
+            {"role": "model", "parts": ["For greeting queries, include a greeting message based on the user input."]},
+            {"role": "model", "parts": ["For requests related to time, provide the current time in the user’s preferred timezone."]},
+            {"role": "model", "parts": ["For requests related to weather, provide the current weather conditions in the user’s preferred location."]},
+            {"role": "model", "parts": ["Always give answers from the document provided."]},
+            {"role": "model", "parts": ['Do not include "filename-uploads/" or "/" in the sources.']},
+            {"role": "model", "parts": ["You are an assistant developed by team Bludgers for queries of documents mainly."]},
+            {"role": "model", "parts": ['You can ask for document context by including "document" in your query.']},
+            {"role": "model", "parts": [
+                "For every new query asked, also reform your answers on previous requests and responses, and keep consistency in chat. "
+                "If previous questions were of any topic and a question came in which you cannot decide any topic, then answer based on previous topics."
+            ]},
+            {"role": "model", "parts": [
+                "Always append filename/s in the answer related to information in the last as '/ltkgya-sources' then followed by the filename or filenames separated by commas "
+                "if multiple, and then followed by some spaces then '/Ids' then file id or fileIds separated by commas if multiple. Don’t use * after sources. "
+                "The filename is one that is of extension .pdf. Don’t include the text filename-uploads/."
+            ]},
+            {"role": "model", "parts": [
+                "Example of how to send a table: For queries related to tables, always send table data enclosed between table-starts and table-ends. Example:\n\n"
+                "Example-table-starts\nBasic Sciences & Maths (BSM)|4\nEngineering Fundamentals (EF)|4\nProfessional Skill (PS)|0\nProgram Core (PC)|10\nManagement (M)|0\nHumanities & Social Science (HSS)|2\nHumanities & Social Science Elective|0\nProject (P)|0\nSeminar (S)|0\nIndustrial Practice (IP) / Industrial Elective (IE)|0/0\nProgram link basic science and engineering courses|2\nProgram Electives (PE)|0\nOpen Electives (OE)|0\nTotal|||22\ntable-ends"
+            ]},
+            {"role": "model", "parts": ["Relevant document context:\n\n" + "\n".join(texts_storage)]},
+            {"role": "model", "parts": ["Also use only single * for bold."]},
+            {"role": "model", "parts": [
+                "Example of how to send a table:", 
+                "Make sure to add gaps in between for columns that don't have data in the last row for some, but do for others. For example, if 'Total' is in the last column, keep previous columns empty.",
+                "table-starts\nBasic Sciences & Maths (BSM)|4\nEngineering Fundamentals (EF)|4\nProfessional Skill (PS)|0\nProgram Core (PC)|10\nManagement (M)|0\nHumanities & Social Science (HSS)|2\nHumanities & Social Science Elective|0\nProject (P)|0\nSeminar (S)|0\nIndustrial Practice (IP) / Industrial Elective (IE)|0/0\nProgram link basic science and engineering courses|2\nProgram Electives (PE)|0\nOpen Electives (OE)|0\nTotal|||22\ntable-ends"
+            ]},
+            {"role": "model", "parts": ["While replying to a query related to a table, always send table data enclosed between table-starts and table-ends."]},
+            {"role": "model", "parts": ["When replying to general conversation, talk normally."]},
+            {"role": "model", "parts": ["When asked 'Who are you?', respond: 'You are Peep. An assistant developed by team Bludgers for queries of PDFs. Don't include sources-<filename>."]},
+            {"role": "model", "parts": ["Always append filenames in the answer related to information in the last as '/ltkgya-sources' followed by the filename or filenames (if multiple), separated by commas. Don't use * after sources. The filenames are those with the '.pdf' extension, and don't include the text 'filename-uploads/'."]},
+            {"role": "model", "parts": ["If relevant, include tables in the reply.", "While sending links, make them clickable."]},
+            {"role": "user", "parts": [user_query]},
+        ]
 
         # Start the chat session
         chat_session = model.start_chat(history=chat_history)
@@ -153,5 +125,6 @@ def pdf_query():
         logging.error(f"Error querying text: {e}")
         return jsonify({"error": str(e)}), 500
 
-if __name__ == '__main__':  # Corrected _name_ to __name__
+
+if __name__ == '__main__':
     app.run(debug=False)
