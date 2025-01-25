@@ -23,6 +23,8 @@ app.use(cors({
   credentials: true,
 }));
 
+const credentialsJson = process.env.JSON;
+const credentials = JSON.parse(credentialsJson);
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ Connected to MongoDB"))
@@ -275,7 +277,7 @@ app.get("/auth/google/callback", passport.authenticate("google", { failureRedire
 // Download file from Google Drive
 
 const auth = new google.auth.GoogleAuth({
-    keyFile: './okk.json',  // Use the path to your credentials
+     credentials: credentials,  // Use the path to your credentials
     scopes: ['https://www.googleapis.com/auth/drive.readonly'],
   });
 
@@ -347,7 +349,7 @@ const splitPdf = async (pdfPath, maxPages = 15) => {
   
   // Create a client
   const client = new DocumentProcessorServiceClient({
-    keyFilename: './okk.json',
+    credentials: credentials,
   });
   
   const processPdfWithDocumentAI = async (pdfPath) => {
