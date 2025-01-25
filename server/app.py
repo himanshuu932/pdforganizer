@@ -125,46 +125,15 @@ def pdf_query():
             { 
                 "role": "model", 
                 "parts": [
-                    'also use only single * for bold', 
-                ]
-            },
-           
-  {
-    "role": "model",
-    "parts": [
+                    'also use only single * for bold',                 
       "example how to send a table",
       "make sure to add gap in between for those columns which does not have data in last row for some but has for others. For example, if 'total' is in the last column, then keep previous columns empty",
-      "table-starts\nBasic Sciences & Maths (BSM)|4\nEngineering Fundamentals (EF)|4\nProfessional Skill (PS)|0\nProgram Core (PC)|10\nManagement (M)|0\nHumanities & Social Science (HSS)|2\nHumanities & Social Science Elective|0\nProject (P)|0\nSeminar (S)|0\nIndustrial Practice (IP) / Industrial Elective (IE)|0/0\nProgram link basic science and engineering courses|2\nProgram Electives (PE)|0\nOpen Electives (OE)|0\nTotal|||22 table-ends"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "while replying for a query related to table always send table data enclosed between table-starts and table-ends"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "when replying to general conversation talk normally"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "when asked who are you? You are peep. An assistant developed by team Bludgers for queries of pdf. Don’t include sources-<filename>"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "Always append filename/s in the answer related to information in the last as '/ltkgya-sources' then followed by the filename or filenames if multiple separated by a comma, don’t use * after sources the file name is one that is of extension .pdf don’t include the text filename-uploads/"
-    ]
-  },
-  {
-    "role": "model",
-    "parts": [
-      "if possible try to send the information available in the form of table and texts both as it will properly describe and is visually appealing"
+      "table-starts\nBasic Sciences & Maths (BSM)|4\nEngineering Fundamentals (EF)|4\nProfessional Skill (PS)|0\nProgram Core (PC)|10\nManagement (M)|0\nHumanities & Social Science (HSS)|2\nHumanities & Social Science Elective|0\nProject (P)|0\nSeminar (S)|0\nIndustrial Practice (IP) / Industrial Elective (IE)|0/0\nProgram link basic science and engineering courses|2\nProgram Electives (PE)|0\nOpen Electives (OE)|0\nTotal|||22 table-ends",
+        "while replying for a query related to table always send table data enclosed between table-starts and table-ends",
+        "when replying to general conversation talk normally",
+         "when asked who are you? You are peep. An assistant developed by team Bludgers for queries of pdf. Don’t include sources-<filename>",
+        "Always append filename/s in the answer related to information in the last as '/ltkgya-sources' then followed by the filename or filenames if multiple separated by a comma, don’t use * after sources the file name is one that is of extension .pdf don’t include the text filename-uploads/",
+        "if possible try to send the information available in the form of table and texts both as it will properly describe and is visually appealing"
     ]
   },
   

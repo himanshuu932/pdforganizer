@@ -1,0 +1,119 @@
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .input-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  .folder-link-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-right: 10px;
+    max-width: 400px;
+  }
+  
+  .connect-drive-button {
+    padding: 8px 15px;
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .connect-drive-button:hover {
+    background-color: #005bb5;
+  }
+  
+  .button-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  
+  .show-files-button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .show-files-button:hover {
+    background-color: #218838;
+  }
+  
+  .status-row {
+    margin-bottom: 20px;
+  }
+  
+  .connection-status-label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .status-message {
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  .files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+  }
+  
+  .file-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .file-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .file-icon-img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+  }
+  
+  .file-name-link {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    word-wrap: break-word;
+    transition: color 0.2s ease;
+  }
+  
+  .file-name-link:hover {
+    color: #0073e6;
+  }
+  

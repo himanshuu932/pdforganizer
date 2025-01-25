@@ -155,7 +155,7 @@ const checkAndRenderResult = (data) => {
   // Remove symbols /, \, *, and filename-uploads\ from afterLtkgya
   afterLtkgya = afterLtkgya.replace(/sources/g,'')
     .replace(/[\/\\\*]/g, '') // Remove /, \, *
-    .replace(/filename-uploads\\/g, ''); // Remove all instances of filename-uploads\
+    .replace(/filename-uploads\\/g, '').replace(/\*\*/g, ''); // Remove all instances of filename-uploads\
 
   // Process the content before /ltkgya- for table handling
   const tableData = handleTable(beforeLtkgya);
