@@ -101,7 +101,8 @@ const FileUpload = () => {
             Uploading: <strong>{currentFile}</strong>
           </p>
           <div style={styles.progressBarContainer}>
-            <div style={{ ...styles.progressBar, width: `${progress}%` }}></div>
+          <div style={{ ...styles.progressBar, width: `${progress}%` }}></div>
+
           </div>
           <p>{progress}%</p>
         </div>
@@ -116,25 +117,26 @@ const FileUpload = () => {
                 <div>
                   <strong>{fileObj.file.name}</strong> -{" "}
                   <span
-                    style={{
-                      color:
-                        fileObj.status === "success"
-                          ? "#4CAF50"
-                          : fileObj.status === "uploading"
-                          ? "#2196F3"
-                          : fileObj.status === "failed"
-                          ? "#FF0000"
-                          : "#888",
-                    }}
-                  >
-                    {fileObj.status === "success"
-                      ? "Uploaded"
-                      : fileObj.status === "uploading"
-                      ? `${fileObj.progress}%`
-                      : fileObj.status === "failed"
-                      ? "Failed"
-                      : "Pending"}
-                  </span>
+  style={{
+    color:
+      fileObj.status === "success"
+        ? "#4CAF50"
+        : fileObj.status === "uploading"
+        ? "#2196F3"
+        : fileObj.status === "failed"
+        ? "#FF0000"
+        : "#888",
+  }}
+>
+  {fileObj.status === "success"
+    ? "Uploaded"
+    : fileObj.status === "uploading"
+    ? `${fileObj.progress}%`
+    : fileObj.status === "failed"
+    ? "Failed"
+    : "Pending"}
+</span>
+
                 </div>
               </li>
             ))}
