@@ -383,7 +383,7 @@ const auth = new google.auth.GoogleAuth({
   
       // Send response
       res.json({
-        message: 'PDF processed and text extracted successfully.',
+        message: 'PDF processed and text extracted successfully.ok',
         text: extractedText,
       });
     } catch (error) {
