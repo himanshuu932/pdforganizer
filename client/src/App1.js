@@ -6,12 +6,12 @@ import ChatSection from "./components/ChatSection";
 import "./App.css";
 import FileUpload from "./components/FileUpload";
 import AboutUs from "./components/AboutUs";
-
-function App() {
+import Home from "./components/Home";
+function Home1({ user, setUser }) {
   // Check localStorage for the saved activeScreen value or default to 1
   const savedScreen = localStorage.getItem("activeScreen");
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [activeScreen, setActiveScreen] = useState(savedScreen ? parseInt(savedScreen) : 1);
+  const [activeScreen, setActiveScreen] = useState(savedScreen?parseInt(savedScreen):1);
 
   // Save activeScreen to localStorage whenever it changes
   useEffect(() => {
@@ -36,13 +36,14 @@ function App() {
   return (
     <div className="app">
       {/* Navbar */}
-      <Navbar setActiveScreen={setActiveScreen} />
+      <Navbar setActiveScreen={setActiveScreen} user={user} setUser={setUser} />
       {/* Start Screen */}
       <div className="start-screen-section">
         {activeScreen === 1 && <StartScreen  setActiveScreen={setActiveScreen} />}
         {activeScreen === 2 && <DocumentModal setActiveScreen={setActiveScreen} />}
         {activeScreen === 4 && <FileUpload />}
         {activeScreen === 5 && <AboutUs />}
+       {/* {activeScreen === 6 && <Home user={user} setUser={setUser} />}*/}
 
         {activeScreen === 3 && <ChatSection setActiveScreen={setActiveScreen} />}
       </div>
@@ -50,4 +51,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home1;
