@@ -8,6 +8,11 @@
   align-items: center;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   opacity: 1; /* Full opacity for navbar content */
+  width: 100%; /* Ensure navbar takes full width of the screen */
+  position: fixed; /* Optional: If you want the navbar to stay fixed at the top */
+  top: 0; /* Optional: Keeps it at the top */
+  left: 0; /* Optional: Align it to the left edge */
+  z-index: 500; /* Ensure it's above other content */
 }
 
 .navbar.light {
@@ -52,9 +57,7 @@
 
 /* Mode Toggle Button */
 .mode-toggle {
-
   color: #007bff;
-  border: 2px solid #007bff;
   border-radius: 4px;
   padding: 0.5rem;
   cursor: pointer;
@@ -114,22 +117,30 @@ body.dark-mode .navbar-links .nav-link:hover {
   text-decoration: underline;
 }
 
-/* Image styling to prevent overflow */
-.icon-image {
-  height: 100%; /* Set image height to 100% of the button height */
-  width: 100%;  /* Set image width to 100% of the button width */
-  object-fit: contain; /* Ensure the image fits within the container without distortion */
-}
-
-.mode-toggle {
+/* Logout Button */
+.logout-button {
+  background: linear-gradient(145deg, #2e2d36, #5f5d69); /* Gradient background */
+  color: white;
+  font-weight: bold;
+  padding: 0.5rem 1.5rem;
+  border-radius: 30px;
+  border: none;
   cursor: pointer;
-  width: 40px;
-  height: 40px;
-  outline: none; /* Removes the focus outline */
-  border: none; /* Ensures no border is applied */
-  transition: transform 0.2s; /* Optional hover effect */
+  transition: background 0.3s ease, transform 0.2s ease; /* Add transition for hover effect */
 }
 
-.mode-toggle:hover {
-  transform: scale(1.1); /* Slightly enlarges the icon on hover */
+.logout-button:hover {
+  background: linear-gradient(145deg, #2e2d36, #45444d); /* Invert gradient on hover */
+  transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.logout-button:focus {
+  outline: none;
+}
+
+/* User Text and Toggle Position */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Space between dark mode toggle and user text */
 }

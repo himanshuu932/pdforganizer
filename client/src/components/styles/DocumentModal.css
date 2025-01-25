@@ -1,5 +1,32 @@
 /* modal-overlay adjustments */
+/* Centering the "No files found" text at the diagonal intersection */
 
+/* CSS for the bottom-right status message */
+.status-message {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.status-message.fade-out {
+  opacity: 0;
+}
+
+.head{
+  margin-bottom: 15px;
+  margin-right: 10px;
+}
+.status-row{
+  margin-right: 10px;
+}
 .modal-overlay {
   position: fixed;
   top: 80px; /* Adjust based on your navbar height */
@@ -101,6 +128,7 @@ body.dark-mode .modal-content {
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  margin-bottom: 25px;
 }
 
 /* File Grid and File Cards */
@@ -169,14 +197,14 @@ body.dark-mode .modal-content {
   max-width: 100%;
 }
 
-/* Selection options */
-.selection-options {
+/*Selection options
+ .selection-options {
   display: flex;
   justify-content: center;
-  align-items: center; /* Centers content vertically */
+  align-items: center; 
   gap: 10px;
-  margin: 0; /* Removes any extra margin */
-  width: 100%; /* Ensures full viewport width */
+  margin: 0;
+  width: 100%; 
 }
 
 .selection-options button {
@@ -191,7 +219,7 @@ body.dark-mode .modal-content {
 
 .selection-options button:hover {
   background-color: #0056b3;
-}
+}*/
 
 /* modal-footer adjustments */
 .modal-footer {
@@ -265,9 +293,90 @@ body.dark-mode .modal-content {
 /* Button Row Layout */
 .button-row {
   display: flex;
-  justify-content: space-around;
-  gap: 10px; /* Space between buttons */
+  justify-content: center; /* Center the buttons */
+  gap: 10px; /* Increased gap between buttons */
+  /* Added some margin for spacing */
 }
+
+/* Button Styling */
+.button-row button {
+  padding: 9px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
+}
+
+
+/* Show Files Button */
+.show-files-button {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+.show-files-button:hover {
+  background-color: #45a049; /* Darker green on hover */
+  transform: scale(1.05); /* Slightly larger on hover */
+}
+
+.show-files-button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+/* Delete Files Button */
+.delete-files-button {
+  background-color: #f44336; /* Red */
+  color: white;
+}
+
+.delete-files-button:hover {
+  background-color: #e53935; /* Darker red on hover */
+  transform: scale(1.05); /* Slightly larger on hover */
+}
+
+.delete-files-button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+/* Select All Button */
+.select-all-button {
+  background-color: #007bff; /* Blue */
+  color: white;
+}
+
+.select-all-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  transform: scale(1.05); /* Slightly larger on hover */
+}
+
+.select-all-button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+/* Deselect All Button */
+.deselect-all-button {
+  background-color: #ff9800; /* Orange */
+  color: white;
+}
+
+.deselect-all-button:hover {
+  background-color: #fb8c00; /* Darker orange on hover */
+  transform: scale(1.05); /* Slightly larger on hover */
+}
+
+.deselect-all-button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
 
 /* Confirm Button */
 .confirm-button {
@@ -301,6 +410,7 @@ body.dark-mode .modal-content {
   background-color: #b3b3b3; /* Darker gray on hover */
 }
 
+
 /* Animation for Modal Appearance */
 @keyframes fadeIn {
   from {
@@ -312,4 +422,44 @@ body.dark-mode .modal-content {
     transform: scale(1);
   }
 }
+/* Status Row Container */
+.status-row {
 
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  font-size: 1rem;
+}
+
+/* Connection Status Label */
+.connection-status-label {
+  font-weight: normal;
+}
+
+/* Default Connection Status Styling (Light Mode) */
+.connection-status-label strong.connected {
+  color: green;
+}
+
+.connection-status-label strong.not-connected {
+  color: red;
+}
+
+/* Dark Mode Styles */
+body.dark-mode .status-row {
+ /* Darker background for dark mode */
+
+  border-radius: 5px;
+}
+
+body.dark-mode .connection-status-label {
+  color: #f1f1f1; /* Lighter text color for dark mode */
+}
+
+body.dark-mode .connection-status-label strong.connected {
+  color: #32cd32; /* Bright green for connected status */
+}
+
+body.dark-mode .connection-status-label strong.not-connected {
+  color: #ff6347; /* Bright red for not connected status */
+}

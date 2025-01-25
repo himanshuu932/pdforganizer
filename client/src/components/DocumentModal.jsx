@@ -4,20 +4,88 @@ import "./styles/DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
 import plusIcon from "../icons/add.png";
 
-const DocumentModal = ({ setActiveScreen }) => {
+const DocumentModal = ({ activeScreen,saved,setSaved }) => {
   
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [folderLink, setFolderLink] = useState("");
-  const [connectionStatus, setConnectionStatus] = useState("Not Connected");
+  const [connectionStatus, setConnectionStatus] = useState("Not Authenticated");
   const [message, setMessage] = useState("");
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-
+ 
   const [showConfirmation, setShowConfirmation] = useState(false);
+  useEffect(() => {
+    if (saved ) {
+      setFolderLink(saved);
+      handleShowFiles();
+    }
+  }, [saved, activeScreen,folderLink]);
+  useEffect(() => {
+  
 
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("status");
+    const msg = params.get("message");
+
+    if (status === "success") {
+      setConnectionStatus("Authenticated");
+      setMessage(msg || "Connected to Google Drive successfully.");
+    } else if (status === "failure") {
+      setMessage(msg || "Failed to connect to Google Drive.");
+    }
+  }, []);
+  useEffect(() => {
+    if (searchQuery.trim().length > 0) {
+      const query = searchQuery.toLowerCase();
+      const filtered = files.filter((file) =>
+        file.name.toLowerCase().includes(query)
+      );
+      setFilteredFiles(filtered);
+    } else {
+      setFilteredFiles(files);
+    }
+  }, [searchQuery, files]);
+  useEffect(() => {
+   pp();
+  }, [files]);
+   
+    const handleShowFiles = async () => {
+     
+    
+      if (!folderLink && !saved) {
+        setMessage("Please provide a valid folder link.");
+        return;
+      }
+      if(!saved)
+        {localStorage.setItem('url',folderLink);setSaved(folderLink);}
+  
+      if(!folderLink)
+        setFolderLink(saved);
+
+      setLoadingFiles(true);
+       
+      try {
+        // Fetch files from the folder link
+        const response = await axios.get("http://localhost:5000/api/files", { params: { folderLink } });
+        const fetchedFiles = response.data.files || [];
+        setFiles(fetchedFiles);
+        setFilteredFiles(fetchedFiles);
+        setMessage(response.data.message || "Files fetched successfully.");
+    
+        // Filter PDF files
+        
+        
+      } catch (err) {
+        console.error("❌ Error fetching files:", err);
+        setMessage("Failed to fetch files. Please try again.");
+      } finally {
+        setLoadingFiles(false); // Ensure loading state is reset
+      }
+    };
+ 
   const handleConfirmDelete = () => {
     setShowConfirmation(true);
   };
@@ -51,35 +119,6 @@ const DocumentModal = ({ setActiveScreen }) => {
       setMessage("Failed to delete files. Please try again.");
     }
   };
-  
-  
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const status = params.get("status");
-    const msg = params.get("message");
-
-    if (status === "success") {
-      setConnectionStatus("Connected");
-      setMessage(msg || "Connected to Google Drive successfully.");
-    } else if (status === "failure") {
-      setMessage(msg || "Failed to connect to Google Drive.");
-    }
-  }, []);
-  useEffect(() => {
-    if (searchQuery.trim().length > 0) {
-      const query = searchQuery.toLowerCase();
-      const filtered = files.filter((file) =>
-        file.name.toLowerCase().includes(query)
-      );
-      setFilteredFiles(filtered);
-    } else {
-      setFilteredFiles(files);
-    }
-  }, [searchQuery, files]);
-  useEffect(() => {
-   pp();
-  }, [files]);
-
 const pp= async ()=>{
 
   const pdfFiles = files.filter((file) => file.name.endsWith('.pdf'));
@@ -122,32 +161,7 @@ const pp= async ()=>{
     window.location.href = connectUrl;
   };
 
-  const handleShowFiles = async () => {
-    if (!folderLink) {
-      setMessage("Please provide a valid folder link.");
-      return;
-    }
-  
-    setLoadingFiles(true);
-  
-    try {
-      // Fetch files from the folder link
-      const response = await axios.get("http://localhost:5000/api/files", { params: { folderLink } });
-      const fetchedFiles = response.data.files || [];
-      setFiles(fetchedFiles);
-      setFilteredFiles(fetchedFiles);
-      setMessage(response.data.message || "Files fetched successfully.");
-  
-      // Filter PDF files
-      
-      
-    } catch (err) {
-      console.error("❌ Error fetching files:", err);
-      setMessage("Failed to fetch files. Please try again.");
-    } finally {
-      setLoadingFiles(false); // Ensure loading state is reset
-    }
-  };
+ 
   
   
   const handleFileUpload = (event) => {
@@ -316,7 +330,7 @@ const pp= async ()=>{
           <div className="input-row">
             <input
               type="text"
-              placeholder="Enter Google Drive folder link"
+              placeholder={folderLink}
               value={folderLink}
               onChange={(e) => setFolderLink(e.target.value)}
               className="folder-link-input"
@@ -325,7 +339,7 @@ const pp= async ()=>{
               className="connect-drive-button"
               onClick={handleConnectDrive}
             >
-              Connect to Google Drive
+              Authenticate Google Drive
             </button>
           </div>
           <div className="button-row">

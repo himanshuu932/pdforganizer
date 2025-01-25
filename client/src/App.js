@@ -5,6 +5,7 @@ import "./App.css";
 
 const App = () => {
   const [user, setUser] = useState(null);
+  const [saved , setSaved] = useState(null);
 
   useEffect(() => {
     axios
@@ -47,7 +48,7 @@ const App = () => {
           </button>
         </div>
       ) : (
-        <Home1 user={user} setUser={setUser} />
+        <Home1 user={user} setUser={setUser} saved={saved} setSaved={setSaved}/>
       )}
     </div>
   );
