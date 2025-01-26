@@ -18,10 +18,23 @@ const bodyParser = require('body-parser');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 
-app.use(cors({
-  origin: "https://iridescent-raindrop-1c2f36.netlify.app/",
-  credentials: true,
-}));
+const allowedOrigins = [
+  "https://iridescent-raindrop-1c2f36.netlify.app",
+  "http://localhost:3000", // Include local development origins if needed
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Allow credentials (cookies)
+  })
+);
 
 const credentialsJson = process.env.JSON;
 const credentials = JSON.parse(credentialsJson);
