@@ -155,12 +155,7 @@ app.get("/api/logout", (req, res) => {
   res.json({ message: "OK" });
 
   // Then, destroy the session after the response is sent
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ message: "Session destroy error" });
-    }
-    res.clearCookie('connect.sid'); // Clear session cookie
-  });
+ 
 });
 
 
