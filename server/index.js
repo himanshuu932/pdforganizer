@@ -108,7 +108,7 @@ app.get( "/auth/google/callback",passport.authenticate("google", { failureRedire
       const encodedUsername = encodeURIComponent(req.user.name);
 
       // Redirect to the frontend with the encoded username in the query string
-      res.redirect(`http://localhost:3000/&username=${encodedUsername}`);
+      res.redirect(`http://localhost:3000/?username=${encodedUsername}`);
     } else {
       console.error("❌ Authentication failed");
       res.redirect("/");
@@ -141,7 +141,7 @@ app.get("/oauth2callback", async (req, res) => {
     res.redirect(`${redirectUri}?status=success&message=Connected to Google Drive successfully.`);
   } catch (error) {
     console.error("Error during OAuth callback:", error.message);
-    res.redirect(`${redirectUri}?status=failure&message=Failed to connect to Google Drive.`);
+    res.redirect(`${redirectUri}&status=failure&message=Failed to connect to Google Drive.`);
   }
 });
 
