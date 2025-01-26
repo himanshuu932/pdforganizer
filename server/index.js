@@ -92,7 +92,7 @@ app.get( "/auth/google/callback",passport.authenticate("google", { failureRedire
       const encodedUsername = encodeURIComponent(req.user.name);
 
       // Redirect to the frontend with the encoded username in the query string
-      res.redirect(`https://strong-sorbet-6adba8.netlify.app/?username=${encodedUsername}`);
+      res.redirect(`https://iridescent-raindrop-1c2f36.netlify.app/?username=${encodedUsername}`);
     } else {
       console.error("❌ Authentication failed");
       res.redirect("/");
@@ -274,7 +274,7 @@ app.delete('/delete', async (req, res) => {
 app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "https://www.googleapis.com/auth/drive.file"] }));
 app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/" }), (req, res) => {
   if (req.user) {
-    res.redirect("https://strong-sorbet-6adba8.netlify.app/");
+    res.redirect("https://iridescent-raindrop-1c2f36.netlify.app/");
   } else {
     res.redirect("/");
   }
