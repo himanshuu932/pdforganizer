@@ -20,21 +20,20 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const allowedOrigins = [
   "https://iridescent-raindrop-1c2f36.netlify.app",
-  "http://localhost:3000",  // Include local development origins if needed
+  "http://localhost:3000", // Include local development origins if needed
  
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // If the origin is not present (e.g., a non-browser request like from Postman) or it's in the allowedOrigins list
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true); // Allow the request
+        callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"), false); // Reject the request with an error
+        callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true, // Allow sending cookies along with the request
+ 
   })
 );
 
@@ -57,12 +56,7 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
   },
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI, 
-    collectionName: 'sessions',
-  }),
 }));
-
 app.use(passport.initialize());
 app.use(passport.session());
 // User Schema
