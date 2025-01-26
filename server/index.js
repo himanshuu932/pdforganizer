@@ -84,15 +84,21 @@ passport.deserializeUser((id, done) => {
 
 app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "https://www.googleapis.com/auth/drive.file"] }));
 
-app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/" }), (req, res) => {
-  if (req.user) {
-    console.log("✅ Login Successful:", req.user.name);
-    res.redirect("http://localhost:3000");
-  } else {
-    console.error("❌ Authentication failed");
-    res.redirect("/");
+app.get( "/auth/google/callback",passport.authenticate("google", { failureRedirect: "/" }),(req, res) => {
+    if (req.user) {
+      console.log("✅ Login Successful:", req.user.name);
+
+      // Encode the username to include it in the redirect URL
+      const encodedUsername = encodeURIComponent(req.user.name);
+
+      // Redirect to the frontend with the encoded username in the query string
+      res.redirect(`http://localhost:3000?username=${encodedUsername}`);
+    } else {
+      console.error("❌ Authentication failed");
+      res.redirect("/");
+    }
   }
-});
+);
 
 // Google Drive File Upload Route
 const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID,process.env.GOOGLE_CLIENT_SECRET,process.env.CALLBACK_URL);
