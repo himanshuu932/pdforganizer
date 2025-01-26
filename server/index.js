@@ -138,7 +138,7 @@ app.get("/oauth2callback", async (req, res) => {
     oauth2Client.setCredentials(tokens);
 
     drive = google.drive({ version: "v3", auth: oauth2Client });
-    res.redirect(`${redirectUri}?status=success&message=Connected to Google Drive successfully.`);
+    res.redirect(`${redirectUri}&status=success&message=Connected to Google Drive successfully.`);
   } catch (error) {
     console.error("Error during OAuth callback:", error.message);
     res.redirect(`${redirectUri}&status=failure&message=Failed to connect to Google Drive.`);
