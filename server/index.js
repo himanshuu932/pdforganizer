@@ -27,13 +27,14 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
+      // If the origin is not present (e.g., a non-browser request like from Postman) or it's in the allowedOrigins list
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
+        callback(null, true); // Allow the request
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(new Error("Not allowed by CORS"), false); // Reject the request with an error
       }
     },
- credentials: true,
+    credentials: true, // Allow sending cookies along with the request
   })
 );
 
@@ -56,7 +57,12 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
   },
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI, 
+    collectionName: 'sessions',
+  }),
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 // User Schema
