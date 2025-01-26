@@ -132,7 +132,7 @@ app.get(
     // Check if user is already logged in
     if (req.isAuthenticated() && req.user.hasDrivePermissions) {
       console.log("🚀 User already authenticated with Drive access.");
-      return res.redirect("iridescent-raindrop-1c2f36.netlify.app?status=alreadyConnected");
+      return res.redirect("https://iridescent-raindrop-1c2f36.netlify.app?status=alreadyConnected");
     }
 
     // Otherwise, request Google Drive permissions
@@ -169,10 +169,10 @@ app.get(
 
       // Redirect to frontend with user info
       const encodedUsername = encodeURIComponent(req.user.name);
-      res.redirect(`iridescent-raindrop-1c2f36.netlify.app?username=${encodedUsername}&status=success`);
+      res.redirect(`https://iridescent-raindrop-1c2f36.netlify.app?username=${encodedUsername}&status=success`);
     } catch (error) {
       console.error("❌ Error during Google Drive Connection:", error);
-      res.redirect("iridescent-raindrop-1c2f36.netlify.app?status=failure");
+      res.redirect("https://iridescent-raindrop-1c2f36.netlify.app?status=failure");
     }
   }
 );
