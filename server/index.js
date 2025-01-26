@@ -21,6 +21,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const allowedOrigins = [
   "https://iridescent-raindrop-1c2f36.netlify.app",
   "http://localhost:3000", // Include local development origins if needed
+ 
 ];
 
 app.use(
@@ -68,7 +69,7 @@ const upload = multer({ storage });
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'https://pdforganizer.onrender.com/auth/google/callback',
+  callbackURL: 'https://pdforganizer.vercel.app/auth/google/callback',
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     console.log("🔄 Google Profile Received:", profile.displayName);
@@ -105,7 +106,7 @@ app.get( "/auth/google/callback",passport.authenticate("google", { failureRedire
       const encodedUsername = encodeURIComponent(req.user.name);
 
       // Redirect to the frontend with the encoded username in the query string
-      res.redirect(`https://iridescent-raindrop-1c2f36.netlify.app/?username=${encodedUsername}`);
+      res.redirect(`http://localhost:3000/?username=${encodedUsername}`);
     } else {
       console.error("❌ Authentication failed");
       res.redirect("/");
@@ -114,7 +115,7 @@ app.get( "/auth/google/callback",passport.authenticate("google", { failureRedire
 );
 
 // Google Drive File Upload Route
-const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID,process.env.GOOGLE_CLIENT_SECRET,process.env.CALLBACK_URL);
+const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID,process.env.GOOGLE_CLIENT_SECRET,"https://pdforganizer.vercel.app/oauth2callback");
 
 app.get("/connect-drive", (req, res) => {
   const redirectUri = req.query.redirectUri;
@@ -282,7 +283,7 @@ app.delete('/delete', async (req, res) => {
 app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "https://www.googleapis.com/auth/drive.file"] }));
 app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/" }), (req, res) => {
   if (req.user) {
-    res.redirect("https://iridescent-raindrop-1c2f36.netlify.app/");
+    res.redirect("http://localhost:3000");
   } else {
     res.redirect("/");
   }
