@@ -20,7 +20,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const allowedOrigins = [
   "https://iridescent-raindrop-1c2f36.netlify.app",
-  "http://localhost:3000", // Include local development origins if needed
+  "http://localhost:3000",  // Include local development origins if needed
  
 ];
 
