@@ -19,7 +19,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 
 app.use(cors({
-  origin: "true",
+  origin: "https://iridescent-raindrop-1c2f36.netlify.app/",
   credentials: true,
 }));
 
