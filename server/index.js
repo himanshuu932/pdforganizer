@@ -151,18 +151,18 @@ app.get("/api/current_user", (req, res) => {
 });
 
 app.get("/api/logout", (req, res) => {
+  // First, send the success response to the client
   res.json({ message: "OK" });
-  
-      req.session.destroy((err) => {
-        if (err) {
-          return res.status(500).json({ message: "Session destroy error" });
-        }
-        res.clearCookie('connect.sid'); // Clear session cookie
-       
-      });
-    });
- 
+
+  // Then, destroy the session after the response is sent
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Session destroy error" });
+    }
+    res.clearCookie('connect.sid'); // Clear session cookie
+  });
 });
+
 
 
 
