@@ -68,100 +68,116 @@ let Usergoogleid='';
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: 'https://pdforganizer.vercel.app/auth/google/callback',
-}, async (accessToken, refreshToken, profile, done) => {
-  try {
-    console.log("🔄 Google Profile Received:", profile.displayName);
-    const existingUser = await User.findOne({ googleId: profile.id });
-    if (existingUser) {
-      Usergoogleid=existingUser.googleId;
-      console.log("✅ User found:", existingUser.name);
-      store();
-      return done(null, existingUser);
-    }
-    const newUser = await User.create({ googleId: profile.id, name: profile.displayName });
-    Usergoogleid=profile.id;
-    store();
-    console.log("✅ New User Created:", newUser.name);
-    done(null, newUser);
-  } catch (error) {
-    console.error("❌ Error in Google Strategy:", error);
-    done(error, null);
-  }
-}));
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "https://pdforganizer.vercel.app/auth/google/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        console.log("🔄 Google Profile Received:", profile.displayName);
 
+        // Check if user exists
+        Usergoogleid=profile.id;
+        let user = await User.findOne({ googleId: profile.id });
+        if (!user) {
+          // Create new user
+          user = await User.create({
+            googleId: profile.id,
+            name: profile.displayName,
+            hasDrivePermissions: true, // Assuming they grant Drive permissions on first login
+          });
+         
+          console.log("✅ New User Created:", user.name);
+        } else {
+          console.log("✅ User Found:", user.name);
+
+          // If the user has already granted permissions, skip additional requests
+          if (user.hasDrivePermissions) {
+            console.log("🚀 User already granted Drive permissions.");
+            return done(null, user);
+          }
+        }
+
+        // Save tokens for Drive access
+        user.accessToken = accessToken;
+        user.refreshToken = refreshToken;
+        user.hasDrivePermissions = true; // Mark Drive permissions as granted
+        await user.save();
+
+        console.log("🔑 Tokens Saved Successfully");
+        done(null, user);
+      } catch (error) {
+        console.error("❌ Error in Google Strategy:", error);
+        done(error, null);
+      }
+    }
+  )
+);
+let drive;
+// Serialize and deserialize user
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser((id, done) => {
-  User.findById(id).then(user => done(null, user)).catch(err => done(err, null));
+  User.findById(id)
+    .then((user) => done(null, user))
+    .catch((err) => done(err, null));
 });
 
-app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "https://www.googleapis.com/auth/drive.file"] }));
-
-app.get( "/auth/google/callback",passport.authenticate("google", { failureRedirect: "/" }),(req, res) => {
-    if (req.user) {
-      console.log("✅ Login Successful:", req.user.name);
-
-      // Encode the username to include it in the redirect URL
-      const encodedUsername = encodeURIComponent(req.user.name);
-
-      // Redirect to the frontend with the encoded username in the query string
-      res.redirect(`https://iridescent-raindrop-1c2f36.netlify.app/?username=${encodedUsername}`);
-    } else {
-      console.error("❌ Authentication failed");
-      res.redirect("/");
+// Login Route
+app.get(
+  "/auth/google",
+  async (req, res, next) => {
+    // Check if user is already logged in
+    if (req.isAuthenticated() && req.user.hasDrivePermissions) {
+      console.log("🚀 User already authenticated with Drive access.");
+      return res.redirect("iridescent-raindrop-1c2f36.netlify.app?status=alreadyConnected");
     }
+
+    // Otherwise, request Google Drive permissions
+    passport.authenticate("google", {
+      scope: ["profile", "email", "https://www.googleapis.com/auth/drive.file"],
+      accessType: "offline",
+      prompt: "consent",
+    })(req, res, next);
   }
 );
 
-// Google Drive File Upload Route
-const oauth2Client = new google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID,process.env.GOOGLE_CLIENT_SECRET,"https://pdforganizer.vercel.app/oauth2callback");
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }),
+  async (req, res) => {
+    try {
+      const oauth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        "https://pdforganizer.vercel.app/auth/google/callback"
+      );
 
-app.get("/connect-drive", (req, res) => {
-  const redirectUri = req.query.redirectUri;
-  const authUrl = oauth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: ["https://www.googleapis.com/auth/drive.file"],
-    state: encodeURIComponent(redirectUri), // Include the redirectUri in the state
-  });
-  console.log("🔗 Auth URL:", authUrl);
-  res.redirect(authUrl);
-});
-let drive
-app.get("/oauth2callback", async (req, res) => {
-  const code = req.query.code;
-  const redirectUri = decodeURIComponent(req.query.state); // Extract the redirectUri from the state
-  try {
-    const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
+      // Set tokens for Drive access
+      oauth2Client.setCredentials({
+        access_token: req.user.accessToken,
+        refresh_token: req.user.refreshToken,
+      });
 
-    drive = google.drive({ version: "v3", auth: oauth2Client });
-    res.redirect(`${redirectUri}&status=success&message=Connected to Google Drive successfully.`);
-  } catch (error) {
-    console.error("Error during OAuth callback:", error.message);
-    res.redirect(`${redirectUri}&status=failure&message=Failed to connect to Google Drive.`);
+      // Validate Drive access (optional)
+       drive = google.drive({ version: "v3", auth: oauth2Client });
+      await drive.files.list({ pageSize: 1 });
+
+      console.log("✅ Google Drive Connected");
+
+      // Redirect to frontend with user info
+      const encodedUsername = encodeURIComponent(req.user.name);
+      res.redirect(`iridescent-raindrop-1c2f36.netlify.app?username=${encodedUsername}&status=success`);
+    } catch (error) {
+      console.error("❌ Error during Google Drive Connection:", error);
+      res.redirect("iridescent-raindrop-1c2f36.netlify.app?status=failure");
+    }
   }
-});
-
+);
 // User Routes
-app.get("/api/current_user", (req, res) => {
-  res.json(req.user || null);
-});
 
-app.get("/api/logout", (req, res) => {
-  // First, send the success response to the client
-  res.json({ message: "OK" });
-
-  // Then, destroy the session after the response is sent
- 
-});
-
-
-
-
-// Endpoint to get a list of files
 app.get("/api/files", async (req, res) => {
   const folderLink = req.query.folderLink;
   const folderId = folderLink?.split("/folders/")[1]?.split("?")[0];
@@ -171,26 +187,87 @@ app.get("/api/files", async (req, res) => {
   }
 
   try {
+
+   
+    // List files within the folder
     const response = await drive.files.list({
       q: `'${folderId}' in parents`,
       pageSize: 100,
-      fields: "files(id, name, webViewLink, webContentLink)",
+      fields: "files(id, name, webViewLink, webContentLink, createdTime, modifiedTime,parents)",
     });
-    console.log(response.data.files[0]?.webContentLink);
-    console.log(response.data.files[0]?.webViewLink);
+    const folderName='';
+    if (response.data.files.length > 0) {
+      // Log the parents of the first file
+      const firstFile = response.data.files[0];
+      console.log("Parents of the first file:", firstFile.parents);}
+
     const files = response.data.files.map((file) => ({
       id: file.id,
       name: file.name,
       link: file.webViewLink,
-
+      createdTime: file.createdTime,
+      modifiedTime: file.modifiedTime,
     }));
 
-    res.json({ files, message: "Files fetched successfully." });
+    res.json({ folderName, files, message: "Files fetched successfully." });
   } catch (error) {
-    console.error("Error listing files from Google Drive:", error.message);
-    res.status(500).json({ message: "Failed to fetch files from Google Drive." });
+    console.error("Error fetching folder data from Google Drive:", error.message);
+    res.status(500).json({ message: "Failed to fetch folder data from Google Drive." });
   }
 });
+
+
+app.get("/api/current_user", (req, res) => {
+  res.json(req.user || null);
+});
+
+app.get("/api/logout", (req, res) => {
+  if (req.isAuthenticated()) {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Logout Error" });
+      }
+      req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).json({ message: "Session destroy error" });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ message: "OK" });
+      });
+    });
+  } else {
+    res.status(400).json({ message: "No user logged in" });
+  }
+});
+  // Function to fetch file from Google Drive
+const fetchFile = async (fileId) => {
+    
+    return new Promise((resolve, reject) => {
+      drive.files.get(
+        { fileId: fileId, alt: 'media' },
+        { responseType: 'stream' },
+        (err, res) => {
+          if (err) {
+            console.error('Error downloading file:', err); // More detailed error logging
+            return reject(`Error downloading file with ID ${fileId}: ${err.message}`);
+          }
+  
+          const dest = fs.createWriteStream(path.join(__dirname, 'downloaded-file.pdf'));
+          res.data.pipe(dest);
+          dest.on('finish', () => {
+            console.log('File downloaded successfully!');
+            resolve(path.join(__dirname, 'downloaded-file.pdf')); // Resolve with the file path
+          });
+          dest.on('error', (err) => {
+            console.error('Error writing file:', err); // Log error if file writing fails
+            reject(err);
+          });
+        }
+      );
+    });
+  };
+  
+const { PDFDocument } = require('pdf-lib');
 const { Readable } = require('stream'); // Import Readable
 
 app.post('/upload', upload.single('file'), async (req, res) => {
@@ -279,53 +356,6 @@ app.delete('/delete', async (req, res) => {
     res.status(500).send("Error deleting files from Google Drive and MongoDB");
   }
 });
-
-app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "https://www.googleapis.com/auth/drive.file"] }));
-app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/" }), (req, res) => {
-  if (req.user) {
-    res.redirect("https://iridescent-raindrop-1c2f36.netlify.app/");
-  } else {
-    res.redirect("/");
-  }
-});
-
-// Download file from Google Drive
-
-const auth = new google.auth.GoogleAuth({
-     credentials: credentials,  // Use the path to your credentials
-    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-  });
-
- 
-  // Function to fetch file from Google Drive
-const fetchFile = async (fileId) => {
-    const drive1 = google.drive({ version: 'v3', auth });
-    return new Promise((resolve, reject) => {
-      drive1.files.get(
-        { fileId: fileId, alt: 'media' },
-        { responseType: 'stream' },
-        (err, res) => {
-          if (err) {
-            console.error('Error downloading file:', err); // More detailed error logging
-            return reject(`Error downloading file with ID ${fileId}: ${err.message}`);
-          }
-  
-          const dest = fs.createWriteStream(path.join(__dirname, 'downloaded-file.pdf'));
-          res.data.pipe(dest);
-          dest.on('finish', () => {
-            console.log('File downloaded successfully!');
-            resolve(path.join(__dirname, 'downloaded-file.pdf')); // Resolve with the file path
-          });
-          dest.on('error', (err) => {
-            console.error('Error writing file:', err); // Log error if file writing fails
-            reject(err);
-          });
-        }
-      );
-    });
-  };
-  
-const { PDFDocument } = require('pdf-lib');
 
 
 const splitPdf = async (pdfPath, maxPages = 15) => {
@@ -538,12 +568,7 @@ async function findtext() {
 
 const store = async () => {
   try {
-    const textDataArray = await TextData.find();
-    if (textDataArray.length === 0) {
-      console.log("No files in the storage");
-      return;
-    }
-
+    
     const texts =await  findtext();
    
     axios.post('http://pythonpdf.vercel.app/store-texts', {
@@ -580,6 +605,95 @@ app.post('/submit-query', async (req, res) => {
   }
 });
   
+// Save a folder link for a user
+app.get('/save-folder', async (req, res) => {
+  const folderLink = req.query.folderLink;
+  const googleId = Usergoogleid;  // Pass the Google ID in the request
+
+  const folderId = folderLink?.split("/folders/")[1]?.split("?")[0];
+
+  if (!folderId) {
+    return res.status(400).json({ message: "Invalid folder link." });
+  }
+
+  // Find the user by Google ID
+  const user = await User.findOne({ googleId });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
+
+  // Add the folder link if it doesn't exist already
+  if (!user.folderLinks.includes(folderLink)) {
+    await User.findOneAndUpdate(
+      { googleId },
+      { $push: { folderLinks: folderLink } }
+    );
+    return res.json({ message: "Folder link saved successfully." });
+  }
+
+  res.status(400).json({ message: "Folder link already exists." });
+});
+
+app.get('/delete-folder', async (req, res) => {
+  const folderLink = req.query.folderLink;
+  const googleId = Usergoogleid;  // Pass the Google ID in the request
+
+  const folderId = folderLink?.split("/folders/")[1]?.split("?")[0];
+
+  if (!folderId) {
+    return res.status(400).json({ message: "Invalid folder link." });
+  }
+
+  // Find the user by Google ID
+  const user = await User.findOne({ googleId });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
+
+  // Remove the folder link if it exists
+  if (user.folderLinks.includes(folderLink)) {
+    await User.findOneAndUpdate(
+      { googleId },
+      { $pull: { folderLinks: folderLink } }
+    );
+    return res.json({ message: "Folder link deleted successfully." });
+  }
+
+  res.status(400).json({ message: "Folder link does not exist." });
+});
+
+
+// Add a folder link
+
+
+// Remove a folder link
+
+// Endpoint to get all folder links for a user by their userId
+app.get("/api/user/folder-links", async (req, res) => {
+  // Assuming the Google ID is passed in as a query parameter
+  const googleId = Usergoogleid; // or req.user.googleId if you're using authentication middleware
+
+  if (!googleId) {
+    return res.status(400).json({ message: "Google ID is required" });
+  }
+
+  try {
+    // Find the user by Google ID and retrieve the folderLinks array
+    const user = await User.findOne({ googleId }).select("folderLinks");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respond with the folderLinks
+    res.json({ folderLinks: user.folderLinks });
+  } catch (error) {
+    console.error("Error fetching folder links:", error.message);
+    res.status(500).json({ message: "Failed to fetch folder links" });
+  }
+});
 
 
 app.listen(port, () => {
