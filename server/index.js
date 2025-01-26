@@ -33,7 +33,7 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
- 
+    credentials: true, 
   })
 );
 
@@ -47,16 +47,18 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 // Enable JSON parsingy
 app.use(express.json());
 app.use(cookieParser());
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    maxAge: 60 * 60 * 1000,
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-  },
-}));
+app.use(
+  session({
+    secret: 'your-secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      sameSite: 'None', // Allow cross-origin cookies
+    },
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 // User Schema
@@ -151,14 +153,22 @@ app.get("/api/current_user", (req, res) => {
 app.get("/api/logout", (req, res) => {
   if (req.isAuthenticated()) {
     req.logout((err) => {
-       
-      res.json({ message: "OK" });
-
+      if (err) {
+        return res.status(500).json({ message: "Logout Error" });
+      }
+      req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).json({ message: "Session destroy error" });
+        }
+        res.clearCookie('connect.sid'); // Clear session cookie
+        res.json({ message: "OK" });
+      });
     });
   } else {
     res.status(400).json({ message: "No user logged in" });
   }
 });
+
 
 
 // Endpoint to get a list of files
