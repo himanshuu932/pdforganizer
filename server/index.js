@@ -108,7 +108,7 @@ app.get( "/auth/google/callback",passport.authenticate("google", { failureRedire
       const encodedUsername = encodeURIComponent(req.user.name);
 
       // Redirect to the frontend with the encoded username in the query string
-      res.redirect(`http://localhost:3000/?username=${encodedUsername}`);
+      res.redirect(`http://localhost:3000/&username=${encodedUsername}`);
     } else {
       console.error("❌ Authentication failed");
       res.redirect("/");
