@@ -150,14 +150,23 @@ app.get("/api/current_user", (req, res) => {
 app.get("/api/logout", (req, res) => {
   if (req.isAuthenticated()) {
     req.logout((err) => {
-       
-      res.json({ message: "OK" });
-
+      if (err) {
+        return res.status(500).json({ message: "Logout Error" });
+      }
+      req.session.destroy((err) => {
+        if (err) {
+          return res.status(500).json({ message: "Session destroy error" });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ message: "OK" });
+      });
     });
   } else {
     res.status(400).json({ message: "No user logged in" });
   }
 });
+
+
 // Endpoint to get a list of files
 app.get("/api/files", async (req, res) => {
   const folderLink = req.query.folderLink;
