@@ -19,7 +19,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "true",
   credentials: true,
 }));
 
@@ -92,7 +92,7 @@ app.get( "/auth/google/callback",passport.authenticate("google", { failureRedire
       const encodedUsername = encodeURIComponent(req.user.name);
 
       // Redirect to the frontend with the encoded username in the query string
-      res.redirect(`http://localhost:3000?username=${encodedUsername}`);
+      res.redirect(`https://strong-sorbet-6adba8.netlify.app/?username=${encodedUsername}`);
     } else {
       console.error("❌ Authentication failed");
       res.redirect("/");
@@ -274,7 +274,7 @@ app.delete('/delete', async (req, res) => {
 app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "https://www.googleapis.com/auth/drive.file"] }));
 app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/" }), (req, res) => {
   if (req.user) {
-    res.redirect("http://localhost:3000");
+    res.redirect("https://strong-sorbet-6adba8.netlify.app/");
   } else {
     res.redirect("/");
   }
