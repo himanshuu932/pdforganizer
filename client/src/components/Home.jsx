@@ -39,13 +39,7 @@ const Home = ({ user, setUser }) => {
       }
     }, [searchQuery, files]);
 
-  const handleConnectDrive = () => {
-    const currentUrl = window.location.href;
-    const connectUrl = `http://localhost:5000/connect-drive?redirectUri=${encodeURIComponent(
-      currentUrl
-    )}`;
-    window.location.href = connectUrl;
-  };
+ 
 
   const handleShowFiles = () => {
     if (!folderLink) {
@@ -78,12 +72,7 @@ const Home = ({ user, setUser }) => {
           onChange={(e) => setFolderLink(e.target.value)}
           className="folder-link-input"
         />
-        <button
-          className="connect-drive-button"
-          onClick={handleConnectDrive}
-        >
-          Connect to Google Drive
-        </button>
+        
         <div className="search-container">
             <input
               type="text"

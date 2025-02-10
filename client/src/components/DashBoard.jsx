@@ -17,7 +17,7 @@ const DashBoard = () => {
       setIsFilesVisible(false);
     }
     if (isFilesVisible) {
-      fetch("http://localhost:5000/files")
+      fetch("https://pdforganizer.vercel.app/files")
         .then((res) => res.json())
         .then((data) => setFiles(data))
         .catch((err) => console.error("Error fetching files:", err));
@@ -35,7 +35,7 @@ const DashBoard = () => {
     setIsDashboardOpen(true);
   };
   const handleFileClick = (fileName) => {
-    const fileUrl = `http://localhost:5000/files/${fileName}`;
+    const fileUrl = `https://pdforganizer.vercel.app/files/${fileName}`;
     window.open(fileUrl, "_blank");
   };
   return (

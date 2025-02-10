@@ -1,13 +1,17 @@
+/* chat.css */
+
+/* Chat Container & Interface */
+
+/* Chat Container – Positioned below the navbar */
 .chat-container {
   display: flex;
   flex-direction: column;
-  align-self: flex-end;
   background: var(--bg-color);
   color: var(--text-color);
   width: 100%;
-  height: 90% ; /* Adjust for navbar height */
   position: absolute;
-  bottom: 0; /* Stick to the bottom */
+  top: 60px; /* Leave space for the fixed navbar (adjust as needed) */
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 10px;
@@ -36,12 +40,12 @@
   --table-border: #555555;
 }
 
-/* Header */
+/* Chat Header */
 .chat-header {
   background-color: var(--header-bg);
   display: flex;
   justify-content: space-between;
-  align-items: cente;
+  align-items: center;
   padding: 10px 15px;
   border-radius: 10px 10px 0 0;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
@@ -90,25 +94,24 @@
   word-wrap: break-word;
   word-break: break-word;
   white-space: normal;
-  color: var(--text-color); /* Dynamic text color */
+  color: var(--text-color);
 }
 
 .user-bubble {
   background: var(--bubble-user);
-  color: white; /* User message text stays white for contrast */
+  color: white;
   align-self: flex-end;
   border-bottom-right-radius: 0;
 }
 
 .bot-bubble {
   background: var(--bubble-bot);
-  color: var(--text-color); /* Bot messages adjust to theme text color */
+  color: var(--text-color);
   align-self: flex-start;
   border-bottom-left-radius: 0;
 }
 
-
-/* Input Section */
+/* Chat Input Section */
 .chat-input {
   display: flex;
   align-items: center;
@@ -141,9 +144,11 @@
   height: 30px;
 }
 
-.dark-mode .attach-image ,.dark-mode .send-icon img {
-  filter: brightness(0) invert(1); /* Inverts the color to white */
+.dark-mode .attach-image,
+.dark-mode .send-icon img {
+  filter: brightness(0) invert(1);
 }
+
 /* Upload Icon */
 .upload-icon {
   cursor: pointer;
@@ -181,4 +186,80 @@ tr:nth-child(even) {
 
 tr:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Styles */
+
+/* Mobile Devices */
+@media (max-width: 600px) {
+  .chat-container {
+    width: 95%;
+    top: 18%;
+    bottom: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .chat-header {
+    padding: 10px;
+    font-size: 16px;
+  }
+
+  .messages {
+    padding: 10px;
+    font-size: 14px;
+    padding-bottom: 60px;
+  }
+
+  .chat-input {
+    padding: 10px;
+  }
+
+  .chat-input input {
+    padding: 8px;
+    font-size: 16px;
+  }
+
+  table {
+    font-size: 14px;
+  }
+
+  th,
+  td {
+    padding: 8px;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) and (min-width: 601px) {
+  .chat-container {
+    width: 90%;
+    top: 60px;
+    bottom: 0;
+  }
+
+  .chat-header {
+    padding: 10px;
+    font-size: 18px;
+  }
+
+  .messages {
+    padding: 15px;
+    font-size: 15px;
+    padding-bottom: 65px;
+  }
+
+  .chat-input input {
+    padding: 8px;
+    font-size: 16px;
+  }
+
+  table {
+    font-size: 15px;
+  }
+
+  th,
+  td {
+    padding: 9px;
+  }
 }

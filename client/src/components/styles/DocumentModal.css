@@ -437,11 +437,11 @@ body.dark-mode .modal-content {
 }
 
 /* Default Connection Status Styling (Light Mode) */
-.connection-status-label strong.connected {
+.connection-status-label strong.authenticated {
   color: green;
 }
 
-.connection-status-label strong.not-connected {
+.connection-status-label strong.not-authenticated {
   color: red;
 }
 
@@ -456,10 +456,10 @@ body.dark-mode .connection-status-label {
   color: #f1f1f1; /* Lighter text color for dark mode */
 }
 
-body.dark-mode .connection-status-label strong.connected {
+body.dark-mode .connection-status-label strong.authenticated {
   color: #32cd32; /* Bright green for connected status */
 }
 
-body.dark-mode .connection-status-label strong.not-connected {
+body.dark-mode .connection-status-label strong.not-authenticated {
   color: #ff6347; /* Bright red for not connected status */
 }

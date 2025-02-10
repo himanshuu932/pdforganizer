@@ -23,63 +23,7 @@ const ChatSection = ({setActiveScreen}) => {
 
 
 
-   const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-  
-    if (file) {
-      // Check if the file is a PDF
-      if (file.type !== "application/pdf") {
-        //alert("Please upload a valid PDF file.");
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: `Only PDF files are allowed.`, sender: "bot" },
-        ]);
-        return;
-      }
-  
-      setSelectedFile(file);
-      //alert(`Selected file: ${file.name}`);
-  
-      const formData = new FormData();
-      formData.append("file", file);
-  
-      try {
-       // alert("Starting file upload...");
-  
-        const response = await fetch("http://localhost:5000/upload", {
-          method: "POST",
-          body: formData,
-        });
-  
-        if (!response.ok) {
-          throw new Error(`Upload failed with status: ${response.status}`);
-        }
-  
-        //alert("File uploaded successfully");
-  
-        // Handle additional logic with the response here
-        const data = await response.json();
-        console.log("Upload response:", data);
-  
-        // Send a success message from the bot
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: `File "${file.name}" uploaded successfully.`, sender: "bot" },
-        ]);
-      } catch (err) {
-        console.error("Upload error:", err);
-        //alert(`Error uploading file: ${err.message}`);
-  
-        // Send a failure message from the bot
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { text: `Failed to upload file "${file.name}".`, sender: "bot" },
-        ]);
-      }
-    } else {
-      alert("Please select a file to upload");
-    }
-  };
+ 
   const parseTableData = (data) => {
     const rows = data.split('\n')
       .filter(row => row.trim() !== '' && row.includes('|'))
@@ -194,7 +138,7 @@ const checkAndRenderResult = (data) => {
     const pdfFiles = files.filter((file) => file.endsWith('.pdf'));
   
     if (pdfFiles.length > 0 && pdfFiles.length === fileIds.length) {
-      sourcesHtml += '<div class="sources-text">Sources:</div><ul>';
+      sourcesHtml += '<div className="sources-text">Sources:</div><ul>';
       pdfFiles.forEach((file, index) => {
         console.log(file);
         const fileId = fileIds[index]; // Match each file with its corresponding ID
@@ -235,15 +179,15 @@ const checkAndRenderResult = (data) => {
       ]);
 
       try {
-        // Simulate a delay to show the bot is thinking
-        await new Promise(resolve => setTimeout(resolve, 1500)); // Delay for "thinking" effect
-
-        // Call the backend API
-        const response = await fetch("http://localhost:5000/submit-query", {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+  
+        // Correct placement of credentials
+        const response = await fetch("http://localhost:5000/api/pdf/submit-query", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include", // Ensures cookies are sent with the request
           body: JSON.stringify({ query: inputMessage }),
         });
 
@@ -286,10 +230,7 @@ const checkAndRenderResult = (data) => {
     }
   };
 
-  const handleFileClick = (fileName) => {
-    const fileUrl = `http://localhost:5000/files/${fileName}`;
-    window.open(fileUrl, "_blank");
-  };
+ 
 
   return (
     <div className={`chat-container `}>
@@ -313,15 +254,7 @@ const checkAndRenderResult = (data) => {
       ))}
     </div>
     <div className="chat-input">
-      <label htmlFor="file-upload" className="upload-icon">
-        <img src={attachIcon} alt="Attach" className="attach-image" />
-        <input
-          id="file-upload"
-          type="file"
-          style={{ display: "none" }}
-          onChange={handleFileUpload}
-        />
-      </label>
+      
       <input
         type="text"
         placeholder="Type a message"

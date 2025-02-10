@@ -1,0 +1,72 @@
+const passport = require('passport');
+const { Strategy: GoogleStrategy } = require('passport-google-oauth20');
+const { google } = require('googleapis');
+const { User } = require('../models/text'); // Ensure correct path
+require('dotenv').config();
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:5000/auth/google/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        console.log("🔄 Google Profile Received:", profile.displayName);
+
+        // Find user in DB
+        let user = await User.findOne({ googleId: profile.id });
+
+        if (!user) {
+          // Create new user with Drive permissions
+          user = await User.create({
+            googleId: profile.id,
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            accessToken,
+            refreshToken,
+            hasDrivePermissions: true, // Assuming they grant Drive permissions on first login
+          });
+          console.log("✅ New User Created:", user.name);
+        } else {
+          console.log("✅ User Found:", user.name);
+
+          // If the user has already granted permissions, skip token updates
+          if (!user.hasDrivePermissions) {
+            console.log("🔑 Updating tokens for Drive access...");
+            user.accessToken = accessToken;
+            user.refreshToken = refreshToken;
+            user.hasDrivePermissions = true;
+            await user.save();
+          } else {
+            console.log("🚀 User already granted Drive permissions.");
+          }
+        }
+
+        done(null, user);
+      } catch (error) {
+        console.error("❌ Error in Google Strategy:", error);
+        done(error, null);
+      }
+    }
+  )
+);
+
+// Serialize & Deserialize User
+passport.serializeUser((user, done) => {
+  console.log("🔒 Serializing User ID:", user.id);
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  console.log("🔍 Deserializing User by ID:", id);
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
+
+module.exports = passport;

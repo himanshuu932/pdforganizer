@@ -1,27 +1,29 @@
+/* navbar.css */
+
 /* General Navbar Styles */
 .navbar {
-  background-color: rgba(255, 255, 255, 0.7); /* Use rgba with alpha for transparency */
+  background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
   color: #000;
   padding: 0.8rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  opacity: 1; /* Full opacity for navbar content */
-  width: 100%; /* Ensure navbar takes full width of the screen */
-  position: fixed; /* Optional: If you want the navbar to stay fixed at the top */
-  top: 0; /* Optional: Keeps it at the top */
-  left: 0; /* Optional: Align it to the left edge */
-  z-index: 500; /* Ensure it's above other content */
+  opacity: 1;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 500;
 }
 
 .navbar.light {
-  background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white for light mode */
+  background-color: rgba(255, 255, 255, 0.7);
   color: #000;
 }
 
 .navbar.dark {
-  background-color: rgba(34, 31, 31, 0.8); /* Semi-transparent dark background */
+  background-color: rgba(34, 31, 31, 0.8);
   color: white;
 }
 
@@ -36,10 +38,10 @@
 .navbar-links {
   list-style: none;
   display: flex;
-  gap: 2rem; /* Space between links */
+  gap: 2rem;
   margin: 0;
   padding: 0;
-  justify-content: center; /* Centering the menu items */
+  justify-content: center;
 }
 
 .nav-item .nav-link {
@@ -47,12 +49,12 @@
   text-decoration: none;
   font-size: 1rem;
   font-weight: bold;
-  transition: color 0.2s ease, transform 0.2s ease; /* Transition for color and transform */
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .nav-item .nav-link:hover {
-  color: #007bff; /* Change color on hover */
-  transform: translateY(-2px); /* Slight upward movement on hover */
+  color: #007bff;
+  transform: translateY(-2px);
 }
 
 /* Mode Toggle Button */
@@ -62,19 +64,18 @@
   padding: 0.5rem;
   cursor: pointer;
   font-weight: bold;
-  height: 2.5rem; /* Set the height of the button */
-  width: 2.5rem;  /* Set the width of the button equal to input size */
+  height: 2.5rem;
+  width: 2.5rem;
   display: flex;
   justify-content: center;
-  align-items: center; /* Center the icon inside the button */
+  align-items: center;
 }
 
-/* Dark Mode Styles for the Button */
 body.dark-mode .mode-toggle,
 body.light-mode .mode-toggle {
-  background-color: transparent; /* Ensures no background */
-  color: inherit; /* Inherit text color (if applicable) */
-  border: none; /* Removes any border */
+  background-color: transparent;
+  color: inherit;
+  border: none;
 }
 
 /* Search Section */
@@ -90,23 +91,22 @@ body.light-mode .mode-toggle {
   gap: 0.5rem;
 }
 
-/* Search Input and Button Styles */
 .search-input {
   padding: 0.5rem;
   font-size: 1rem;
   border-radius: 4px;
   border: 1px solid #ddd;
-  width: 200px; /* Adjust the width as needed */
+  width: 200px;
 }
 
-/* Dark Mode Styles */
+/* Dark Mode Global Styles */
 body.dark-mode {
   background-color: #121212;
   color: #f1f1f1;
 }
 
 body.dark-mode .navbar {
-  background-color: rgba(51, 51, 51, 0.9); /* More opaque dark background */
+  background-color: rgba(51, 51, 51, 0.9);
 }
 
 body.dark-mode .navbar-links .nav-link {
@@ -119,28 +119,28 @@ body.dark-mode .navbar-links .nav-link:hover {
 
 /* Logout Button */
 .logout-button {
-  background: linear-gradient(145deg, #2e2d36, #5f5d69); /* Gradient background */
+  background: linear-gradient(145deg, #2e2d36, #5f5d69);
   color: white;
   font-weight: bold;
   padding: 0.5rem 1.5rem;
   border-radius: 30px;
   border: none;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease; /* Add transition for hover effect */
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .logout-button:hover {
-  background: linear-gradient(145deg, #2e2d36, #45444d); /* Invert gradient on hover */
-  transform: scale(1.05); /* Slightly enlarge the button on hover */
+  background: linear-gradient(145deg, #2e2d36, #45444d);
+  transform: scale(1.05);
 }
 
 .logout-button:focus {
   outline: none;
 }
 
-/* User Text and Toggle Position */
+/* Navbar Right Section */
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 1rem; /* Space between dark mode toggle and user text */
+  gap: 1rem;
 }

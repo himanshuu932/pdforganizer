@@ -13,19 +13,20 @@ function Navbar({setActiveScreen,user, setUser }) {
   };
 
   const handleLogout = () => {
-    axios
-      .get("http://localhost:5000/api/logout", { withCredentials: true })
-      .then((response) => {
-        if (response.data.message === "OK") {
+    fetch("http://localhost:5000/auth/logout", {
+      method: "GET",
+      credentials: "include", // Include cookies for session tracking
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message === "OK") {
           setUser(null);
-          localStorage.removeItem("userData");
-          sessionStorage.clear();
-          window.location.href = "/";
+          console.log("Logout successful");
+        } else {
+          console.log("Logout failed", data);
         }
-      })
-      .catch((err) => {
-        console.error("❌ Error logging out:", err);
       });
+  
   };
 
   const getFirstName = () => {

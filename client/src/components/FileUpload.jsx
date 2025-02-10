@@ -41,7 +41,7 @@ const FileUpload = () => {
         formData.append("file", files[i].file);
 
         try {
-          await axios.post("http://localhost:5000/upload", formData, {
+          await axios.post("https://pdforganizer.vercel.app/upload", formData, {
             headers: { "Content-Type": "multipart/form-data" },
             onUploadProgress: (progressEvent) => {
               const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);

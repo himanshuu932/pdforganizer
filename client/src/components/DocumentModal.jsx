@@ -3,9 +3,11 @@ import axios from "axios";
 import "./styles/DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
 import plusIcon from "../icons/add.png";
+import Links from "./abc";
+import useQueueProcessing from "./useQueueProcessing";
 
-const DocumentModal = ({ activeScreen,saved,setSaved }) => {
-  
+const DocumentModal = ({savedFolderLink,setSavedFolderLink,activeScreen}) => {
+  const [folderName,setFolderName]=useState('No folder');
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -15,21 +17,14 @@ const DocumentModal = ({ activeScreen,saved,setSaved }) => {
   const [message, setMessage] = useState("");
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
- 
+  const { pushToQueue } = useQueueProcessing();
   const [showConfirmation, setShowConfirmation] = useState(false);
+ 
   useEffect(() => {
-    if (saved ) {
-      setFolderLink(saved);
-      handleShowFiles();
-    }
-  }, [saved, activeScreen,folderLink]);
-  useEffect(() => {
-  
-
-    const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(window.location.search);
     const status = params.get("status");
     const msg = params.get("message");
-
+   
     if (status === "success") {
       setConnectionStatus("Authenticated");
       setMessage(msg || "Connected to Google Drive successfully.");
@@ -37,6 +32,7 @@ const DocumentModal = ({ activeScreen,saved,setSaved }) => {
       setMessage(msg || "Failed to connect to Google Drive.");
     }
   }, []);
+ 
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
       const query = searchQuery.toLowerCase();
@@ -45,38 +41,40 @@ const DocumentModal = ({ activeScreen,saved,setSaved }) => {
       );
       setFilteredFiles(filtered);
     } else {
-      setFilteredFiles(files);
+      setFilteredFiles(files); 
     }
   }, [searchQuery, files]);
+
   useEffect(() => {
-   pp();
-  }, [files]);
-   
-    const handleShowFiles = async () => {
+    setMessage("Processing please wait...")
+    pp();
+   }, [files]);
+
+    const handleShowFiles = async (folderLink) => {
      
     
-      if (!folderLink && !saved) {
+      if (!folderLink) {
         setMessage("Please provide a valid folder link.");
         return;
       }
-      if(!saved)
-        {localStorage.setItem('url',folderLink);setSaved(folderLink);}
-  
-      if(!folderLink)
-        setFolderLink(saved);
-
+     
+      setSavedFolderLink(folderLink); 
       setLoadingFiles(true);
        
       try {
-        // Fetch files from the folder link
-        const response = await axios.get("http://localhost:5000/api/files", { params: { folderLink } });
+        // Fetch files from the folder linkhttp://localhost:5000
+         // Include credentials (cookies) in the request
+      const response = await axios.get("http://localhost:5000/api/drive/files", {
+        params: { folderLink },
+        withCredentials: true, // Send cookies along with the request
+      });
         const fetchedFiles = response.data.files || [];
         setFiles(fetchedFiles);
         setFilteredFiles(fetchedFiles);
         setMessage(response.data.message || "Files fetched successfully.");
-    
+        setMessage("Processing please wait...")
         // Filter PDF files
-        
+     
         
       } catch (err) {
         console.error("❌ Error fetching files:", err);
@@ -95,14 +93,14 @@ const DocumentModal = ({ activeScreen,saved,setSaved }) => {
   };
   
   const handleConfirmDeleteFiles = async () => {
-    setShowConfirmation(false); // Close the modal after confirming
-    // Proceed with the delete logic here
+    setShowConfirmation(false); 
     try {
-      const res = await axios.delete("http://localhost:5000/delete", {
+      const res = await axios.delete("http://localhost:5000/api/drive/delete", {
         data: {
           fileIds: selectedFiles,
           folderLink,
         },
+        withCredentials: true, // Send cookies along with the request
       });
   
       if (res.status === 200) {
@@ -126,15 +124,12 @@ const pp= async ()=>{
       if (pdfFiles.length === 0) {
         setMessage("No PDF files found.");
       } else {
-        // Process PDFs sequentially
+       
         for (const file of pdfFiles) {
           try {
-            const response = await axios.get("http://localhost:5000/process-pdf", {
-              params: { fileId: file.id, filename: file.name }
-            });
-            
-            // Log the extracted text for the current file
-            console.log(`Extracted text for file ${file.name}:`, response.data.text);
+
+           pushToQueue(file);
+
           } catch (err) {
             console.error(`Error processing PDF for file ${file.name}:`, err);
           }
@@ -153,13 +148,6 @@ const pp= async ()=>{
     setSelectedFiles([]);
   };
   
-  const handleConnectDrive = () => {
-    const currentUrl = window.location.href;
-    const connectUrl = `http://localhost:5000/connect-drive?redirectUri=${encodeURIComponent(
-      currentUrl
-    )}`;
-    window.location.href = connectUrl;
-  };
 
  
   
@@ -199,9 +187,11 @@ const pp= async ()=>{
         <span id="progress-percent">0%</span>
       `;
       document.body.appendChild(progressDialog);
-  
+      console.log([...formData.entries()]); // Logs all formData key-value pairs
+
       try {
-        const res = await axios.post("http://localhost:5000/upload", formData, {
+        const res = await axios.post("http://localhost:5000/api/drive/upload", formData,  {
+          withCredentials: true,
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             const progressBar = document.getElementById('progress-bar');
@@ -209,7 +199,12 @@ const pp= async ()=>{
             progressBar.value = percentCompleted;
             progressPercent.textContent = `${percentCompleted}%`;
           }
-        });
+        
+        },
+        
+        // Send cookies along with the request
+      
+      );
   
         if (res.status === 200) {
           // Check if file data exists in the response
@@ -259,38 +254,7 @@ const pp= async ()=>{
     }
   };
   
-  
- const handleDeleteFiles = async () => {
-  if (!folderLink) {
-    setMessage("Please provide a valid folder link.");
-    return;
-  }
 
-  try {
-    const res = await axios.delete("http://localhost:5000/delete", {
-      data: {
-        fileIds: selectedFiles,
-        folderLink, // Include folderLink in the request payload
-      },
-    });
-
-    if (res.status === 200) {
-      const remainingFiles = files.filter((file) => !selectedFiles.includes(file.id));
-      setFiles(remainingFiles);
-      setFilteredFiles(remainingFiles);
-      setSelectedFiles([]);
-      setMessage("Selected files deleted successfully.");
-    } else {
-      setMessage("Failed to delete files. Please try again.");
-    }
-  } catch (err) {
-    console.error("Error deleting files:", err);
-    setMessage("Failed to delete files. Please try again.");
-  }
-};
-
-  
-  
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -326,36 +290,24 @@ const pp= async ()=>{
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Documents</h2>
+        
           <div className="input-row">
-            <input
-              type="text"
-              placeholder={folderLink}
-              value={folderLink}
-              onChange={(e) => setFolderLink(e.target.value)}
-              className="folder-link-input"
-            />
-            <button
-              className="connect-drive-button"
-              onClick={handleConnectDrive}
-            >
-              Authenticate Google Drive
-            </button>
+         
+          <Links folderLink={folderLink} 
+          setFolderLink={setFolderLink}
+          handleShowFiles={handleShowFiles} 
+          activeScreen={activeScreen} 
+          savedFolderLink={savedFolderLink}
+          setSavedFolderLink={setSavedFolderLink}/>
           </div>
           <div className="button-row">
-  <button
-    className="show-files-button"
-    onClick={handleShowFiles}
-    disabled={loadingFiles}
-  >
-    {loadingFiles ? "Loading Files..." : "Show Files"}
-  </button>
+ 
   <button
     className="delete-files-button"
     onClick={handleConfirmDelete}
     disabled={selectedFiles.length === 0}
   >
-    Delete Selected Files
+    Delete
   </button>
   <button
     className="select-all-button"
@@ -372,10 +324,10 @@ const pp= async ()=>{
     Deselect All
   </button>
 </div>
-
+   
           <div className="status-row">
             <label className="connection-status-label">
-              Status: <strong>{connectionStatus}</strong>
+            Status: <strong className={connectionStatus === "Authenticated" ? "authenticated" : "not-authenticated"}>{connectionStatus}</strong>
             </label>
           </div>
           <div className="search-container">
