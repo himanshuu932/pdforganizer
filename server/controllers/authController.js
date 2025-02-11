@@ -35,10 +35,7 @@ const authController = {
     
       const encodedUsername = encodeURIComponent(req.user.name);
       res.redirect(`http://localhost:3000?username=${encodedUsername}&status=success`);
-    
-     
     });
-    
   },
 
   logout: async (req, res) => {
@@ -51,8 +48,7 @@ const authController = {
           console.error("❌ Logout Error:", err);
           return res.status(500).json({ message: "Logout Error" });
         }
-
-        req.session.destroy((err) => {
+         req.session.destroy((err) => {
           if (err) {
             console.error("❌ Session destroy error:", err);
             return res.status(500).json({ message: "Session destroy error" });

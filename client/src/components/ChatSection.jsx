@@ -1,22 +1,26 @@
-import React, { useState } from "react";
+import React, { useState,useRef,useEffect } from "react";
 import attachIcon from "../icons/attach.png";
 import sendIcon from "../icons/send.png";
 import './styles/Chat.css'
 import chatIcon from "../icons/chat.png";
-const ChatSection = ({setActiveScreen}) => {
+const ChatSection = ({setActiveScreen,messages,setMessages}) => {
 
-  const [messages, setMessages] = useState([]);
+  
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [isBotThinking, setIsBotThinking] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(true); // Manage chat visibility
   const [isDarkMode, setIsDarkMode] = useState(false);
-
+  const messagesEndRef = useRef(null);
   const toggleDarkMode = () => {
     setIsDarkMode((prevMode) => !prevMode);
   };
-  
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const handleCloseChat = () => {
     setActiveScreen(1); // Close the chat
   };
@@ -169,8 +173,8 @@ const checkAndRenderResult = (data) => {
       // Add the user message to the chat
       setMessages([...messages, { text: inputMessage, sender: "user" }]);
       setInputMessage("");
-      setIsSending(true); // Disable sending while waiting for bot response
-      setIsBotThinking(true); // Show the bot's thinking message
+      setIsSending(true); 
+      setIsBotThinking(true);
 
       // Simulate a "thinking..." message from the bot before making the request
       setMessages((prevMessages) => [
@@ -236,10 +240,11 @@ const checkAndRenderResult = (data) => {
     <div className={`chat-container `}>
     <div className="chat-header">
       <img src={chatIcon} alt="Chat Icon" className="icon-image" />
-      
+      <div>
+      <button  onClick={() => setMessages([])}>Clear</button>
       <button className="close-btn" onClick={handleCloseChat}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
   <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
-</svg></button>
+</svg></button></div>
     </div>
     <div className="messages" id="chatMessages">
       {messages.map((msg, index) => (
@@ -252,6 +257,8 @@ const checkAndRenderResult = (data) => {
           {msg.text}
         </div>
       ))}
+   <div ref={messagesEndRef} />
+
     </div>
     <div className="chat-input">
       

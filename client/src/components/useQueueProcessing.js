@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const useQueueProcessing = () => {
-  const [queue, setQueue] = useState([]); // Queue for files to process
-  const [isProcessing, setProcessing] = useState(false); // Processing state
-  const [queueStatus, setQueueStatus] = useState(""); // To display the queue status
+  const [queue, setQueue] = useState([]); 
+  const [isProcessing, setProcessing] = useState(false);
+  const [queueStatus, setQueueStatus] = useState(""); 
 
   // Function to push files to the queue
   const pushToQueue = (file) => {
@@ -14,11 +14,9 @@ const useQueueProcessing = () => {
 
   // Function to process files in the queue
   const processQueue = async () => {
- // Prevent multiple simultaneous processes
- // Set processing state to true
 
     while (queue.length > 0) {
-      const file = queue.shift(); // Get the next file from the queue
+      const file = queue.shift(); 
       try {
         const response = await axios.get("http://localhost:5000/api/pdf/process-pdf", {
           params: { fileId: file.id, filename: file.name },

@@ -7,7 +7,7 @@ const oauth2Client = new google.auth.OAuth2(
 const { PDFDocument } = require('pdf-lib');
 const { Readable } = require('stream'); // Import Readable
 let drive='';
-
+const {TextData} = require('../models/text');
 const driveController = {
   // Function to list files from Google Drive
   getFiles: async (req, res) => {

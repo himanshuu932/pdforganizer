@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import pdfIcon from "../icons/pdf-file.png"; // Ensure this path is correct
-import "./Home.css";
+import "./styles/Home.css";
 
 const Home = ({ user, setUser }) => {
   const [uploading, setUploading] = useState(false);

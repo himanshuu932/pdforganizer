@@ -6,14 +6,13 @@ import plusIcon from "../icons/add.png";
 import Links from "./abc";
 import useQueueProcessing from "./useQueueProcessing";
 
-const DocumentModal = ({savedFolderLink,setSavedFolderLink,activeScreen}) => {
-  const [folderName,setFolderName]=useState('No folder');
+const DocumentModal = ({savedFolderLink,setSavedFolderLink,activeScreen,connectionStatus,setConnectionStatus}) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [folderLink, setFolderLink] = useState("");
-  const [connectionStatus, setConnectionStatus] = useState("Not Authenticated");
+  
   const [message, setMessage] = useState("");
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -26,9 +25,10 @@ const DocumentModal = ({savedFolderLink,setSavedFolderLink,activeScreen}) => {
     const msg = params.get("message");
    
     if (status === "success") {
-      setConnectionStatus("Authenticated");
+      setConnectionStatus(true);
       setMessage(msg || "Connected to Google Drive successfully.");
     } else if (status === "failure") {
+      setConnectionStatus(false);
       setMessage(msg || "Failed to connect to Google Drive.");
     }
   }, []);
@@ -326,9 +326,7 @@ const pp= async ()=>{
 </div>
    
           <div className="status-row">
-            <label className="connection-status-label">
-            Status: <strong className={connectionStatus === "Authenticated" ? "authenticated" : "not-authenticated"}>{connectionStatus}</strong>
-            </label>
+           
           </div>
           <div className="search-container">
             <input

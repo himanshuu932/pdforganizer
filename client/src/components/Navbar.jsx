@@ -4,9 +4,9 @@ import SearchFiles from "./SearchFiles";
 import darkmode from '../icons/dark.png';
 import lightmode from '../icons/light.png';
 import axios from "axios";
-function Navbar({setActiveScreen,user, setUser }) {
+function Navbar({setActiveScreen,user, setUser,connectionStatus }) {
   const [isDarkMode, setIsDarkMode] = useState(false);
-
+     
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     document.body.classList.toggle('dark-mode', !isDarkMode);
@@ -54,7 +54,7 @@ function Navbar({setActiveScreen,user, setUser }) {
           <a className="nav-link" onClick={()=>setActiveScreen(4)}>Upload</a>
         </li>*/}
         <li className="nav-item">
-          <a className="nav-link" onClick={()=>setActiveScreen(5)}>About Us</a>
+          <a className="nav-link" onClick={()=>setActiveScreen(4)}>About Us</a>
         </li>
        {/*   <li className="nav-item">
           <a className="nav-link" onClick={()=>setActiveScreen(6)}>drive</a>
@@ -63,6 +63,19 @@ function Navbar({setActiveScreen,user, setUser }) {
 
       {/* Mode Toggle Button and Search Section */}
       <div className="search-form">
+      <span>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="50"
+    height="50"
+    fill={!connectionStatus? "red" : "green"} 
+    className="bi bi-dot"
+    viewBox="0 0 16 16"
+  >
+    <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3" />
+  </svg>
+</span>
+
       <span className="user-name">{getFirstName()}</span>
       <img
   src={isDarkMode ? lightmode : darkmode}

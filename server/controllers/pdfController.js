@@ -42,8 +42,6 @@ const initializeDrive = (credentials) => {
 
 const {
   GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
 } = require("@google/generative-ai");
 
 const apiKey = process.env.API_KEY;
@@ -354,6 +352,7 @@ router.get('/process-pdf', async (req, res) => {
     store(user._id);
 
     res.json({
+      status: 200,
       message: 'PDF processed and text extracted successfully.',
       text: extractedText,
     });
