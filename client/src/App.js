@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Home1 from "./App1"; // Assuming Home1 is another component you have.
+import Home1 from "./Home"; // Assuming Home1 is another component you have.
 import "./App.css";
 import logo from "./icons/google.jpg";
 
