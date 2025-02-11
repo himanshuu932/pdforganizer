@@ -96,7 +96,7 @@ body.dark-mode .modal-content {
 .modal-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  
   margin-bottom: 15px;
 }
 
@@ -116,11 +116,8 @@ body.dark-mode .modal-content {
 
 /* Search Container */
 .search-container {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 5px;
-}
+    display: flex;
+  }
 
 .search-input {
   width: 250px;
@@ -128,7 +125,7 @@ body.dark-mode .modal-content {
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  margin-bottom: 25px;
+ 
 }
 
 /* File Grid and File Cards */
@@ -420,5 +417,81 @@ body.dark-mode .modal-content {
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+ /* Fade In Animation */
+ @keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* RESPONSIVE ADJUSTMENTS */
+
+/* For devices with width 768px and below */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    padding: 15px;
+  }
+  .modal-overlay
+  {
+    top:10%;
+  }
+  .modal-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  /* Make sure each section in the header takes full width */
+  .modal-header > div {
+    width: 100%;
+  }
+  
+  
+  .input-row,
+  .button-row {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Adjust search input to use full available width */
+  .search-input {
+    width: 100%;
+    max-width: 100%;
+  }
+  .modal-content
+  {
+    
+    width: 100%;
+  }
+  
+}
+
+/* For very small devices (e.g., phones) */
+@media (max-width: 480px) {
+  .search-input {
+    padding: 8px;
+    font-size: 13px;
+  }
+  .modal-overlay
+  {
+    top:10%;
+    width: 100%;
+  }
+  .modal-content
+  {
+    
+    width: 100%;
+  }
+  
+  
+  .file-name {
+    font-size: 11px;
   }
 }

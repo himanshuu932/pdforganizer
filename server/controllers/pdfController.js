@@ -14,6 +14,8 @@ const { google } = require('googleapis');
 const { DocumentProcessorServiceClient } = require('@google-cloud/documentai');
 require('dotenv').config();
 
+const EventEmitter = require('events');
+const queueEmitter = new EventEmitter();
 // Import your Mongoose models (adjust the paths as needed)
 const {TextData,User} = require('../models/text');
 // Global variable for Google Drive client
@@ -284,87 +286,149 @@ const store = async (userId) => {
     console.error("Error during store operation:", error);
   }
 };
-router.get('/process-pdf', async (req, res) => {
-  const { fileId, filename } = req.query;
+// routes/pdf.js (or similar)
+const processingQueue = []; // Array to hold tasks
+let isProcessing = false;   // Flag to indicate if processing is active
+
+/**
+ * Processes tasks in the queue one at a time. If new tasks are added while processing, they are handled too.
+ */
+async function processQueue() {
+  if (isProcessing) return;
+  isProcessing = true;
   
-  // Ensure OAuth2 credentials are available in the session.
+  while (processingQueue.length > 0) {
+    const { file, user } = processingQueue.shift();
+    
+    try {
+      // Check if this file has already been processed.
+      const existingTextData = await TextData.findOne({ fileId: file.id });
+      if (existingTextData) {
+        console.log(`File ${file.name} already processed. Skipping.`);
+        continue; // Skip to the next file.
+      }
+      
+      // Download the PDF file from Google Drive.
+      const pdfPath = await fetchFile(file.id);
+      
+      // Split the PDF into chunks.
+      const chunkPaths = await splitPdf(pdfPath);
+      
+      // Begin constructing the extracted text with a header.
+      let extractedText = `filename-${file.name}\\nfileIdstarts-${file.id}-fileIdends\\n`;
+      
+      // Process each chunk with Document AI.
+      for (const chunkPath of chunkPaths) {
+        const chunkText = await processPdfWithDocumentAI(chunkPath);
+        if (chunkText) {
+          // Replace newlines with the literal "\n" before appending.
+          extractedText += chunkText.replace(/\n/g, '\\n') + '\\n';
+        }
+        // Delete the chunk file after processing.
+        fs.unlink(chunkPath, (err) => {
+          if (err) {
+            console.error(`Error deleting chunk file ${chunkPath}:`, err);
+          } else {
+            console.log(`Chunk file deleted: ${chunkPath}`);
+          }
+        });
+      }
+      
+      // Final formatting of the extracted text.
+      extractedText = extractedText.replace(/\n/g, '\\n') + '\n';
+      
+      // Save the extracted text to the database.
+      const newTextData = new TextData({
+        text: extractedText,
+        filename: file.name,
+        fileId: file.id,
+        user: user._id,
+      });
+      await newTextData.save();
+      
+      console.log(`File ${file.name} processed successfully.`);
+      
+    } catch (error) {
+      console.error(`Error processing file ${file.name}:`, error);
+      // Optionally, record the error in a log or database.
+    }
+  }
+  
+  // Processing is done; update the flag and emit an event.
+  isProcessing = false;
+  queueEmitter.emit('empty');
+}
+
+function waitForQueueEmpty() {
+  if (processingQueue.length === 0 && !isProcessing) {
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    queueEmitter.once('empty', () => {
+      resolve();
+    });
+  });
+}
+
+/**
+ * Adds an array of tasks to the global queue and triggers processing.
+ * Each task is an object of the form { file, user }.
+ */
+function addTasks(tasks) {
+  tasks.forEach((task) => processingQueue.push(task));
+  processQueue(); // Start processing if it isn’t already running.
+}
+
+// ----- ROUTE DEFINITION ----- //
+/**
+ * POST /process-pdfs
+ *
+ * Expects a JSON body with an array of file objects under the property "files".
+ * Each file should have at least "id" and "name".
+ *
+ * The route adds the files to the global queue and waits until all are processed.
+ * After processing, it calls store(user._id) and returns a 200 response.
+ */
+router.post('/process-pdfs', async (req, res) => {
+  // Ensure OAuth2 credentials are available.
   if (!req.session || !req.session.oauth2Credentials) {
     return res.status(401).json({ message: 'OAuth2 credentials not found in session.' });
   }
-  // Initialize the Drive client.
-  initializeDrive(req.session.oauth2Credentials);
-
+  
   // Ensure the user is authenticated.
   if (!req.user) {
     return res.status(401).json({ message: 'User not authenticated.' });
   }
   const user = req.user;
-
-  if (!fileId) {
-    return res.status(400).json({ message: 'File ID is required.' });
+  
+  // Initialize the Drive client.
+  initializeDrive(req.session.oauth2Credentials);
+  
+  // Validate the incoming files.
+  const files = req.body.files;
+  if (!files || !Array.isArray(files) || files.length === 0) {
+    return res.status(400).json({ message: 'No files provided.' });
   }
-
-  try {
-    // Check if this file has already been processed.
-    const existingTextData = await TextData.findOne({ fileId });
-    if (existingTextData) {
-      return res.json({
-        message: 'PDF has already been processed and text extracted previously.',
-        text: existingTextData.text,
-      });
-    }
-
-    // Download the PDF file from Google Drive.
-    const pdfPath = await fetchFile(fileId);
-
-    // Split the PDF into chunks.
-    const chunkPaths = await splitPdf(pdfPath);
-
-    let extractedText = `filename-${filename}\\nfileIdstarts-${fileId}-fileIdends\\n`;
-
-    // Process each chunk with Document AI.
-    for (const chunkPath of chunkPaths) {
-      const chunkText = await processPdfWithDocumentAI(chunkPath);
-      if (chunkText) {
-        extractedText += chunkText.replace(/\n/g, '\\n') + '\\n';
-      }
-      // Delete the chunk file after processing.
-      fs.unlink(chunkPath, (err) => {
-        if (err) {
-          console.error(`Error deleting chunk file: ${chunkPath}`, err);
-        } else {
-          console.log(`Chunk file deleted: ${chunkPath}`);
-        }
-      });
-    }
-
-    extractedText = extractedText.replace(/\n/g, '\\n') + '\n';
-
-    // Save the extracted text data.
-    const newTextData = new TextData({
-      text: extractedText,
-      filename: filename,
-      fileId: fileId,
-      user: user._id,
-    });
-    await newTextData.save();
-
-    store(user._id);
-
-    res.json({
+  
+  // Map each file to a task including the user context.
+  const tasks = files.map((file) => ({ file, user }));
+  
+  // Add tasks to the global queue.
+  addTasks(tasks);
+  
+  // Wait until the global queue becomes empty (i.e. all files are processed).
+  await waitForQueueEmpty();
+  
+  store(user._id);
+  
+  // Send a response back to the client indicating success.
+   res.json({
       status: 200,
       message: 'PDF processed and text extracted successfully.',
-      text: extractedText,
+      
     });
-  } catch (error) {
-    console.error('Error processing PDF:', error);
-    res.status(500).json({ message: `Error processing PDF: ${error}` });
-  }
-  finally{
-    store(user._id);
-  }
-});
 
+});
 router.post('/submit-query', async (req, res) => {
   const { query } = req.body;
   

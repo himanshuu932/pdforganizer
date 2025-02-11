@@ -10,12 +10,13 @@
 
 .file-search-input {
   width: 100%;
-  padding: 8px;
   font-size: 14px;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
   background-color: #fff;
   color: #333;
+  box-sizing: border-box;
 }
 
 /* Light Mode Styles */
@@ -79,8 +80,8 @@ body.dark-mode .file-item:active {
   max-height: 200px;
   overflow-y: auto;
   z-index: 999;
-  padding: 0; /* Remove default padding for the list */
-  margin: 0;  /* Remove default margin for the list */
+  padding: 0;  /* Remove default padding */
+  margin: 0;   /* Remove default margin */
   list-style-type: none; /* Remove bullets */
   border-top: none; /* Remove border at the top */
 }
@@ -91,10 +92,28 @@ body.dark-mode .file-item:active {
   font-size: 14px;
 }
 
+/* Hover and active states */
 .file-item:hover {
   background-color: #e0f7fa;
 }
 
 .file-item:active {
   background-color: #89d0ce;
+}
+
+/* Responsive Styles */
+@media (max-width: 48px) {
+  .file-search-input {
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  .file-item {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .file-list {
+    top: 45px; /* Increase if the input height grows on mobile */
+  }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import './styles/sf.css';
+import "./styles/sf.css";
 
 const SearchFiles = ({ isVisible, onFileClick }) => {
   const [files, setFiles] = useState([]);
@@ -41,7 +41,7 @@ const SearchFiles = ({ isVisible, onFileClick }) => {
     // Close the search dropdown if the click is outside the search component
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setSearchQuery(''); // Optional: Clear the search input
+        setSearchQuery(''); // Optional: Clear the search input when clicking outside
       }
     };
 

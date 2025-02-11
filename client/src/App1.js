@@ -13,7 +13,7 @@ function Home1({ user, setUser,saved,setSaved }) {
   const [savedFolderLink, setSavedFolderLink] = useState(null);
   const [messages, setMessages] = useState([]);
   const [connectionStatus, setConnectionStatus] = useState(true);
-  
+  const [isProcessing, setIsProcessing] = useState(false);
   useEffect(() => {
     localStorage.setItem("activeScreen", activeScreen);
     activeScreen==3? openChat():closeChat();
@@ -36,7 +36,7 @@ function Home1({ user, setUser,saved,setSaved }) {
     <div className="app">
       {/* Navbar */}
       <Navbar setActiveScreen={setActiveScreen} user={user} setUser={setUser} 
-      connectionStatus={connectionStatus} 
+      connectionStatus={connectionStatus} isProcessing={isProcessing}
       />
       {/* Start Screen */}
       <div className="start-screen-section">
@@ -45,8 +45,9 @@ function Home1({ user, setUser,saved,setSaved }) {
         <DocumentModal activeScreen={activeScreen} 
          savedFolderLink={savedFolderLink} 
          setSavedFolderLink={setSavedFolderLink}
-         connectionStatus={connectionStatus}
          setConnectionStatus={setConnectionStatus}
+         isProcessing={isProcessing}
+         setIsProcessing={setIsProcessing}
          />}
         
         {activeScreen === 4 && <AboutUs />}

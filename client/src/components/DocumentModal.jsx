@@ -3,10 +3,10 @@ import axios from "axios";
 import "./styles/DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
 import plusIcon from "../icons/add.png";
-import Links from "./abc";
-import useQueueProcessing from "./useQueueProcessing";
+import Links from "./Links";
 
-const DocumentModal = ({savedFolderLink,setSavedFolderLink,activeScreen,connectionStatus,setConnectionStatus}) => {
+
+const DocumentModal = ({savedFolderLink,setSavedFolderLink,activeScreen,isProcessing,setIsProcessing,setConnectionStatus}) => {
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -16,7 +16,7 @@ const DocumentModal = ({savedFolderLink,setSavedFolderLink,activeScreen,connecti
   const [message, setMessage] = useState("");
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const { pushToQueue } = useQueueProcessing();
+
   const [showConfirmation, setShowConfirmation] = useState(false);
  
   useEffect(() => {
@@ -117,27 +117,35 @@ const DocumentModal = ({savedFolderLink,setSavedFolderLink,activeScreen,connecti
       setMessage("Failed to delete files. Please try again.");
     }
   };
-const pp= async ()=>{
-
-  const pdfFiles = files.filter((file) => file.name.endsWith('.pdf'));
+  const pp = async () => {
+    // Assume `files` is an array available in your component/context.
+    const pdfFiles = files.filter((file) => file.name.endsWith('.pdf'));
   
-      if (pdfFiles.length === 0) {
-        setMessage("No PDF files found.");
-      } else {
-       
-        for (const file of pdfFiles) {
-          try {
-
-           pushToQueue(file);
-
-          } catch (err) {
-            console.error(`Error processing PDF for file ${file.name}:`, err);
-          }
-        }
-      
+    if (pdfFiles.length === 0) {
+      setMessage("No PDF files found.");
+      return;
+    }
+  
+    try {
+      // Send the entire array of PDF files to the backend via a POST request.
+      setIsProcessing(true);
+      const response = await axios.post("http://localhost:5000/api/pdf/process-pdfs", {
+        files: pdfFiles, // Each file should have at least an `id` and `name` property.
+      }, {
+        withCredentials: true, // Include credentials if needed.
+      });
+  
+      if (response.status === 200) {
+        console.log("All files processed", response.data.message);
         setMessage("PDF files processed successfully.");
       }
-}
+      setIsProcessing(false);
+    } catch (err) {
+      console.error("Error processing PDFs: ", err);
+      setMessage("Error processing PDF files.");
+    }
+  };
+  
 
   const handleSelectAll = () => {
     const allFileIds = filteredFiles.map((file) => file.id);
@@ -290,45 +298,7 @@ const pp= async ()=>{
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-        
-          <div className="input-row">
-         
-          <Links folderLink={folderLink} 
-          setFolderLink={setFolderLink}
-          handleShowFiles={handleShowFiles} 
-          activeScreen={activeScreen} 
-          savedFolderLink={savedFolderLink}
-          setSavedFolderLink={setSavedFolderLink}/>
-          </div>
-          <div className="button-row">
- 
-  <button
-    className="delete-files-button"
-    onClick={handleConfirmDelete}
-    disabled={selectedFiles.length === 0}
-  >
-    Delete
-  </button>
-  <button
-    className="select-all-button"
-    onClick={handleSelectAll}
-    disabled={filteredFiles.length === 0}
-  >
-    Select All
-  </button>
-  <button
-    className="deselect-all-button"
-    onClick={handleDeselectAll}
-    disabled={selectedFiles.length === 0}
-  >
-    Deselect All
-  </button>
-</div>
-   
-          <div className="status-row">
-           
-          </div>
-          <div className="search-container">
+        <div className="search-container">
             <input
               type="text"
               className="search-input"
@@ -337,8 +307,45 @@ const pp= async ()=>{
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <div className="input-row">
+         
+          <Links folderLink={folderLink} 
+          setFolderLink={setFolderLink}
+          handleShowFiles={handleShowFiles} 
+          activeScreen={activeScreen} 
+          savedFolderLink={savedFolderLink}
+          setSavedFolderLink={setSavedFolderLink}
+          setFiles={setFiles} />
+          
+          </div>
+      
+           
         </div>
 
+        {  selectedFiles.length > 0  && ( <div className="button-row">
+ 
+ <button
+   className="delete-files-button"
+   onClick={handleConfirmDelete}
+   disabled={selectedFiles.length === 0}
+ >
+   Delete
+ </button>
+ <button
+   className="select-all-button"
+   onClick={handleSelectAll}
+   disabled={filteredFiles.length === 0}
+ >
+   Select All
+ </button>
+ <button
+   className="deselect-all-button"
+   onClick={handleDeselectAll}
+   disabled={selectedFiles.length === 0}
+ >
+   Deselect All
+ </button>
+</div>)}
         <div
           className={`dropzone ${isDragging ? "dragging" : ""}`}
           onDragOver={handleDragOver}

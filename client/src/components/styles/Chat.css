@@ -1,8 +1,4 @@
-/* chat.css */
 
-/* Chat Container & Interface */
-
-/* Chat Container – Positioned below the navbar */
 .chat-container {
   display: flex;
   flex-direction: column;
@@ -10,14 +6,14 @@
   color: var(--text-color);
   width: 100%;
   position: absolute;
-  top: 60px; /* Leave space for the fixed navbar (adjust as needed) */
+  top: 9%; /* Leave space for the fixed navbar (adjust as needed) */
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  z-index: 1100;
+  z-index: 100;
   transition: all 0.3s ease-in-out;
 }
 
@@ -194,7 +190,7 @@ tr:hover {
 @media (max-width: 600px) {
   .chat-container {
     width: 95%;
-    top: 18%;
+    top: 10%;
     bottom: 0;
     border-radius: 0;
     box-shadow: none;
@@ -234,7 +230,7 @@ tr:hover {
 @media (max-width: 768px) and (min-width: 601px) {
   .chat-container {
     width: 90%;
-    top: 60px;
+    top: 10%;
     bottom: 0;
   }
 
@@ -262,4 +258,22 @@ tr:hover {
   td {
     padding: 9px;
   }
+}
+.clear-btn {
+  background-color: transparent; /* Transparent background */
+  color: #000;                  /* Black text */
+  border: 1px solid #000;       /* Black border */
+  padding: 2px 4px;            /* Padding for clickable area */
+  border-radius: 4px;           /* Slightly rounded corners */
+  font-size: 14px;              /* Font size */
+  cursor: pointer;              /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.clear-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* Subtle background change on hover */
+}
+
+.clear-btn:active {
+  transform: scale(0.98); /* Slight shrink on click */
 }

@@ -1,0 +1,129 @@
+/* Base wrapper */
+.links-wrapper-links {
+    margin-top: 10px;
+    font-family: Arial, sans-serif;
+    
+  }
+  
+  /* Container for dropdown and buttons */
+  .links-container-links {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+  }
+  
+  /* Dropdown (select) styles */
+  .folder-select-links {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Shared button styles */
+  .button-links {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  /* Add button style */
+  .add-button-links {
+    background-color: #4caf50;
+    color: #fff;
+  }
+  
+  /* Delete button style */
+  .delete-button-links {
+    background-color: #f44336;
+    color: #fff;
+  }
+  
+  /* Cancel button style (red) for the add modal */
+  .cancel-button-links {
+    background-color: #f44336;
+    color: #fff;
+  }
+  
+  /* Alternate cancel button style (gray) for the delete modal */
+  .cancel-button-alt-links {
+    background-color: #ccc;
+    color: #000;
+  }
+  
+  /* Modal overlay styles */
+  .modal-overlay-links {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  /* Modal content styles */
+  .modal-links {
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    width: 400px;
+    max-width: 90%;
+  }
+  
+  /* Modal header */
+  .modal-header-links {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  
+  /* Modal input field */
+  .modal-input-links {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  /* Container for modal buttons */
+  .modal-buttons-links {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .cc{
+    display: flex;
+    flex-direction: row;
+   }
+
+  /* Media query for mobile view (480px or less) */
+  @media (max-width: 480px) {
+    .links-container-links {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+   .cc{
+      display: flex;
+      flex-direction: row;
+   }
+  }
+  @media (max-width: 760px) {
+    .links-container-links {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+   .cc{
+    display: flex;
+      flex-direction: row;
+   }
+  }
+  
