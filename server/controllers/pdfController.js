@@ -353,7 +353,14 @@ async function processQueue() {
       // Optionally, record the error in a log or database.
     }
   }
-
+  const downloadedFilePath = path.join(__dirname, "downloaded-file.pdf");
+  fs.unlink(downloadedFilePath, (err) => {
+    if (err) {
+      console.error(`Error deleting downloaded file:`, err);
+    } else {
+      console.log(`Downloaded file deleted: ${downloadedFilePath}`);
+    }
+  });
   // Processing is done; update the flag and emit an event.
   isProcessing = false;
   queueEmitter.emit("empty");
