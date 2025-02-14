@@ -35,6 +35,23 @@
     background-color: #4caf50;
     color: #fff;
   }
+
+  .add-button-links:hover::after {
+    content: "Add folder link";
+    position: absolute;
+    top: 66px;
+    left: 96%;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease-in-out;
+  }
   
   /* Delete button style */
   .delete-button-links {

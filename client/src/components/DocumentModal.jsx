@@ -560,7 +560,15 @@ return (
         </div>
       </div>
 
-      {message && <div className="status-message">{message}</div>}
+      {message && (
+  <div
+    className={`status-message ${
+      message.includes("Failed") || message.includes("Error") || message.includes("No")? "error" : "success"
+    } ${!message ? "fade-out" : ""}`}
+  >
+    {message}
+  </div>
+)}
       {showConfirmation && (
         <div className="confirmation-modal">
           <div className="modal-content1">

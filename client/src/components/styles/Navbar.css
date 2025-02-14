@@ -85,6 +85,23 @@
   align-items: center;
 }
 
+.status-dot:hover::after {
+  content: "Drive Status: Connected";
+  position: absolute;
+  top: 45px;
+  left: 80%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  white-space: nowrap;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease-in-out;
+}
+
 .mode-toggle {
   color: #007bff;
   border-radius: 4px;
