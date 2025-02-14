@@ -40,7 +40,7 @@ const driveController = {
           });
   
           let folderName = "";
-  
+          
           // Map the response and also send size (parsed as a number if available)
           const files = response.data.files.map((file) => ({
             id: file.id,

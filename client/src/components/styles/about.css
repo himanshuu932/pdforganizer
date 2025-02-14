@@ -1,0 +1,121 @@
+/* Base container for About Us */
+.about-us {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  /* Light and dark backgrounds */
+  .about-us.light {
+    background-color: #f4f4f4;
+  }
+  
+  .about-us.dark {
+    background-color: #333;
+  }
+  
+  /* Info Section */
+  .info-section {
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .heading {
+    font-size: 2rem;
+  }
+  
+  .heading-light {
+    color: #333;
+  }
+  
+  .heading-dark {
+    color: #f1f1f1;
+  }
+  
+  .paragraph {
+    font-size: 1rem;
+  }
+  
+  .paragraph-light {
+    color: #333;
+  }
+  
+  .paragraph-dark {
+    color: #ddd;
+  }
+  
+  /* Carousel Styles */
+  .carousel-wrapper {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    perspective: 1000px;
+    margin-top: 20px;  /* Ensure there is spacing below the info section */
+    z-index: 2;        /* Bring the carousel above the info section if overlapping occurs */
+  }
+  
+  .carousel-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Card Base */
+  .card-base {
+    position: absolute;
+    width: 250px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  
+  /* Member Image */
+  .member-image {
+    width: 100%;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  
+  /* Member Text */
+  .member-name {
+    font-size: 1.2rem;
+  }
+  
+  .member-name-light {
+    color: #333;
+  }
+  
+  .member-name-dark {
+    color: #f1f1f1;
+  }
+  
+  .member-role {
+    font-size: 1rem;
+  }
+  
+  .member-role-light {
+    color: #666;
+  }
+  
+  .member-role-dark {
+    color: #ccc;
+  }
+  
+  .member-info {
+    font-size: 0.9rem;
+  }
+  
+  .member-info-light {
+    color: #444;
+  }
+  
+  .member-info-dark {
+    color: #bbb;
+  }
+  

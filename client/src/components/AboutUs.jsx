@@ -1,77 +1,161 @@
 import React, { useState, useEffect } from 'react';
+import './AboutUs.css';
 
 const AboutUs = () => {
   const [darkMode, setDarkMode] = useState(false);
+  const [centerIndex, setCenterIndex] = useState(0);
+  const [slideOffset, setSlideOffset] = useState(0);
+  const [isSliding, setIsSliding] = useState(false);
+  const [disableTransition, setDisableTransition] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
+  // Set dark mode based on system preference on mount
   useEffect(() => {
-    // Listen for changes in dark mode preference (e.g., system preference)
-    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setDarkMode(isDarkMode);
+    const isDark =
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setDarkMode(isDark);
   }, []);
 
+  const teamMembers = [
+    {
+      name: "Himanshu Upadhyay",
+      role: "Full Stack Developer",
+      image: "https://picsum.photos/seed/himanshu/200/200",
+      info: "Himanshu is a seasoned full stack developer with expertise in both front-end and back-end technologies. "
+    },
+    
+    {
+      name: "Bob Johnson",
+      role: "Backend Developer",
+      image: "https://picsum.photos/seed/bob/200/200",
+      info: "Bob powers our systems and ensures everything runs smoothly."
+    },
+    {
+      name: "Carol Williams",
+      role: "UX Designer",
+      image: "https://picsum.photos/seed/carol/200/200",
+      info: "Carol crafts engaging user experiences that delight our users."
+    },
+  ];
+
+  // Use five slots:
+  // Slot 0: Far Left
+  // Slot 1: Left
+  // Slot 2: Center
+  // Slot 3: Right
+  // Slot 4: Far Right
+  const indices = [
+    (centerIndex - 2 + teamMembers.length) % teamMembers.length, // Far left
+    (centerIndex - 1 + teamMembers.length) % teamMembers.length, // Left
+    centerIndex,                                                 // Center
+    (centerIndex + 1) % teamMembers.length,                        // Right
+    (centerIndex + 2) % teamMembers.length,                        // Far right
+  ];
+
+  // Base positions for each slot (x in %, y in %, etc.)
+  const positions = [
+    { x: -250, y: -50, scale: 0.6, rotate: 30,  zIndex: 0 }, // Far left
+    { x: -150, y: -50, scale: 0.8, rotate: 20,  zIndex: 1 }, // Left
+    { x: -50,  y: -50, scale: 1,   rotate: 0,   zIndex: 2 }, // Center
+    { x: 50,   y: -50, scale: 0.8, rotate: -20, zIndex: 1 }, // Right
+    { x: 150,  y: -50, scale: 0.6, rotate: -30, zIndex: 0 }, // Far right
+  ];
+
+  // Auto-slide effect (only when not hovered)
+  useEffect(() => {
+    if (!isHovered) {
+      const timer = setInterval(() => {
+        if (!isSliding) {
+          setIsSliding(true);
+          setDisableTransition(false);
+          setSlideOffset(100); // Slide right by 100%
+          setTimeout(() => {
+            // Update center index and reposition instantly
+            setCenterIndex((prev) => (prev - 1 + teamMembers.length) % teamMembers.length);
+            setDisableTransition(true); // disable transition for instant repositioning
+            setSlideOffset(0);
+            setTimeout(() => {
+              setDisableTransition(false);
+              setIsSliding(false);
+            }, 50);
+          }, 1000); // Duration of the slide animation
+        }
+      }, 3000);
+      return () => clearInterval(timer);
+    }
+  }, [isSliding, teamMembers.length, isHovered]);
+
+  // Interpolate scales for smooth transitions.
+  const getEffectiveScale = (slotIndex) => {
+    const fraction = Math.min(Math.max(slideOffset / 100, 0), 1);
+    if (slotIndex === 1) {
+      return 0.8 + 0.2 * fraction;
+    }
+    if (slotIndex === 2) {
+      return 1 - 0.2 * fraction;
+    }
+    if (slotIndex === 3) {
+      return 0.8 - 0.2 * fraction;
+    }
+    return positions[slotIndex].scale;
+  };
+
   return (
-    <section
-      id="about-us"
-      style={darkMode ? styles.containerDark : styles.containerLight}
-    >
-      <h2 style={darkMode ? styles.headingDark : styles.headingLight}>About Us</h2>
-      <p style={darkMode ? styles.paragraphDark : styles.paragraphLight}>
-        We are a team of passionate developers dedicated to creating innovative and impactful solutions for the web. Our mission is to bring the best technologies and ideas together to create exceptional user experiences.
-      </p>
-    </section>
+    <div className={`about-us ${darkMode ? 'dark' : 'light'}`}>
+      <div className="info-section">
+        <h2 className={`heading ${darkMode ? 'heading-dark' : 'heading-light'}`}>
+        BLUDGERS
+        </h2>
+        <p className={`paragraph ${darkMode ? 'paragraph-dark' : 'paragraph-light'}`}>
+          We are a team of passionate developers dedicated to creating innovative solutions.
+        </p>
+      </div>
+
+      <div className="carousel-wrapper">
+        <div className="carousel-container">
+          {indices.map((memberIndex, slotIndex) => {
+            const pos = positions[slotIndex];
+            const effectiveScale = getEffectiveScale(slotIndex);
+
+            // For the center card (slot index 2), add hover event handlers.
+            const cardProps = {
+              key: slotIndex,
+              className: 'card-base',
+              style: {
+                transition: disableTransition ? 'none' : 'transform 1s ease-in-out',
+                transform: `translate(${pos.x + slideOffset}%, ${pos.y}%) scale(${effectiveScale}) rotateY(${pos.rotate}deg)`,
+                zIndex: pos.zIndex,
+              },
+            };
+            if (slotIndex === 2) {
+              cardProps.onMouseEnter = () => setIsHovered(true);
+              cardProps.onMouseLeave = () => setIsHovered(false);
+            }
+
+            return (
+              <div {...cardProps}>
+                <img
+                  src={teamMembers[memberIndex].image}
+                  alt={teamMembers[memberIndex].name}
+                  className="member-image"
+                />
+                <h3 className={`member-name ${darkMode ? 'member-name-dark' : 'member-name-light'}`}>
+                  {teamMembers[memberIndex].name}
+                </h3>
+                <h4 className={`member-role ${darkMode ? 'member-role-dark' : 'member-role-light'}`}>
+                  {teamMembers[memberIndex].role}
+                </h4>
+                <p className={`member-info ${darkMode ? 'member-info-dark' : 'member-info-light'}`}>
+                  {teamMembers[memberIndex].info}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
-};
-
-const styles = {
-  // Light Mode Styles
-  containerLight: {
-    padding: '20px',
-    width: '300px',   // Set width
-    height: '300px',  // Set height to be equal to width for square shape
-    backgroundColor: '#f4f4f4',
-    borderRadius: '8px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headingLight: {
-    fontSize: '1.5rem', // Adjust font size to fit square container
-    marginBottom: '10px',
-    color: '#333',
-    textAlign: 'center',
-  },
-  paragraphLight: {
-    fontSize: '1rem',
-    color: '#333',
-    textAlign: 'center',
-  },
-
-  // Dark Mode Styles
-  containerDark: {
-    padding: '20px',
-    width: '300px',   // Set width
-    height: '300px',  // Set height to be equal to width for square shape
-    backgroundColor: '#333',
-    borderRadius: '8px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headingDark: {
-    fontSize: '1.5rem', // Adjust font size to fit square container
-    marginBottom: '10px',
-    color: '#f1f1f1',
-    textAlign: 'center',
-  },
-  paragraphDark: {
-    fontSize: '1rem',
-    color: '#ddd',
-    textAlign: 'center',
-  },
 };
 
 export default AboutUs;
