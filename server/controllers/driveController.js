@@ -19,41 +19,38 @@ const driveController = {
           access_token: req.user.accessToken,
           refresh_token: req.user.refreshToken,
         });
-
+  
         // Create drive instance
-         drive = google.drive({ version: "v3", auth: oauth2Client });
-
+        const drive = google.drive({ version: "v3", auth: oauth2Client });
+  
         const folderLink = req.query.folderLink;
         const folderId = folderLink?.split("/folders/")[1]?.split("?")[0];
-
+  
         if (!folderId) {
           return res.status(400).json({ message: "Invalid folder link." });
         }
-
+  
         try {
           // List files within the folder
           const response = await drive.files.list({
             q: `'${folderId}' in parents`,
             pageSize: 100,
             fields:
-              "files(id, name, webViewLink, webContentLink, createdTime, modifiedTime, parents)",
+              "files(id, name, webViewLink, webContentLink, createdTime, modifiedTime, size, parents)",
           });
-
-          const folderName = "";
-          if (response.data.files.length > 0) {
-            // Log the parents of the first file
-            const firstFile = response.data.files[0];
-            console.log("Parents of the first file:", firstFile.parents);
-          }
-
+  
+          let folderName = "";
+  
+          // Map the response and also send size (parsed as a number if available)
           const files = response.data.files.map((file) => ({
             id: file.id,
             name: file.name,
             link: file.webViewLink,
             createdTime: file.createdTime,
             modifiedTime: file.modifiedTime,
+            size: file.size ? parseInt(file.size, 10) : null,
           }));
-
+  
           res.json({
             folderName,
             files,
@@ -76,6 +73,7 @@ const driveController = {
       res.status(401).json({ message: "Not authenticated" });
     }
   },
+  
 
   // Function to upload a file to Google Drive
   uploadFile: async (req, res) => {

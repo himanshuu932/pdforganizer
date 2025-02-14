@@ -12,7 +12,7 @@ const SearchFiles = ({ isVisible, onFileClick }) => {
       // Retrieve the JWT token from localStorage
       const token = localStorage.getItem("token");
       
-      const res = await fetch("https://pdforganizer-vt1s.onrender.com/files", {
+      const res = await fetch("http://localhost:5000/files", {
         headers: {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",

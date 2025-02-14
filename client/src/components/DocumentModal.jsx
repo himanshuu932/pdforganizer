@@ -66,7 +66,7 @@ const DocumentModal = ({
     setLoadingFiles(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("https://pdforganizer-vt1s.onrender.com/api/drive/files", {
+      const response = await axios.get("http://localhost:5000/api/drive/files", {
         params: { folderLink },
         headers: {
           "Content-Type": "application/json",
@@ -76,6 +76,11 @@ const DocumentModal = ({
       const fetchedFiles = response.data.files || [];
       setFiles(fetchedFiles);
       setFilteredFiles(fetchedFiles);
+      fetchedFiles.forEach((file) => {
+        console.log(`File: ${file.name}`);
+        console.log("Created Time:", file.createdTime);
+        console.log("Modified Time:", file.modifiedTime);
+      });
       setMessage(response.data.message || "Files fetched successfully.");
       setMessage("Processing please wait...");
     } catch (err) {
@@ -85,7 +90,27 @@ const DocumentModal = ({
       setLoadingFiles(false);
     }
   };
-
+  const sortFiles = (property, orderFlag) => {
+    const sortedFiles = [...files].sort((a, b) => {
+      // For date fields, convert to Date objects
+      if (property === "createdTime" || property === "modifiedTime") {
+        return orderFlag * (new Date(a[property]) - new Date(b[property]));
+      }
+      // For alphabetical sort (using the file name)
+      if (property === "name") {
+        return orderFlag * a[property].localeCompare(b[property]);
+      }
+      // For numeric sorting (e.g., file size)
+      if (property === "size") {
+        return orderFlag * (a[property] - b[property]);
+      }
+      return 0;
+    });
+    setFiles(sortedFiles);
+    setFilteredFiles(sortedFiles);
+  };
+  
+  
   const handleConfirmDelete = () => {
     setShowConfirmation(true);
   };
@@ -99,7 +124,7 @@ const DocumentModal = ({
     setShowConfirmation(false);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete("https://pdforganizer-vt1s.onrender.com/api/drive/delete", {
+      const res = await axios.delete("http://localhost:5000/api/drive/delete", {
         data: {
           fileIds: selectedFiles,
           folderLink,
@@ -140,7 +165,7 @@ const DocumentModal = ({
       setIsProcessing(true);
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "https://pdforganizer-vt1s.onrender.com/api/pdf/process-pdfs",
+        "http://localhost:5000/api/pdf/process-pdfs",
         {
           files: pdfFiles,
         },
@@ -213,7 +238,7 @@ const DocumentModal = ({
       try {
         const token = localStorage.getItem("token");
         const res = await axios.post(
-          "https://pdforganizer-vt1s.onrender.com/api/drive/upload",
+          "http://localhost:5000/api/drive/upload",
           formData,
           {
             headers: {
@@ -397,6 +422,50 @@ const DocumentModal = ({
             </div>
           </div>
         </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+  <h3>Sort Files</h3>
+  
+  <div>
+    <h4>Sort by Created Time</h4>
+    <button onClick={() => sortFiles("createdTime", 1)}>
+      Ascending
+    </button>
+    <button onClick={() => sortFiles("createdTime", -1)}>
+      Descending
+    </button>
+  </div>
+  
+  <div>
+    <h4>Sort by Modified Time</h4>
+    <button onClick={() => sortFiles("modifiedTime", 1)}>
+      Ascending
+    </button>
+    <button onClick={() => sortFiles("modifiedTime", -1)}>
+      Descending
+    </button>
+  </div>
+  
+  <div>
+    <h4>Sort Alphabetically (Name)</h4>
+    <button onClick={() => sortFiles("name", 1)}>
+      Ascending (A-Z)
+    </button>
+    <button onClick={() => sortFiles("name", -1)}>
+      Descending (Z-A)
+    </button>
+  </div>
+  
+  <div>
+    <h4>Sort by Size</h4>
+    <button onClick={() => sortFiles("size", 1)}>
+      Ascending
+    </button>
+    <button onClick={() => sortFiles("size", -1)}>
+      Descending
+    </button>
+  </div>
+</div>
+
 
         {message && <div className="status-message">{message}</div>}
         {showConfirmation && (

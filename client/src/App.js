@@ -30,7 +30,7 @@ const App = () => {
 
   const handleLogin = () => {
     console.log("🔄 Redirecting to Google Login...");
-    window.location.href = "https://pdforganizer-vt1s.onrender.com/auth/google";
+    window.location.href = "http://localhost:5000/auth/google";
   };
 
   const fetchCurrentUser = async () => {
@@ -38,7 +38,7 @@ const App = () => {
     if (!token) return;
 
     try {
-      const response = await axios.get("https://pdforganizer-vt1s.onrender.com/auth/current_user", {
+      const response = await axios.get("http://localhost:5000/auth/current_user", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUser(response.data.user);
