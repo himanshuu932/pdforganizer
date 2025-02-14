@@ -168,7 +168,7 @@ const fetchFile = async (fileId) => {
  * @param {number} maxPages - Maximum number of pages per chunk (default is 15).
  * @returns {Promise<string[]>} - Resolves with an array of chunk file paths.
  */
-const splitPdf = async (pdfPath, maxPages = 5) => {
+const splitPdf = async (pdfPath, maxPages = 15) => {
   const pdfBytes = fs.readFileSync(pdfPath);
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const totalPages = pdfDoc.getPageCount();
