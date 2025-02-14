@@ -13,7 +13,7 @@ const driveController = {
         const oauth2Client = new google.auth.OAuth2(
           process.env.GOOGLE_CLIENT_ID,
           process.env.GOOGLE_CLIENT_SECRET,
-          "http://localhost:5000/auth/google/callback"
+          process.env.CALLBACK_URL2,
         );
         oauth2Client.setCredentials({
           access_token: req.user.accessToken,
@@ -108,38 +108,7 @@ const driveController = {
     }
   
     try {
-      console.log("🔑 Setting up OAuth2 client...");
-      console.log("👤 User credentials:", req.user);
-  
-      const oauth2Client = new google.auth.OAuth2(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET,
-        "http://localhost:5000/auth/google/callback"
-      );
-  
-      oauth2Client.setCredentials({
-        access_token: req.user.accessToken,
-        refresh_token: req.user.refreshToken,
-      });
-  
-      console.log("✅ OAuth2 client set up successfully.");
-  
-      // 🔄 Refresh Access Token if Expired
-      console.log("🔄 Checking if access token needs to be refreshed...");
-      try {
-        const { token } = await oauth2Client.getAccessToken();
-        oauth2Client.setCredentials({
-          access_token: token,
-          refresh_token: req.user.refreshToken, // Ensure the refresh token is retained
-        });
-        console.log("🆕 Using refreshed access token:", token);
-        
-      } catch (refreshError) {
-        console.error("❌ Failed to refresh access token:", refreshError.message);
-        return res.status(401).json({ message: "Failed to refresh access token. Please re-authenticate." });
-      }
-  
-      console.log("📂 Creating Drive instance...");
+     
       
   
       const { originalname, mimetype, buffer } = req.file;
@@ -176,19 +145,7 @@ const driveController = {
         const fileId = req.params.fileId;
 
         // Create a new OAuth2 client and set credentials from req.user
-        const oauth2Client = new google.auth.OAuth2(
-          process.env.GOOGLE_CLIENT_ID,
-          process.env.GOOGLE_CLIENT_SECRET,
-          "http://localhost:5000/auth/google/callback"
-        );
-        oauth2Client.setCredentials({
-          access_token: req.user.accessToken,
-          refresh_token: req.user.refreshToken,
-        });
-
-       
-       
-
+   
         // Get the file metadata
         const file = await drive.files.get({
           fileId: fileId,
@@ -208,18 +165,7 @@ const driveController = {
   // Function to delete a file from Google Drive
   deleteFile: async (req, res) => {
     if (req.user) {
-      // Create a new OAuth2 client and set credentials from req.user
-      const oauth2Client = new google.auth.OAuth2(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET,
-        "http://localhost:5000/auth/google/callback"
-      );
-      oauth2Client.setCredentials({
-        access_token: req.user.accessToken,
-        refresh_token: req.user.refreshToken,
-      });
-
-      // Create drive instance
+    
      
 
       const { fileIds, folderLink } = req.body; // Expecting file IDs and folder link in the request body

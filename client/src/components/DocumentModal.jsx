@@ -66,7 +66,7 @@ const DocumentModal = ({
     setLoadingFiles(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/drive/files", {
+      const response = await axios.get("https://pdforganizer.vercel.app/api/drive/files", {
         params: { folderLink },
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +99,7 @@ const DocumentModal = ({
     setShowConfirmation(false);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete("http://localhost:5000/api/drive/delete", {
+      const res = await axios.delete("https://pdforganizer.vercel.app/api/drive/delete", {
         data: {
           fileIds: selectedFiles,
           folderLink,
@@ -140,7 +140,7 @@ const DocumentModal = ({
       setIsProcessing(true);
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:5000/api/pdf/process-pdfs",
+        "https://pdforganizer.vercel.app/api/pdf/process-pdfs",
         {
           files: pdfFiles,
         },
@@ -213,7 +213,7 @@ const DocumentModal = ({
       try {
         const token = localStorage.getItem("token");
         const res = await axios.post(
-          "http://localhost:5000/api/drive/upload",
+          "https://pdforganizer.vercel.app/api/drive/upload",
           formData,
           {
             headers: {

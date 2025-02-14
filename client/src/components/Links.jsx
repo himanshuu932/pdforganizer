@@ -26,7 +26,7 @@ const Links = ({
     const fetchFolderLinks = async () => {
       try {
         
-        const response = await fetch("http://localhost:5000/api/user/folder-links", {
+        const response = await fetch("https://pdforganizer.vercel.app/api/user/folder-links", {
           headers: {
             "Content-Type": "application/json",
             Authorization: token ? `Bearer ${token}` : "",
@@ -96,7 +96,7 @@ const Links = ({
   // Save a new folder link via the API
   const saveFolderLink = async (link) => {
     try {
-      const response = await fetch("http://localhost:5000/api/user/save-folder", {
+      const response = await fetch("https://pdforganizer.vercel.app/api/user/save-folder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -125,7 +125,7 @@ const Links = ({
   // Delete the selected folder link via the API
   const deleteFolderLink = async (link) => {
     try {
-      const response = await fetch("http://localhost:5000/api/user/delete-folder", {
+      const response = await fetch("https://pdforganizer.vercel.app/api/user/delete-folder", {
         method: "POST", // Using POST for deletion
         headers: {
           "Content-Type": "application/json",

@@ -12,7 +12,7 @@ const SearchFiles = ({ isVisible, onFileClick }) => {
       // Retrieve the JWT token from localStorage
       const token = localStorage.getItem("token");
       
-      const res = await fetch("http://localhost:5000/files", {
+      const res = await fetch("https://pdforganizer.vercel.app/files", {
         headers: {
           "Content-Type": "application/json",
           Authorization: token ? `Bearer ${token}` : "",
