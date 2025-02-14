@@ -2,6 +2,95 @@
 /* Centering the "No files found" text at the diagonal intersection */
 
 /* CSS for the bottom-right status message */
+/* Filter Dropdown */
+.filter-dropdown {
+  position: relative;
+  display: inline-block;
+  margin-left: 16px; /* Position next to search input */
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.filter-toggle:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
+.filter-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.filter-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 200px;
+  margin-top: 8px;
+  z-index: 10;
+}
+
+.filter-option {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between triangle and text */
+}
+
+.filter-option:hover {
+  background-color: #f5f5f5;
+}
+
+.filter-option.active {
+  font-weight: 600;
+}
+
+.sort-indicator {
+  font-size: 12px;
+  color: #007bff;
+}
+
+.close-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  color: #666;
+}
+
+.close-icon:hover {
+  background: #e0e0e0;
+  color: #333;
+}
 .status-message {
   position: fixed;
   bottom: 20px;

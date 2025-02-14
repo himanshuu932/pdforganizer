@@ -4,6 +4,7 @@ import "./styles/DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
 import plusIcon from "../icons/add.png";
 import Links from "./Links";
+import filterIcon from "../icons/filter.png";
 
 const DocumentModal = ({
   savedFolderLink,
@@ -330,165 +331,197 @@ const DocumentModal = ({
   const handleFileDoubleClick = (fileLink) => {
     window.open(fileLink, "_blank");
   };
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <div className="modal-header">
-          <div className="search-container">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search files..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="input-row">
-            <Links
-              folderLink={folderLink}
-              setFolderLink={setFolderLink}
-              handleShowFiles={handleShowFiles}
-              activeScreen={activeScreen}
-              savedFolderLink={savedFolderLink}
-              setSavedFolderLink={setSavedFolderLink}
-            />
-          </div>
-        </div>
-
-        {selectedFiles.length > 0 && (
-          <div className="button-row">
-            <button
-              className="delete-files-button"
-              onClick={handleConfirmDelete}
-              disabled={selectedFiles.length === 0}
-            >
-              Delete
-            </button>
-            <button
-              className="select-all-button"
-              onClick={handleSelectAll}
-              disabled={filteredFiles.length === 0}
-            >
-              Select All
-            </button>
-            <button
-              className="deselect-all-button"
-              onClick={handleDeselectAll}
-              disabled={selectedFiles.length === 0}
-            >
-              Deselect All
-            </button>
-          </div>
-        )}
-        <div
-          className={`dropzone ${isDragging ? "dragging" : ""}`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <div className="modal-body">
-            <div className="file-grid">
-              <div className="file-card upload-card">
-                <label htmlFor="file-upload" className="upload-label">
-                  <img src={plusIcon} alt="Upload Icon" className="file-icon" />
-                  <div className="file-name">Upload</div>
-                </label>
-                <input
-                  id="file-upload"
-                  type="file"
-                  multiple
-                  onChange={handleFileUpload}
-                  style={{ display: "none" }}
-                />
-              </div>
-              {filteredFiles.length > 0 ? (
-                filteredFiles.map((file) => (
-                  <div
-                    key={file.id}
-                    className={`file-card ${
-                      selectedFiles.includes(file.id) ? "selected" : ""
-                    }`}
-                    onClick={() => handleFileSelect(file.id)}
-                    onDoubleClick={() => handleFileDoubleClick(file.link)}
-                  >
-                    <img src={pdfIcon} alt="PDF Icon" className="file-icon-i" />
-                    <span className="file-name-link">{file.name}</span>
-                  </div>
-                ))
-              ) : (
-                <p>No files found.</p>
-              )}
-            </div>
-          </div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-  <h3>Sort Files</h3>
-  
-  <div>
-    <h4>Sort by Created Time</h4>
-    <button onClick={() => sortFiles("createdTime", 1)}>
-      Ascending
-    </button>
-    <button onClick={() => sortFiles("createdTime", -1)}>
-      Descending
-    </button>
-  </div>
-  
-  <div>
-    <h4>Sort by Modified Time</h4>
-    <button onClick={() => sortFiles("modifiedTime", 1)}>
-      Ascending
-    </button>
-    <button onClick={() => sortFiles("modifiedTime", -1)}>
-      Descending
-    </button>
-  </div>
-  
-  <div>
-    <h4>Sort Alphabetically (Name)</h4>
-    <button onClick={() => sortFiles("name", 1)}>
-      Ascending (A-Z)
-    </button>
-    <button onClick={() => sortFiles("name", -1)}>
-      Descending (Z-A)
-    </button>
-  </div>
-  
-  <div>
-    <h4>Sort by Size</h4>
-    <button onClick={() => sortFiles("size", 1)}>
-      Ascending
-    </button>
-    <button onClick={() => sortFiles("size", -1)}>
-      Descending
-    </button>
-  </div>
-</div>
-
-
-        {message && <div className="status-message">{message}</div>}
-        {showConfirmation && (
-          <div className="confirmation-modal">
-            <div className="modal-content1">
-              <p>
-                Are you sure you want to delete the selected files? This action
-                cannot be undone.
-              </p>
-              <div className="button-row">
-                <button className="confirm-button" onClick={handleConfirmDeleteFiles}>
-                  Yes, Delete
-                </button>
-                <button className="cancel-button" onClick={handleCancelDelete}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  const [sortConfig, setSortConfig] = useState({ key: null, order: 1 });
+const [isFilterOpen, setIsFilterOpen] = useState(false);
+const handleSortToggle = (key) => {
+  let order = 1;
+  if (sortConfig.key === key) {
+    order = sortConfig.order === 1 ? -1 : 1; // Toggle between ascending and descending
+  }
+  setSortConfig({ key, order });
+  sortFiles(key, order);
 };
 
+return (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <div className="modal-header">
+        <div className="search-container">
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search files..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {/* Filter Dropdown */}
+          <div className="filter-dropdown">
+            <button
+              className="filter-toggle"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              onMouseEnter={() => setIsFilterOpen(true)}
+            >
+              <img src={filterIcon} alt="Filter Icon" className="filter-icon" />
+              Sort Files
+            </button>
+            {isFilterOpen && (
+              <div
+                className="filter-menu"
+                onMouseLeave={() => setTimeout(() => setIsFilterOpen(false), 500)} // Persist for 500ms
+              >
+                <button className="close-icon" onClick={() => setIsFilterOpen(false)}>
+                  ×
+                </button>
+                <div
+                  className={`filter-option ${
+                    sortConfig.key === "name" ? "active" : ""
+                  }`}
+                  onClick={() => handleSortToggle("name")}
+                >
+                  <span className="sort-indicator">
+                    {sortConfig.key === "name" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
+                  </span>
+                  <span>Sort by Name</span>
+                </div>
+                <div
+                  className={`filter-option ${
+                    sortConfig.key === "createdTime" ? "active" : ""
+                  }`}
+                  onClick={() => handleSortToggle("createdTime")}
+                >
+                  <span className="sort-indicator">
+                    {sortConfig.key === "createdTime" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
+                  </span>
+                  <span>Sort by Created Time</span>
+                </div>
+                <div
+                  className={`filter-option ${
+                    sortConfig.key === "modifiedTime" ? "active" : ""
+                  }`}
+                  onClick={() => handleSortToggle("modifiedTime")}
+                >
+                  <span className="sort-indicator">
+                    {sortConfig.key === "modifiedTime" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
+                  </span>
+                  <span>Sort by Modified Time</span>
+                </div>
+                <div
+                  className={`filter-option ${
+                    sortConfig.key === "size" ? "active" : ""
+                  }`}
+                  onClick={() => handleSortToggle("size")}
+                >
+                  <span className="sort-indicator">
+                    {sortConfig.key === "size" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
+                  </span>
+                  <span>Sort by Size</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="input-row">
+          <Links
+            folderLink={folderLink}
+            setFolderLink={setFolderLink}
+            handleShowFiles={handleShowFiles}
+            activeScreen={activeScreen}
+            savedFolderLink={savedFolderLink}
+            setSavedFolderLink={setSavedFolderLink}
+          />
+        </div>
+      </div>
+
+      {/* Rest of the modal content */}
+      {selectedFiles.length > 0 && (
+        <div className="button-row">
+          <button
+            className="delete-files-button"
+            onClick={handleConfirmDelete}
+            disabled={selectedFiles.length === 0}
+          >
+            Delete
+          </button>
+          <button
+            className="select-all-button"
+            onClick={handleSelectAll}
+            disabled={filteredFiles.length === 0}
+          >
+            Select All
+          </button>
+          <button
+            className="deselect-all-button"
+            onClick={handleDeselectAll}
+            disabled={selectedFiles.length === 0}
+          >
+            Deselect All
+          </button>
+        </div>
+      )}
+
+      <div
+        className={`dropzone ${isDragging ? "dragging" : ""}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
+        <div className="modal-body">
+          <div className="file-grid">
+            <div className="file-card upload-card">
+              <label htmlFor="file-upload" className="upload-label">
+                <img src={plusIcon} alt="Upload Icon" className="file-icon" />
+                <div className="file-name">Upload</div>
+              </label>
+              <input
+                id="file-upload"
+                type="file"
+                multiple
+                onChange={handleFileUpload}
+                style={{ display: "none" }}
+              />
+            </div>
+            {filteredFiles.length > 0 ? (
+              filteredFiles.map((file) => (
+                <div
+                  key={file.id}
+                  className={`file-card ${
+                    selectedFiles.includes(file.id) ? "selected" : ""
+                  }`}
+                  onClick={() => handleFileSelect(file.id)}
+                  onDoubleClick={() => handleFileDoubleClick(file.link)}
+                >
+                  <img src={pdfIcon} alt="PDF Icon" className="file-icon-i" />
+                  <span className="file-name-link">{file.name}</span>
+                </div>
+              ))
+            ) : (
+              <p>No files found.</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {message && <div className="status-message">{message}</div>}
+      {showConfirmation && (
+        <div className="confirmation-modal">
+          <div className="modal-content1">
+            <p>
+              Are you sure you want to delete the selected files? This action
+              cannot be undone.
+            </p>
+            <div className="button-row">
+              <button className="confirm-button" onClick={handleConfirmDeleteFiles}>
+                Yes, Delete
+              </button>
+              <button className="cancel-button" onClick={handleCancelDelete}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+);
+}
 export default DocumentModal;
