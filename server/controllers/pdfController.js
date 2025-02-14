@@ -46,7 +46,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({
   model: "gemini-2.0-flash-thinking-exp-01-21",
   systemInstruction:
-    "I am Peep, an AI assistant developed by team Bludgers for document-based queries. Follow these strict guidelines:\n\n1. **Always answer from the provided document context** and append relevant sources at the end in this format:\n   `/ltkgya-sources <filename>.pdf /Ids <fileId>`  \n   Do not include `filename-uploads/` in sources.\n   \n2. **Mix text and tables** in responses. Tables must be enclosed between `table-starts` and `table-ends`.  \n   **Do NOT include `|---|` in tables.**  \n   Example:  table-starts Column1 | Column2 Value1 | Value2 table-ends\n   \n3. Maintain **consistency** across queries. If a new query lacks context, infer it from previous conversations.\n\n4. **Language Adaptation**: Respond in the language the user queries in.\n\n5. **Avoid Unnecessary Randomness**: Use a structured, deterministic response style.\n\n6. **For time-related queries**, provide real-time values in the user's timezone.\n\n7. **For weather queries**, mention the latest weather conditions in the user's preferred location.\n\n8. **General replies should be polite and well-structured.** When asked 'Who are you?', respond:  \n\"You are Peep. An assistant developed by team Bludgers for queries of PDFs.\"\n\n9. **While sending links**, ensure they are clickable and properly formatted.",
+    "I am Peep, an AI assistant developed by team Bludgers for document-based queries. Follow these strict guidelines:\n\n1. **Always answer from the provided document context and if there are no documents greet it and say please upload documents to to proceed ** and append relevant sources at the end in this format:\n   `/ltkgya-sources <filename>.pdf /Ids <fileId>`  \n   Do not include `filename-uploads/` in sources.\n   \n2. **Mix text and tables** in responses. Tables must be enclosed between `table-starts` and `table-ends`.  \n   **Do NOT include `|---|` in tables.**  \n   Example:  table-starts Column1 | Column2 Value1 | Value2 table-ends\n   \n3. Maintain **consistency** across queries. If a new query lacks context, infer it from previous conversations.\n\n4. **Language Adaptation**: Respond in the language the user queries in.\n\n5. **Avoid Unnecessary Randomness**: Use a structured, deterministic response style.\n\n6. **For time-related queries**, provide real-time values in the user's timezone.\n\n7. **For weather queries**, mention the latest weather conditions in the user's preferred location.\n\n8. **General replies should be polite and well-structured.** When asked 'Who are you?', respond:  \n\"You are Peep. An assistant developed by team Bludgers for queries of PDFs.\"\n\n9. **While sending links**, ensure they are clickable and properly formatted.",
 });
 
 const generationConfig = {
@@ -168,7 +168,7 @@ const fetchFile = async (fileId) => {
  * @param {number} maxPages - Maximum number of pages per chunk (default is 15).
  * @returns {Promise<string[]>} - Resolves with an array of chunk file paths.
  */
-const splitPdf = async (pdfPath, maxPages = 15) => {
+const splitPdf = async (pdfPath, maxPages = 5) => {
   const pdfBytes = fs.readFileSync(pdfPath);
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const totalPages = pdfDoc.getPageCount();
@@ -312,31 +312,34 @@ async function processQueue() {
       // Download the PDF file from Google Drive.
       const pdfPath = await fetchFile(file.id);
 
-      // Split the PDF into chunks.
-      const chunkPaths = await splitPdf(pdfPath);
+      // Split the PDF into chunks of max 5 pages.
+      const chunkPaths = await splitPdf(pdfPath, 5);
 
-      // Begin constructing the extracted text with a header.
-      let extractedText = `filename-${file.name}\\nfileIdstarts-${file.id}-fileIdends\\n`;
+      // Build header for the extracted text.
+      const header = `filename-${file.name}\\nfileIdstarts-${file.id}-fileIdends\\n`;
 
-      // Process each chunk with Document AI.
-      for (const chunkPath of chunkPaths) {
-        const chunkText = await processPdfWithDocumentAI(chunkPath);
-        if (chunkText) {
-          // Replace newlines with the literal "\n" before appending.
-          extractedText += chunkText.replace(/\n/g, "\\n") + "\\n";
+      // Process each chunk concurrently.
+      const chunkPromises = chunkPaths.map(async (chunkPath) => {
+        try {
+          const chunkText = await processPdfWithDocumentAI(chunkPath);
+          // Delete the chunk file after processing.
+          fs.unlink(chunkPath, (err) => {
+            if (err) {
+              console.error(`Error deleting chunk file ${chunkPath}:`, err);
+            } else {
+              console.log(`Chunk file deleted: ${chunkPath}`);
+            }
+          });
+          return chunkText ? chunkText.replace(/\n/g, "\\n") + "\\n" : "";
+        } catch (error) {
+          console.error(`Error processing chunk ${chunkPath}:`, error);
+          return "";
         }
-        // Delete the chunk file after processing.
-        fs.unlink(chunkPath, (err) => {
-          if (err) {
-            console.error(`Error deleting chunk file ${chunkPath}:`, err);
-          } else {
-            console.log(`Chunk file deleted: ${chunkPath}`);
-          }
-        });
-      }
+      });
 
-      // Final formatting of the extracted text.
-      extractedText = extractedText.replace(/\n/g, "\\n") + "\n";
+      // Wait for all chunk processing to complete concurrently.
+      const chunkResults = await Promise.all(chunkPromises);
+      const extractedText = header + chunkResults.join("") + "\n";
 
       // Save the extracted text to the database.
       const newTextData = new TextData({
@@ -348,23 +351,25 @@ async function processQueue() {
       await newTextData.save();
 
       console.log(`File ${file.name} processed successfully.`);
+      
+      // Delete the downloaded PDF file after processing.
+      fs.unlink(pdfPath, (err) => {
+        if (err) {
+          console.error(`Error deleting downloaded file ${pdfPath}:`, err);
+        } else {
+          console.log(`Downloaded file deleted: ${pdfPath}`);
+        }
+      });
     } catch (error) {
       console.error(`Error processing file ${file.name}:`, error);
-      // Optionally, record the error in a log or database.
+      // Optionally record the error in a log or database.
     }
   }
-  const downloadedFilePath = path.join(__dirname, "downloaded-file.pdf");
-  fs.unlink(downloadedFilePath, (err) => {
-    if (err) {
-      console.error(`Error deleting downloaded file:`, err);
-    } else {
-      console.log(`Downloaded file deleted: ${downloadedFilePath}`);
-    }
-  });
-  // Processing is done; update the flag and emit an event.
+
   isProcessing = false;
   queueEmitter.emit("empty");
 }
+
 
 function waitForQueueEmpty() {
   if (processingQueue.length === 0 && !isProcessing) {
@@ -386,17 +391,6 @@ function addTasks(tasks) {
   processQueue(); // Start processing if it isn’t already running.
 }
 
-// ----- ROUTE DEFINITION ----- //
-
-/**
- * POST /process-pdfs
- *
- * Expects a JSON body with an array of file objects under the property "files".
- * Each file should have at least "id" and "name".
- *
- * The route adds the files to the global queue and waits until all are processed.
- * After processing, it calls store(user.id) and returns a 200 response.
- */
 router.post("/process-pdfs", async (req, res) => {
   // Ensure the user is authenticated via JWT.
   if (!req.user) {
