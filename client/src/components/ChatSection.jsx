@@ -189,7 +189,7 @@ const ChatSection = ({ setActiveScreen, messages, setMessages }) => {
         const token = localStorage.getItem("token");
 
         // Make API call with JWT in the Authorization header
-        const response = await fetch("https://pdforganizer.vercel.app/api/pdf/submit-query", {
+        const response = await fetch("https://pdforganizer-vt1s.onrender.com/api/pdf/submit-query", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
