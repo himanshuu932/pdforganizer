@@ -1,28 +1,29 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const pdfController = require('./controllers/pdfController');
-// ✅ Import Passport Configuration
-require('./config/passport');  // 🔥 Ensure Google Strategy is registered
+
+// Import Passport Configuration (for Google OAuth or other strategies)
+require('./config/passport');
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const driveRoutes = require('./routes/driveRoutes');
 const pdfRoutes = require('./routes/pdfRoutes');
+
+// Import JWT authentication middleware from the middlewares folder
+const authenticateJWT = require('./middlewares/authenticateJWT');
+
 const app = express();
 const port = 5000;
 
 // CORS Configuration
-app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true,
-}));
+app.use(cors());
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -33,31 +34,23 @@ mongoose.connect(process.env.MONGO_URI)
 app.use(express.json());
 app.use(cookieParser());
 
-// Session Configuration
-app.use(session({
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-  secret: process.env.SESSION_SECRET || 'your-secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: false,
-    httpOnly: true,
-    sameSite: 'Lax',
-    maxAge: 86400000,  
-  },
-}));
+// Remove session middleware since we're using JWT
+// app.use(session({...}));
 
-// Initialize Passport Middleware
+// Initialize Passport (if using Passport for OAuth)
 app.use(passport.initialize());
-app.use(passport.session());
 
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/drive', driveRoutes);
-app.use('/api/pdf', pdfController.router);
-// Start Server
+app.use('/api/pdf',authenticateJWT ,pdfController.router);
+
+// Example: Protected route using JWT middleware
+app.get('/protected', authenticateJWT, (req, res) => {
+  res.json({ message: 'You are authorized!', user: req.user });
+});
+
 app.listen(port, () => {
   console.log(`🚀 Server running at http://localhost:${port}`);
 });
-

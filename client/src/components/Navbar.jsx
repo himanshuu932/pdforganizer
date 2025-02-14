@@ -24,20 +24,11 @@ function Navbar({ setActiveScreen, user, setUser, connectionStatus, isProcessing
     document.body.classList.toggle("dark-mode", !isDarkMode);
   };
 
+  // For JWT, logout is handled by removing the token from storage and clearing user state.
   const handleLogout = () => {
-    fetch("http://localhost:5000/auth/logout", {
-      method: "GET",
-      credentials: "include", // Include cookies for session tracking
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.message === "OK") {
-          setUser(null);
-          console.log("Logout successful");
-        } else {
-          console.log("Logout failed", data);
-        }
-      });
+    localStorage.removeItem("token");
+    setUser(null);
+    console.log("Logout successful. Token removed from localStorage.");
   };
 
   // Extract the first name from the user's full name.

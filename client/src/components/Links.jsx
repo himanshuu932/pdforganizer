@@ -16,16 +16,21 @@ const Links = ({
   // State for the add-folder modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newFolderLink, setNewFolderLink] = useState("");
-
+ const [token, setToken] = useState(localStorage.getItem("token"));
   // State for the delete confirmation modal
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Fetch folder links from the database on component mount
   useEffect(() => {
+    setToken(localStorage.getItem("token"));
     const fetchFolderLinks = async () => {
       try {
+        
         const response = await fetch("http://localhost:5000/api/user/folder-links", {
-          credentials: "include", // Ensures cookies/session are sent
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
         });
         if (!response.ok) {
           throw new Error("Failed to fetch folder links");
@@ -95,9 +100,10 @@ const Links = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({ folderLink: link }),
-        credentials: "include",
+       
       });
       const data = await response.json();
       if (response.ok) {
@@ -123,9 +129,10 @@ const Links = ({
         method: "POST", // Using POST for deletion
         headers: {
           "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
         },
         body: JSON.stringify({ folderLink: link }),
-        credentials: "include",
+        
       });
       const data = await response.json();
       if (response.ok) {

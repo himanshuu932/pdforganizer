@@ -9,7 +9,15 @@ const SearchFiles = ({ isVisible, onFileClick }) => {
 
   const fetchFiles = async () => {
     try {
-      const res = await fetch("http://localhost:5000/files");
+      // Retrieve the JWT token from localStorage
+      const token = localStorage.getItem("token");
+      
+      const res = await fetch("http://localhost:5000/files", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
       const data = await res.json();
       setFiles(data);
       setFilteredFiles(data);

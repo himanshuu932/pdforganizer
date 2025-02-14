@@ -5,7 +5,8 @@ const userController = {
   // Fetch user-specific texts
   getUserTexts: async (req, res) => {
     try {
-      const userId = req.user; // Using session user ID
+      // Use the user ID from the JWT payload (assuming it's stored as id)
+      const userId = req.user.id;
       const texts = await TextData.find({ user: userId });
       res.json({ texts });
     } catch (error) {
@@ -16,10 +17,12 @@ const userController = {
 
   // Get folder links for the logged-in user
   getUserFolderLinks: async (req, res) => {
+    console.log("Loading folder links");
     try {
-      const userId = req.user;
-     // console.log("Loading folder links for user:", userId);
-      const user = await User.findById(userId).select('folderLinks');
+      const userId = req.user.id;
+      
+      // console.log("Loading folder links for user:", userId);
+      const user = await User.findById(userId).select("folderLinks");
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -32,8 +35,9 @@ const userController = {
 
   // Save folder link for the logged-in user
   saveFolderLink: async (req, res) => {
+    console.log("Saving folder link");
     try {
-      const userId = req.user; // Using session user ID
+      const userId = req.user.id;
       const { folderLink } = req.body;
 
       if (!folderLink) {
@@ -62,7 +66,7 @@ const userController = {
   deleteFolderLink: async (req, res) => {
     try {
       console.log("delete folder link");
-      const userId = req.user; // Using session user ID
+      const userId = req.user.id;
       const { folderLink } = req.body;
 
       if (!folderLink) {

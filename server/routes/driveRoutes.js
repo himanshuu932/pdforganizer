@@ -1,12 +1,17 @@
+// routes/driveRoutes.js
 const express = require('express');
 const driveController = require('../controllers/driveController');
-
-const router = express.Router();
-const multer=require("multer"); 
+const multer = require("multer"); 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.get("/files", driveController.getFiles);
-router.delete("/delete", driveController.deleteFile);
-router.post("/upload", upload.single("file"), driveController.uploadFile);
+// Import the JWT authentication middleware
+const authenticateJWT = require('../middlewares/authenticateJWT');
+
+const router = express.Router();
+
+router.get("/files", authenticateJWT, driveController.getFiles);
+router.delete("/delete", authenticateJWT, driveController.deleteFile);
+router.post("/upload", authenticateJWT, upload.single("file"), driveController.uploadFile);
+
 module.exports = router;

@@ -3,19 +3,29 @@ import axios from "axios";
 import Home1 from "./Home"; // Assuming Home1 is another component you have.
 import "./App.css";
 import logo from "./icons/google.jpg";
+import l from "./icons/chat.png";
 
 const App = () => {
   const [user, setUser] = useState(null);
   const [saved, setSaved] = useState(null);
 
   useEffect(() => {
-    // Check if the username exists in the URL query string
+    // Check URL for token and username query parameters.
     const queryParams = new URLSearchParams(window.location.search);
+    const tokenFromURL = queryParams.get("token");
     const usernameFromURL = queryParams.get("username");
 
-   
-      fetchCurrentUser(); // Fetch user data when no username is found in the URL
-    
+    if (tokenFromURL) {
+      // Save the token to localStorage for subsequent API calls
+      localStorage.setItem("token", tokenFromURL);
+      // Optionally, you can save the username if needed
+      localStorage.setItem("username", usernameFromURL);
+      // Clean up the URL (remove query parameters)
+      window.history.replaceState({}, document.title, "/");
+    }
+
+    // Fetch current user data using the stored JWT.
+    fetchCurrentUser();
   }, []);
 
   const handleLogin = () => {
@@ -24,77 +34,69 @@ const App = () => {
   };
 
   const fetchCurrentUser = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
     try {
-      const response = await axios.get('http://localhost:5000/auth/current_user', {
-        withCredentials: true,  // ✅ Required for cookies/session
+      const response = await axios.get("http://localhost:5000/auth/current_user", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setUser(response.data.user);
     } catch (error) {
       console.error("❌ Error fetching user:", error);
-      return null;
+      // Optionally, clear the token if it is invalid
+      localStorage.removeItem("token");
     }
   };
 
   return (
     <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        backgroundImage: 'url("your-image-url.jpg")',
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        padding: "40px",
-      }}
-    >
-      {!user ? (
-        <div
-          className="xyz"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: "20px",
-            backgroundColor: "rgba(255, 255, 255, 0.9)", // Slightly transparent white background
-            borderRadius: "8px",
-            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)", // Subtle shadow for depth
-            width: "300px", // Fixed width for consistency
-            textAlign: "center",
-          }}
-        >
-          <h3 style={{ marginBottom: "16px" }}>Sign In</h3>
-          <button
-            onClick={handleLogin}
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
+      backgroundImage: 'url("your-image-url.jpg")',
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      padding: "40px",
+    }}
+  >
+    {!user ? (
+      <div
+        className="xyz"
+        
+      >
+        <div className="logo">
+        
+          <img
+            src={l}
+            alt="Chat Logo"
             style={{
-              padding: "7.5px 20px",
-              backgroundColor: "#4285F4",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
+              width: "150px",
+              height: "150px",
             }}
-          >
-            <img
-              src={logo}
-              alt="Google Logo"
-              style={{
-                width: "20px",
-                height: "20px",
-              }}
-            />
-            Sign in with Google
-          </button>
+          />
+          <div className="name">PeekPDF</div>
+        
         </div>
-      ) : (
-        <Home1 user={user} setUser={setUser} saved={saved} setSaved={setSaved} />
-      )}
-    </div>
+
+        <button className="sign" onClick={handleLogin}>
+          <img
+            src={logo}
+            alt="Google Logo"
+            style={{
+              width: "20px",
+              height: "20px",
+            }}
+          />
+          Sign in with Google
+        </button>
+      </div>
+    ) : (
+      <Home1 user={user} setUser={setUser} saved={saved} setSaved={setSaved} />
+    )}
+  </div>
   );
 };
 

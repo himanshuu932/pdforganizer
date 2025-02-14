@@ -1,84 +1,58 @@
 const passport = require("passport");
 const { google } = require("googleapis");
-const axios = require("axios");
+const jwt = require("jsonwebtoken");
+require('dotenv').config();
+
 const authController = {
+  // Initiates Google OAuth2 flow
   googleAuth: passport.authenticate("google", {
     scope: ["profile", "email", "https://www.googleapis.com/auth/drive.file"],
     accessType: "offline",
     prompt: "consent",
   }),
 
+  // Callback after Google authentication; generates a JWT
   googleAuthCallback: (req, res) => {
-    req.session.save((err) => {
-      if (err) {
-        console.error("❌ Error saving session:", err);
-        return res.redirect(`http://localhost:3000?status=error`);
-      }
-    
-      // Store Google OAuth2 credentials in session
+  
+    // Generate a JWT payload with user information and OAuth2 credentials
+    const payload = {
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      accessToken: req.user.accessToken,
+      refreshToken: req.user.refreshToken,
+    };
+
+    // Sign the token using your JWT secret; adjust expiration as needed
+    const token = jwt.sign(payload, '1234', { expiresIn: '1d' });
+   
+    const encodedUsername = encodeURIComponent(req.user.name);
+    // Redirect to the client with the token (you may also choose to send JSON)
+    res.redirect(`http://localhost:3000?username=${encodedUsername}&token=${token}&status=success`);
+  },
+
+  // Since JWTs are stateless, logging out is handled client-side by discarding the token.
+  logout: async (req, res) => {
+    res.json({ message: "Logout successful. Please remove the token from your client." });
+  },
+
+  // Returns the current user and creates an OAuth2 client using JWT credentials
+  getCurrentUser: (req, res) => {
+   
+    if (req.user) {
       const oauth2Client = new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
         "http://localhost:5000/auth/google/callback"
       );
-    
+
       oauth2Client.setCredentials({
         access_token: req.user.accessToken,
         refresh_token: req.user.refreshToken,
       });
-    
-      req.session.oauth2Credentials = {
-        access_token: req.user.accessToken,
-        refresh_token: req.user.refreshToken,
-      };
-      console.log("✅ Google OAuth2 credentials stored in session");
-    
-      const encodedUsername = encodeURIComponent(req.user.name);
-      res.redirect(`http://localhost:3000?username=${encodedUsername}&status=success`);
-    });
-  },
-
-  logout: async (req, res) => {
-    if (req.isAuthenticated()) {
-      const sessionID = req.sessionID;
-      console.log("🔍 Session ID before logout:", sessionID);
-
-      req.logout((err) => {
-        if (err) {
-          console.error("❌ Logout Error:", err);
-          return res.status(500).json({ message: "Logout Error" });
-        }
-         req.session.destroy((err) => {
-          if (err) {
-            console.error("❌ Session destroy error:", err);
-            return res.status(500).json({ message: "Session destroy error" });
-          }
-
-          res.clearCookie("connect.sid");
-          console.log("✅ User logged out and session destroyed");
-          res.json({ message: "OK" });
-        });
-      });
-    } else {
-      res.status(400).json({ message: "No user logged in" });
-    }
-  },
-
-  getCurrentUser: (req, res) => {
-    if (req.user) {
-    
-      const oauth2Client = new google.auth.OAuth2(
-        process.env.GOOGLE_CLIENT_ID,
-        process.env.GOOGLE_CLIENT_SECRET,
-        "http://localhost:5000/auth/google/callback"
-      );
-
-      // Set credentials from the session
-      if (req.session.oauth2Credentials) {
-        oauth2Client.setCredentials(req.session.oauth2Credentials);
-      }
 
       const drive = google.drive({ version: "v3", auth: oauth2Client });
+    
       
       res.json({ user: req.user, drive });
     } else {

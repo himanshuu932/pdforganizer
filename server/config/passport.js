@@ -1,6 +1,5 @@
 const passport = require('passport');
 const { Strategy: GoogleStrategy } = require('passport-google-oauth20');
-const { google } = require('googleapis');
 const { User } = require('../models/text'); // Ensure correct path
 require('dotenv').config();
 
@@ -15,7 +14,7 @@ passport.use(
       try {
         console.log("🔄 Google Profile Received:", profile.displayName);
 
-        // Find user in DB
+        // Find user in DB by their Google ID
         let user = await User.findOne({ googleId: profile.id });
 
         if (!user) {
@@ -32,7 +31,7 @@ passport.use(
         } else {
           console.log("✅ User Found:", user.name);
 
-          // If the user has already granted permissions, skip token updates
+          // Update tokens if Drive permissions weren't granted yet
           if (!user.hasDrivePermissions) {
             console.log("🔑 Updating tokens for Drive access...");
             user.accessToken = accessToken;
@@ -44,6 +43,7 @@ passport.use(
           }
         }
 
+        // Pass the user object to the next middleware (your auth controller)
         done(null, user);
       } catch (error) {
         console.error("❌ Error in Google Strategy:", error);
@@ -53,20 +53,22 @@ passport.use(
   )
 );
 
-// Serialize & Deserialize User
-passport.serializeUser((user, done) => {
-  console.log("🔒 Serializing User ID:", user.id);
-  done(null, user.id);
-});
+// Since we are using JWTs, session serialization/deserialization is not needed.
+// You can remove or comment out these functions.
 
-passport.deserializeUser(async (id, done) => {
-  console.log("🔍 Deserializing User by ID:", id);
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (error) {
-    done(error, null);
-  }
-});
+// passport.serializeUser((user, done) => {
+//   console.log("🔒 Serializing User ID:", user.id);
+//   done(null, user.id);
+// });
+
+// passport.deserializeUser(async (id, done) => {
+//   console.log("🔍 Deserializing User by ID:", id);
+//   try {
+//     const user = await User.findById(id);
+//     done(null, user);
+//   } catch (error) {
+//     done(error, null);
+//   }
+// });
 
 module.exports = passport;
