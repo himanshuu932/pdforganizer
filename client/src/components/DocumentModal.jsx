@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import "./styles/DocumentModal.css";
 import pdfIcon from "../icons/pdf-file.png";
@@ -332,7 +332,6 @@ const DocumentModal = ({
     window.open(fileLink, "_blank");
   };
   const [sortConfig, setSortConfig] = useState({ key: null, order: 1 });
-const [isFilterOpen, setIsFilterOpen] = useState(false);
 const handleSortToggle = (key) => {
   let order = 1;
   if (sortConfig.key === key) {
@@ -341,6 +340,52 @@ const handleSortToggle = (key) => {
   setSortConfig({ key, order });
   sortFiles(key, order);
 };
+const dropdownRef = useRef(null);
+const [isFilterOpen, setIsFilterOpen] = useState(false);
+const [isPersistent, setIsPersistent] = useState(false); // To track if dropdown is persistent
+ // For sorting logic
+
+// Handle clicks outside the dropdown
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsFilterOpen(false);
+      setIsPersistent(false); // Reset persistence when clicking outside
+    }
+  };
+
+  // Add event listener when the dropdown is open
+  if (isFilterOpen) {
+    document.addEventListener("mousedown", handleClickOutside);
+  }
+
+  // Clean up the event listener
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [isFilterOpen]);
+
+// Handle hover to open dropdown
+// Handle hover to open dropdown
+const handleHover = () => {
+  if (!isPersistent) {
+    setIsFilterOpen(true);
+  }
+};
+
+// Handle click to make dropdown persistent
+const handleClick = () => {
+  setIsFilterOpen(true);
+  setIsPersistent(true); // Make dropdown persistent
+};
+
+// Handle close button click
+const handleClose = () => {
+  setIsFilterOpen(false);
+  setIsPersistent(false); // Reset persistence
+};
+
+// Handle sorting logic
 
 return (
   <div className="modal-overlay">
@@ -355,70 +400,84 @@ return (
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {/* Filter Dropdown */}
-          <div className="filter-dropdown">
-            <button
-              className="filter-toggle"
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              onMouseEnter={() => setIsFilterOpen(true)}
-            >
-              <img src={filterIcon} alt="Filter Icon" className="filter-icon" />
-              Sort Files
-            </button>
-            {isFilterOpen && (
-              <div
-                className="filter-menu"
-                onMouseLeave={() => setTimeout(() => setIsFilterOpen(false), 500)} // Persist for 500ms
-              >
-                <button className="close-icon" onClick={() => setIsFilterOpen(false)}>
-                  ×
-                </button>
-                <div
-                  className={`filter-option ${
-                    sortConfig.key === "name" ? "active" : ""
-                  }`}
-                  onClick={() => handleSortToggle("name")}
-                >
-                  <span className="sort-indicator">
-                    {sortConfig.key === "name" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
-                  </span>
-                  <span>Sort by Name</span>
-                </div>
-                <div
-                  className={`filter-option ${
-                    sortConfig.key === "createdTime" ? "active" : ""
-                  }`}
-                  onClick={() => handleSortToggle("createdTime")}
-                >
-                  <span className="sort-indicator">
-                    {sortConfig.key === "createdTime" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
-                  </span>
-                  <span>Sort by Created Time</span>
-                </div>
-                <div
-                  className={`filter-option ${
-                    sortConfig.key === "modifiedTime" ? "active" : ""
-                  }`}
-                  onClick={() => handleSortToggle("modifiedTime")}
-                >
-                  <span className="sort-indicator">
-                    {sortConfig.key === "modifiedTime" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
-                  </span>
-                  <span>Sort by Modified Time</span>
-                </div>
-                <div
-                  className={`filter-option ${
-                    sortConfig.key === "size" ? "active" : ""
-                  }`}
-                  onClick={() => handleSortToggle("size")}
-                >
-                  <span className="sort-indicator">
-                    {sortConfig.key === "size" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
-                  </span>
-                  <span>Sort by Size</span>
-                </div>
-              </div>
-            )}
-          </div>
+          <div
+  className="filter-dropdown"
+  ref={dropdownRef}
+  onMouseEnter={handleHover} // Keep open when hovering over menu
+  onMouseLeave={() => {
+    if (!isPersistent) {
+      setIsFilterOpen(false); // Close on hover out if not persistent
+    }
+  }}
+>
+  <button
+    className="filter-toggle"
+    onClick={handleClick} // Make dropdown persistent on click
+    onMouseEnter={handleHover} // Open on hover
+  >
+    <img src={filterIcon} alt="Filter Icon" className="filter-icon" />
+    Sort Files
+  </button>
+  {isFilterOpen && (
+    <div
+      className="filter-menu"
+      onMouseEnter={handleHover} // Keep open when hovering over menu
+      onMouseLeave={() => {
+        if (!isPersistent) {
+          setIsFilterOpen(false); // Close on hover out if not persistent
+        }
+      }}
+    >
+      <button className="close-icon" onClick={handleClose}>
+        ×
+      </button>
+      <div
+        className={`filter-option ${
+          sortConfig.key === "name" ? "active" : ""
+        }`}
+        onClick={() => handleSortToggle("name")}
+      >
+        <span className="sort-indicator">
+          {sortConfig.key === "name" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
+        </span>
+        <span>Sort by Name</span>
+      </div>
+      <div
+        className={`filter-option ${
+          sortConfig.key === "createdTime" ? "active" : ""
+        }`}
+        onClick={() => handleSortToggle("createdTime")}
+      >
+        <span className="sort-indicator">
+          {sortConfig.key === "createdTime" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
+        </span>
+        <span>Sort by Created Time</span>
+      </div>
+      <div
+        className={`filter-option ${
+          sortConfig.key === "modifiedTime" ? "active" : ""
+        }`}
+        onClick={() => handleSortToggle("modifiedTime")}
+      >
+        <span className="sort-indicator">
+          {sortConfig.key === "modifiedTime" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
+        </span>
+        <span>Sort by Modified Time</span>
+      </div>
+      <div
+        className={`filter-option ${
+          sortConfig.key === "size" ? "active" : ""
+        }`}
+        onClick={() => handleSortToggle("size")}
+      >
+        <span className="sort-indicator">
+          {sortConfig.key === "size" ? (sortConfig.order === 1 ? "▲" : "▼") : ""}
+        </span>
+        <span>Sort by Size</span>
+      </div>
+    </div>
+  )}
+</div>
         </div>
         <div className="input-row">
           <Links
@@ -523,5 +582,6 @@ return (
     </div>
   </div>
 );
-}
+};
+
 export default DocumentModal;

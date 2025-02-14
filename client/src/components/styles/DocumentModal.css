@@ -24,6 +24,7 @@
   transition: background-color 0.2s, border-color 0.2s;
 }
 
+
 .filter-toggle:hover {
   background-color: #f5f5f5;
   border-color: #ccc;
@@ -36,15 +37,17 @@
 
 .filter-menu {
   position: absolute;
-  top: 100%;
   right: 0;
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 200px;
-  margin-top: 8px;
   z-index: 10;
+  top: 100%; /* Position the menu directly below the sort icon */
+  left: 0;
+  margin-top: 0; /* Remove any margin that creates a gap */
+  padding-top: 0; /* Remove any padding that creates a gap */
 }
 
 .filter-option {
