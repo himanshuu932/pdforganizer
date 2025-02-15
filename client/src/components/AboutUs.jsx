@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './AboutUs.css';
 
 const AboutUs = () => {
-  const [darkMode, setDarkMode] = useState(false);
+ 
   const [centerIndex, setCenterIndex] = useState(0);
   const [slideOffset, setSlideOffset] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
@@ -14,7 +14,7 @@ const AboutUs = () => {
     const isDark =
       window.matchMedia &&
       window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setDarkMode(isDark);
+  
   }, []);
 
   const teamMembers = [
@@ -102,12 +102,12 @@ const AboutUs = () => {
   };
 
   return (
-    <div className={`about-us ${darkMode ? 'dark' : 'light'}`}>
+    <div className={`about-us`}>
       <div className="info-section">
-        <h2 className={`heading ${darkMode ? 'heading-dark' : 'heading-light'}`}>
+        <h2 className={`heading`}>
         BLUDGERS
         </h2>
-        <p className={`paragraph ${darkMode ? 'paragraph-dark' : 'paragraph-light'}`}>
+        <p className={`paragraph `}>
           We are a team of passionate developers dedicated to creating innovative solutions.
         </p>
       </div>
@@ -140,13 +140,13 @@ const AboutUs = () => {
                   alt={teamMembers[memberIndex].name}
                   className="member-image"
                 />
-                <h3 className={`member-name ${darkMode ? 'member-name-dark' : 'member-name-light'}`}>
+                <h3 className={`member-name`}>
                   {teamMembers[memberIndex].name}
                 </h3>
-                <h4 className={`member-role ${darkMode ? 'member-role-dark' : 'member-role-light'}`}>
+                <h4 className={`member-role`}>
                   {teamMembers[memberIndex].role}
                 </h4>
-                <p className={`member-info ${darkMode ? 'member-info-dark' : 'member-info-light'}`}>
+                <p className={`member-info `}>
                   {teamMembers[memberIndex].info}
                 </p>
               </div>

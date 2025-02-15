@@ -1,125 +1,158 @@
 /* Base container for About Us */
 .about-us {
-    padding: 20px;
-    top:15%;
-    background-color: transparent;
-    border-radius: 5%;
-    height :70%;
-    text-align: center;
-  }
-  
-  /* Light and dark backgrounds */
-  .about-us.light {
-    background-color: #f4f4f4;
-  }
-  
-  .about-us.dark {
-    background-color: #333;
-  }
-  
-  /* Info Section */
-  .info-section {
-    margin-bottom: 40px;
-    position: relative;
-    z-index: 1;
-  }
-  
-  .heading {
-    font-size: 2rem;
-  }
-  
-  .heading-light {
-    color: #333;
-  }
-  
-  .heading-dark {
-    color: #f1f1f1;
-  }
-  
-  .paragraph {
-    font-size: 1rem;
-  }
-  
-  .paragraph-light {
-    color: #333;
-  }
-  
-  .paragraph-dark {
-    color: #ddd;
-  }
-  
-  /* Carousel Styles */
-  .carousel-wrapper {
-    position: relative;
-    width: 100%;
-    height: 400px;
-    overflow: hidden;
-    perspective: 1000px;
-    margin-top: 20px;
-    z-index: 2;
-  }
-  
-  .carousel-container {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translate(-0%, -50%);
-    width: 100%;
-    height: 100%;
-  }
-  
-  /* Card Base */
-  .card-base {
-    position: absolute;
-    width: 250px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    text-align: center;
-  }
-  
-  /* Member Image */
-  .member-image {
-    width: 100%;
-    border-radius: 50%;
-    margin-bottom: 10px;
-  }
-  
-  /* Member Text */
-  .member-name {
-    font-size: 1.2rem;
-  }
-  
-  .member-name-light {
-    color: #333;
-  }
-  
-  .member-name-dark {
-    color: #f1f1f1;
-  }
-  
-  .member-role {
-    font-size: 1rem;
-  }
-  
-  .member-role-light {
-    color: #666;
-  }
-  
-  .member-role-dark {
-    color: #ccc;
-  }
-  
-  .member-info {
-    font-size: 0.9rem;
-  }
-  
-  .member-info-light {
-    color: #444;
-  }
-  
-  .member-info-dark {
-    color: #bbb;
-  }
-  
+  padding: 20px;
+  top: 15%;
+  background-color: transparent;
+  border-radius: 5%;
+  height: 70%;
+  text-align: center;
+  position: absolute; /* Ensure the element is positioned */
+padding: 20px;
+top: 15%;
+background-color: #ffffffcc;
+border-radius: 5%;
+height: 70%;
+text-align: center;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
+
+}
+
+/* Light and dark backgrounds */
+.about-us.light {
+  background-color: #f4f4f4;
+}
+
+.about-us.dark {
+  background-color: #222;
+}
+
+/* Info Section */
+.info-section {
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.heading-light {
+  color: #222;
+}
+
+.heading-dark {
+  color: #f1f1f1;
+}
+
+.paragraph {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.paragraph-light {
+  color: #222;
+}
+
+.paragraph-dark {
+  color: #ddd;
+}
+
+/* Carousel Styles */
+.carousel-wrapper {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  perspective: 1000px;
+  margin-top: 20px;
+  z-index: 2;
+}
+
+.carousel-container {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-0%, -50%);
+  width: 100%;
+  height: 100%;
+}
+
+/* Card Base */
+.card-base {
+  position: absolute;
+  width: 260px;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.card-base:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.about-us.light .card-base {
+  background-color: white;
+  color: #222;
+  border: 2px solid #ddd;
+}
+
+.about-us.dark .card-base {
+  background-color: black;
+  color: #f1f1f1;
+  border: 2px solid #444;
+}
+
+/* Member Image */
+.member-image {
+  width: 100%;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  border: 3px solid #ffcc00;
+}
+
+/* Member Text */
+.member-name {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.member-name-light {
+  color: #222;
+}
+
+.member-name-dark {
+  color: #f1f1f1;
+}
+
+.member-role {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.member-role-light {
+  color: #555;
+}
+
+.member-role-dark {
+  color: #bbb;
+}
+
+.member-info {
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-top: 10px;
+}
+
+.member-info-light {
+  color: #444;
+}
+
+.member-info-dark {
+  color: #bbb;
+}
