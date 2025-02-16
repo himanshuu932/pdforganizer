@@ -58,10 +58,10 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
 .carousel-wrapper {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 450px;
   overflow: hidden;
   perspective: 1000px;
-  margin-top: 20px;
+  margin-top: 10px;
   z-index: 2;
 }
 
@@ -69,9 +69,13 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
   position: absolute;
   top: 100%;
   left: 50%;
-  transform: translate(-0%, -50%);
+  transform: translate(-0%, -51%);
   width: 100%;
   height: 100%;
+  -webkit-transform: translate(-0%, -51%);
+  -moz-transform: translate(-0%, -51%);
+  -ms-transform: translate(-0%, -51%);
+  -o-transform: translate(-0%, -51%);
 }
 
 /* Card Base */
@@ -138,7 +142,7 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
 }
 
 .member-info {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 400;
   margin-top: 10px;
 }
