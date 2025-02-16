@@ -1,20 +1,14 @@
 /* Base container for About Us */
 .about-us {
-  padding: 20px;
-  top: 15%;
   background-color: transparent;
   border-radius: 5%;
-  height: 70%;
-  text-align: center;
-  position: absolute; /* Ensure the element is positioned */
-padding: 20px;
+  position: absolute; 
+padding: 10px;
 top: 15%;
 background-color: #ffffffcc;
-border-radius: 5%;
-height: 70%;
+height: 80%;
 text-align: center;
 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
-
 }
 
 /* Light and dark backgrounds */
@@ -157,15 +151,6 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
   color: #bbb;
 }
 /* Base container for About Us */
-.about-us {
-  padding: 20px;
-  top: 15%;
-  border-radius: 5%;
-  height: 80%;
-  text-align: center;
-  position: absolute;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
 
 /* Light and dark backgrounds */
 .about-us.light {
@@ -241,7 +226,7 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
 .carousel-wrapper {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 75%;
   overflow: hidden;
   perspective: 1000px;
   margin-top: 20px;
@@ -262,9 +247,11 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
   width: 260px;
   height: 380px;
   padding: 20px;
-  border-radius: 30px;
+  border-radius: 40px;
   text-align: center;
-  background: linear-gradient(45deg, #ffffff, #e0e0e0); /* Subtle gradient */
+  background: linear-gradient(225deg, #ffffff, #babdc2); /* Subtle gradient */
+  content-visibility: 1px;
+  filter: brightness(1) contrast(1.3);
   border: 2px solid transparent;
   color: #333; /* Dark text for better readability */
   overflow: visible;
@@ -276,7 +263,7 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
 .card:hover {
   transform: scale(1.1);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-  background: rgba(173, 173, 173, 0.05); /* Add hover background */
+  background: linear-gradient(225deg, #ffffff, #adaeb4);  /* Add hover background */
 }
 
 /* Member Image */
@@ -338,9 +325,9 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Adds a drop shadow */
   width: 60px;          /* match .circle-wrapper width */
   height: 60px;         /* match .circle-wrapper height */
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 30%, transparent 70%);
+  /* background: radial-gradient(circle, rgba(94, 217, 225, 0.3) 30%, transparent 70%); */
   opacity: 0;
-  border: 1px solid rgba(255,255,255,0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   transition: transform 0.4s ease, opacity 0.4s ease;
   transform: translate(-50%, -50%);
   z-index: 10;

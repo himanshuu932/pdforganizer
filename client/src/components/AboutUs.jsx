@@ -39,11 +39,11 @@ const AboutUs = () => {
 
   // Indices for your 5-slot carousel
   const indices = [
-    (centerIndex - 2 + teamMembers.length) % teamMembers.length,
+     (centerIndex - 2 + teamMembers.length) % teamMembers.length,
     (centerIndex - 1 + teamMembers.length) % teamMembers.length,
     centerIndex,
-    (centerIndex + 1 + teamMembers.length) % teamMembers.length,
-    (centerIndex + 2 + teamMembers.length) % teamMembers.length,
+     (centerIndex + 1 + teamMembers.length) % teamMembers.length,
+     (centerIndex + 2 + teamMembers.length) % teamMembers.length,
   ];
 
   // Positions for each slot
