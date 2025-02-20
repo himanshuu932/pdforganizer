@@ -8,6 +8,7 @@ import AboutUs from "./components/AboutUs";
 
 function Home1({ user, setUser,saved,setSaved }) {
   // Check localStorage for the saved activeScreen value or default to 1
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const savedScreen = localStorage.getItem("activeScreen");
   const [activeScreen, setActiveScreen] = useState(savedScreen?parseInt(savedScreen):1);
   const [savedFolderLink, setSavedFolderLink] = useState(null);
@@ -37,6 +38,7 @@ function Home1({ user, setUser,saved,setSaved }) {
       {/* Navbar */}
       <Navbar setActiveScreen={setActiveScreen} user={user} setUser={setUser} 
       connectionStatus={connectionStatus} isProcessing={isProcessing}
+      isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode}
       />
       {/* Start Screen */}
       <div className="start-screen-section">
@@ -50,7 +52,7 @@ function Home1({ user, setUser,saved,setSaved }) {
          setIsProcessing={setIsProcessing}
          />}
         
-        {activeScreen === 4 && <AboutUs />}
+        {activeScreen === 4 && <AboutUs  isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode}/>}
         {activeScreen === 3 && <ChatSection setActiveScreen={setActiveScreen}   messages={messages} setMessages={setMessages} />}
       </ div>
     </div>

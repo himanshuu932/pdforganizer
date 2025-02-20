@@ -3,8 +3,8 @@ import "./styles/Navbar.css";
 import darkmode from "../icons/dark.png";
 import lightmode from "../icons/light.png";
 
-function Navbar({ setActiveScreen, user, setUser, connectionStatus, isProcessing }) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+function Navbar({ setActiveScreen, user, setUser, connectionStatus, isProcessing,isDarkMode,setIsDarkMode }) {
+ 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   // Determine if viewport is mobile (less than 768px)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
