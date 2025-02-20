@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './AboutUs.css';
+import './styles/AboutUs.css';
 import HimanshuImage from '../icons/Himanshu.jpg';
 import UtakrshImage from '../icons/Utkarsh.png';
 import AshutoshImage from '../icons/Ashutosh.png';
