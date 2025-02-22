@@ -16,6 +16,7 @@ require('dotenv').config();
 
 const EventEmitter = require('events');
 const queueEmitter = new EventEmitter();
+const TMP_DIR = '/tmp';
 
 // Import your Mongoose models (adjust the paths as needed)
 const { TextData, User } = require('../models/text');
@@ -146,7 +147,8 @@ const fetchFile = async (fileId) => {
           console.error("Error downloading file:", err);
           return reject(`Error downloading file with ID ${fileId}: ${err.message}`);
         }
-        const destPath = path.join(__dirname, "downloaded-file.pdf");
+        const destPath = path.join(TMP_DIR, "downloaded-file.pdf");
+
         const dest = fs.createWriteStream(destPath);
         response.data.pipe(dest);
         dest.on("finish", () => {
@@ -184,7 +186,8 @@ const splitPdf = async (pdfPath, maxPages = 5) => {
     }
 
     const chunkBytes = await chunkDoc.save();
-    const chunkPath = path.join(__dirname, `chunk_${Math.floor(i / maxPages) + 1}.pdf`);
+    const chunkPath = path.join(TMP_DIR, `chunk_${Math.floor(i / maxPages) + 1}.pdf`);
+
     fs.writeFileSync(chunkPath, chunkBytes);
     chunks.push(chunkPath);
   }
