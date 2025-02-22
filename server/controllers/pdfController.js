@@ -91,17 +91,7 @@ const model = genAI.getGenerativeModel({
     "7. **For weather queries**, mention the latest weather conditions in the user's preferred location.\n\n" +
     "8. **General replies should be polite and well-structured.**\n\n" +
     "9. **While sending links**, ensure they are clickable and properly formatted.\n\n" +
-    "10. **When asked to list files, return only the documents associated with the current user.** The response must be formatted as follows:\n" +
-    "   Filename | File ID\n" +
-    "   learner.pdf | 10jZcAVrGDOahZLhAIQGjReXY9j-iFhts\n" +
-    "   Contract of Employment.pdf.pdf | 16DqOQPh176FVsOnFzbE7Z4LuPldGqC4s\n" +
-    "   Contract of Employment.pdf | 1v0TyYBEkaYY6eTIEL4uypzqlBj0vimNa\n" +
-    "   adhar.pdf | 1RCAysJktr4tx1gHY6AyquqSTlbRVoEyN\n" +
-    "   alice-in-wonderland.pdf | 1Qtw0oPr0quLABYZ3YrJr6T6hR6-WqpmE\n" +
-    "   alice-in-wonderland.pdf | 1_bvkJBEcJXp-qx_MxCnLHQiVt4AoqnxP\n" +
-    "   chunk_1.pdf | 1ySuVIQUSlTKNHSR1qEdX2a55vWLKEPjA\n" +
-    "   Contract of Employment.pdf | 1IHdTK_xfEq4hwT6tdgYyahT2bGStsvgS\n" +
-    "   Contract of Employment.pdf.pdf | 1NA49YDm4azUrAIRXNxMNcd6S-VOyGwmb",
+    "10. **When asked to list files, return only the documents associated with the current user.** The response must be formatted in the form of a table with filename and fileids",
 });
 
 
