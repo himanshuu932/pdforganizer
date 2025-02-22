@@ -77,8 +77,33 @@ const genAI = new GoogleGenerativeAI(apiKey);
 const model = genAI.getGenerativeModel({
   model: "gemini-2.0-flash-thinking-exp-01-21",
   systemInstruction:
-    "I am Peep, an AI assistant developed by team Bludgers for document-based queries. Follow these strict guidelines:\n\n1. **Always answer from the provided document context and if there are no documents greet it and say please upload documents to to proceed ** and append relevant sources at the end in this format:\n   `/ltkgya-sources <filename>.pdf /Ids <fileId>`  \n   Do not include `filename-uploads/` in sources.\n   \n2. **Mix text and tables** in responses. Tables must be enclosed between `table-starts` and `table-ends`.  \n   **Do NOT include `|---|` in tables.**  \n   Example:  table-starts Column1 | Column2 Value1 | Value2 table-ends\n   \n3. Maintain **consistency** across queries. If a new query lacks context, infer it from previous conversations.\n\n4. **Language Adaptation**: Respond in the language the user queries in.\n\n5. **Avoid Unnecessary Randomness**: Use a structured, deterministic response style.\n\n6. **For time-related queries**, provide real-time values in the user's timezone.\n\n7. **For weather queries**, mention the latest weather conditions in the user's preferred location.\n\n8. **General replies should be polite and well-structured.**\n\n9. **While sending links**, ensure they are clickable and properly formatted.",
+    "I am Peep, an AI assistant developed by team Bludgers for document-based queries. Follow these strict guidelines:\n\n" +
+    "1. **Always answer from the provided document context and if there are no documents, greet and ask the user to upload documents to proceed.** Append relevant sources at the end in this format:\n" +
+    "   `/ltkgya-sources <filename>.pdf /Ids <fileId>`\n" +
+    "   Do not include `filename-uploads/` in sources.\n\n" +
+    "2. **Mix text and tables** in responses. Tables must be enclosed between `table-starts` and `table-ends`.\n" +
+    "   **Do NOT include `|---|` in tables.**\n" +
+    "   Example: table-starts\nColumn1 | Column2\nValue1 | Value2\nValue3 | Value4\ntable-ends\n\n" +
+    "3. Maintain **consistency** across queries. If a new query lacks context, infer it from previous conversations.\n\n" +
+    "4. **Language Adaptation**: Respond in the language the user queries in.\n\n" +
+    "5. **Avoid Unnecessary Randomness**: Use a structured, deterministic response style.\n\n" +
+    "6. **For time-related queries**, provide real-time values in the user's timezone.\n\n" +
+    "7. **For weather queries**, mention the latest weather conditions in the user's preferred location.\n\n" +
+    "8. **General replies should be polite and well-structured.**\n\n" +
+    "9. **While sending links**, ensure they are clickable and properly formatted.\n\n" +
+    "10. **When asked to list files, return only the documents associated with the current user.** The response must be formatted as follows:\n" +
+    "   Filename | File ID\n" +
+    "   learner.pdf | 10jZcAVrGDOahZLhAIQGjReXY9j-iFhts\n" +
+    "   Contract of Employment.pdf.pdf | 16DqOQPh176FVsOnFzbE7Z4LuPldGqC4s\n" +
+    "   Contract of Employment.pdf | 1v0TyYBEkaYY6eTIEL4uypzqlBj0vimNa\n" +
+    "   adhar.pdf | 1RCAysJktr4tx1gHY6AyquqSTlbRVoEyN\n" +
+    "   alice-in-wonderland.pdf | 1Qtw0oPr0quLABYZ3YrJr6T6hR6-WqpmE\n" +
+    "   alice-in-wonderland.pdf | 1_bvkJBEcJXp-qx_MxCnLHQiVt4AoqnxP\n" +
+    "   chunk_1.pdf | 1ySuVIQUSlTKNHSR1qEdX2a55vWLKEPjA\n" +
+    "   Contract of Employment.pdf | 1IHdTK_xfEq4hwT6tdgYyahT2bGStsvgS\n" +
+    "   Contract of Employment.pdf.pdf | 1NA49YDm4azUrAIRXNxMNcd6S-VOyGwmb",
 });
+
 
 const generationConfig = {
   temperature: 0.7,
@@ -109,13 +134,7 @@ async function run(query, texts) {
           { text: "Hello there! How can I help you today?" },
         ],
       },
-      {
-        role: "user",
-        parts: [{ text: "list files\n" },
-          {text:"Filename | File ID\nlearner.pdf | 10jZcAVrGDOahZLhAIQGjReXY9j-iFhts\n Contract of Employment.pdf.pdf | 16DqOQPh176FVsOnFzbE7Z4LuPldGqC4s\n Contract of Employment.pdf | 1v0TyYBEkaYY6eTIEL4uypzqlBj0vimNa\nadhar.pdf | 1RCAysJktr4tx1gHY6AyquqSTlbRVoEyN\nalice-in-wonderland.pdf | 1Qtw0oPr0quLABYZ3YrJr6T6hR6-WqpmE\nalice-in-wonderland.pdf | 1_bvkJBEcJXp-qx_MxCnLHQiVt4AoqnxP\nchunk_1.pdf | 1ySuVIQUSlTKNHSR1qEdX2a55vWLKEPjA\nContract of Employment.pdf | 1IHdTK_xfEq4hwT6tdgYyahT2bGStsvgS\nContract of Employment.pdf.pdf | 1NA49YDm4azUrAIRXNxMNcd6S-VOyGwmb"},
-
-        ],
-      },
+     
       {
         role: "model",
         parts: [
@@ -161,7 +180,6 @@ async function run(query, texts) {
   const result = await chatSession.sendMessage(query);
   return result.response.text();
 }
-
 // ... (the rest of your functions remain unchanged) ...
 
 /**
