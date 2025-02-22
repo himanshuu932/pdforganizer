@@ -6,7 +6,7 @@ require('dotenv').config();
 const authController = {
   // Initiates Google OAuth2 flow
   googleAuth: passport.authenticate("google", {
-    scope: ["profile", "email", "https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive.metadata.readonly"],
+    scope: ["profile", "email", "https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/drive.metadata.readonly","https://www.googleapis.com/auth/drive"],
     accessType: "offline",
     prompt: "consent",
   }),
