@@ -21,7 +21,7 @@ const driveController = {
         });
   
         // Create drive instance
-        const drive = google.drive({ version: "v3", auth: oauth2Client });
+         drive = google.drive({ version: "v3", auth: oauth2Client });
   
         const folderLink = req.query.folderLink;
         const folderId = folderLink?.split("/folders/")[1]?.split("?")[0];
@@ -114,7 +114,7 @@ const driveController = {
   
       const fileMetadata = { name: originalname, parents: [folderId] };
       const media = { mimeType: mimetype, body: Readable.from(buffer) };
-  
+  console.log("drive"+drive);
       console.log("⏳ Uploading file to Google Drive...");
       const file = await drive.files.create({
         requestBody: fileMetadata,
