@@ -28,7 +28,7 @@ const authController = {
    
     const encodedUsername = encodeURIComponent(req.user.name);
     // Redirect to the client with the token (you may also choose to send JSON)
-    res.redirect(`http://localhost:3000?username=${encodedUsername}&token=${token}&status=success`);
+    res.redirect(`https://peek-pdf.netlify.app?username=${encodedUsername}&token=${token}&status=success`);
   },
 
   // Since JWTs are stateless, logging out is handled client-side by discarding the token.
