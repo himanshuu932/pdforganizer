@@ -3,8 +3,8 @@ const { PDFDocument } = require("pdf-lib");
 const { Readable } = require("stream");
 const { TextData } = require("../models/text");
 
-// Helper function to create a new Google Drive instance for each request.
-const getDriveInstance = (req) => {
+// Helper function to create a new Drive instance with token refresh logic.
+const getDriveInstance = async (req) => {
   if (!req.user) {
     throw new Error("User not authenticated");
   }
@@ -17,6 +17,13 @@ const getDriveInstance = (req) => {
     access_token: req.user.accessToken,
     refresh_token: req.user.refreshToken,
   });
+  try {
+    // Force a token refresh if needed.
+    const { token } = await oauth2Client.getAccessToken();
+    console.log("Refreshed access token:", token);
+  } catch (err) {
+    console.error("Error refreshing access token:", err);
+  }
   return google.drive({ version: "v3", auth: oauth2Client });
 };
 
@@ -27,7 +34,7 @@ const driveController = {
       return res.status(401).json({ message: "Not authenticated" });
     }
     try {
-      const drive = getDriveInstance(req);
+      const drive = await getDriveInstance(req);
       const folderLink = req.query.folderLink;
       const folderId = folderLink?.split("/folders/")[1]?.split("?")[0];
 
@@ -95,7 +102,7 @@ const driveController = {
     }
 
     try {
-      const drive = getDriveInstance(req);
+      const drive = await getDriveInstance(req);
       const { originalname, mimetype, buffer } = req.file;
       console.log("📄 File Details - Name:", originalname, "| Type:", mimetype);
 
@@ -127,15 +134,12 @@ const driveController = {
       return res.status(401).json({ message: "Not authenticated" });
     }
     try {
-      const drive = getDriveInstance(req);
+      const drive = await getDriveInstance(req);
       const fileId = req.params.fileId;
-
-      // Get the file metadata
       const file = await drive.files.get({
         fileId: fileId,
         fields: "id, name, mimeType",
       });
-
       res.json({ file: file.data });
     } catch (error) {
       console.error("❌ Error retrieving file:", error);
@@ -155,15 +159,16 @@ const driveController = {
     if (!folderId) return res.status(400).send("Invalid folder link");
 
     if (!Array.isArray(fileIds) || fileIds.length === 0) {
-      return res.status(400).json({ message: "No file IDs provided or invalid format" });
+      return res
+        .status(400)
+        .json({ message: "No file IDs provided or invalid format" });
     }
 
     try {
-      const drive = getDriveInstance(req);
+      const drive = await getDriveInstance(req);
       const deletionResults = await Promise.all(
         fileIds.map(async (fileId) => {
           try {
-            // Optionally, verify the file's parent matches the folder ID
             const file = await drive.files.get({
               fileId,
               fields: "parents",
@@ -176,10 +181,7 @@ const driveController = {
               };
             }
 
-            // Delete the file from Google Drive
             await drive.files.delete({ fileId });
-
-            // Delete the corresponding TextData entry from MongoDB
             await TextData.deleteOne({ fileId });
 
             return { fileId, status: "success" };
