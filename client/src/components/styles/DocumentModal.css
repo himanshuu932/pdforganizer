@@ -31,8 +31,8 @@
 }
 
 .filter-icon {
-  width: 16px;
-  height: 16px;
+  width: 24px;
+  height: 24px;
 }
 
 .filter-menu {
@@ -569,6 +569,9 @@ body.dark-mode .modal-content {
     
     width: 100%;
   }
+  .file-name-link {
+    color: #000 !important; /* Always black text */
+  }
   
 }
 
@@ -589,8 +592,11 @@ body.dark-mode .modal-content {
     width: 100%;
   }
   
-  
-  .file-name {
-    font-size: 11px;
+  .file-name-link {
+    color: #000 !important; /* Always black text */
   }
+  
+}
+.file-name-link {
+  color: #000 !important; /* Always black text */
 }

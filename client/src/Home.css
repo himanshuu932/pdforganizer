@@ -1,0 +1,86 @@
+/* App container styles */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* xyz container styles */
+.xyz {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 70%;
+  text-align: center;
+  padding: 100px;
+  background-color: rgba(255, 255, 255, 0.9); /* Corrected background color */
+  border-radius: 12px; /* Corrected border radius */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Corrected box shadow */
+  width: 350px; /* Corrected width */
+}
+
+/* Sign-in button styles */
+.sign {
+  width: 200px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4285F4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 15px;
+}
+
+/* Start screen section styles */
+.start-screen-section {
+  top: 80px;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Light mode background */
+body {
+  background-image: url('./icons/43534.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+body.dark-mode {
+  background-color: black;
+  background-image: none;
+}
+
+/* Logo container */
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0px;
+  z-index: 1;
+}
+
+/* Logo image styles */
+.logo img {
+  width: 150px;
+  height: 150px;
+  padding: 10px 10px;
+}
+
+/* App name text styles */
+.name {
+  font-size: 40px;
+  font-weight: bold;
+  display: block;
+  color: #333;
+  z-index: 2;
+}

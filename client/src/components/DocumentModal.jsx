@@ -67,7 +67,7 @@ const DocumentModal = ({
     setLoadingFiles(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("https://pdforganizer.vercel.app/api/drive/files", {
+      const response = await axios.get(" https://pdforganizer-vt1s.onrender.com/api/drive/files", {
         params: { folderLink },
         headers: {
           "Content-Type": "application/json",
@@ -125,7 +125,7 @@ const DocumentModal = ({
     setShowConfirmation(false);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete("https://pdforganizer.vercel.app/api/drive/delete", {
+      const res = await axios.delete(" https://pdforganizer-vt1s.onrender.com/api/drive/delete", {
         data: {
           fileIds: selectedFiles,
           folderLink,
@@ -166,7 +166,7 @@ const DocumentModal = ({
       setIsProcessing(true);
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "https://pdforganizer.vercel.app/api/pdf/process-pdfs",
+        " https://pdforganizer-vt1s.onrender.com/api/pdf/process-pdfs",
         {
           files: pdfFiles,
         },
@@ -239,7 +239,7 @@ const DocumentModal = ({
       try {
         const token = localStorage.getItem("token");
         const res = await axios.post(
-          "https://pdforganizer.vercel.app/api/drive/upload",
+          " https://pdforganizer-vt1s.onrender.com/api/drive/upload",
           formData,
           {
             headers: {
@@ -416,7 +416,7 @@ return (
     onMouseEnter={handleHover} // Open on hover
   >
     <img src={filterIcon} alt="Filter Icon" className="filter-icon" />
-    Sort Files
+    
   </button>
   {isFilterOpen && (
     <div

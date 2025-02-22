@@ -6,9 +6,9 @@ import ChatSection from "./components/ChatSection";
 import "./App.css";
 import AboutUs from "./components/AboutUs";
 
-function Home1({ user, setUser,saved,setSaved }) {
+function Home1({ user, setUser,isDarkMode,setIsDarkMode }) {
   // Check localStorage for the saved activeScreen value or default to 1
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  
   const savedScreen = localStorage.getItem("activeScreen");
   const [activeScreen, setActiveScreen] = useState(savedScreen?parseInt(savedScreen):1);
   const [savedFolderLink, setSavedFolderLink] = useState(null);
