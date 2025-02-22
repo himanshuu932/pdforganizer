@@ -16,128 +16,35 @@ require('dotenv').config();
 
 const EventEmitter = require('events');
 const queueEmitter = new EventEmitter();
-const TMP_DIR = '/tmp';
 
 // Import your Mongoose models (adjust the paths as needed)
 const { TextData, User } = require('../models/text');
 
-// Global variable for Google Drive client
-let drive = null;
-
-// Setup OAuth2 client for Google APIs
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.CALLBACK_URL2,
-);
+// Removed global drive variable
 
 /**
- * Initialize the Google Drive client using OAuth2 credentials.
+ * Create a new Google Drive client instance using OAuth2 credentials.
  * @param {Object} creds - An object containing OAuth2 credentials.
+ * @returns {Object} - A new instance of the Google Drive client.
  */
 const initializeDrive = (creds) => {
+  // Create a new OAuth2 client instance for each request.
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.CALLBACK_URL2,
+  );
   oauth2Client.setCredentials(creds);
-  drive = google.drive({ version: "v3", auth: oauth2Client });
+  return google.drive({ version: "v3", auth: oauth2Client });
 };
-
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-const apiKey = process.env.API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey);
-const model = genAI.getGenerativeModel({
-  model: "gemini-2.0-flash-thinking-exp-01-21",
-  systemInstruction:
-    "I am Peep, an AI assistant developed by team Bludgers for document-based queries. Follow these strict guidelines:\n\n1. **Always answer from the provided document context and if there are no documents greet it and say please upload documents to to proceed ** and append relevant sources at the end in this format:\n   `/ltkgya-sources <filename>.pdf /Ids <fileId>`  \n   Do not include `filename-uploads/` in sources.\n   \n2. **Mix text and tables** in responses. Tables must be enclosed between `table-starts` and `table-ends`.  \n   **Do NOT include `|---|` in tables.**  \n   Example:  table-starts Column1 | Column2 Value1 | Value2 table-ends\n   \n3. Maintain **consistency** across queries. If a new query lacks context, infer it from previous conversations.\n\n4. **Language Adaptation**: Respond in the language the user queries in.\n\n5. **Avoid Unnecessary Randomness**: Use a structured, deterministic response style.\n\n6. **For time-related queries**, provide real-time values in the user's timezone.\n\n7. **For weather queries**, mention the latest weather conditions in the user's preferred location.\n\n8. **General replies should be polite and well-structured.** When asked 'Who are you?', respond:  \n\"You are Peep. An assistant developed by team Bludgers for queries of PDFs.\"\n\n9. **While sending links**, ensure they are clickable and properly formatted.",
-});
-
-const generationConfig = {
-  temperature: 0.7,
-  topP: 0.95,
-  topK: 64,
-  maxOutputTokens: 65536,
-  responseMimeType: "text/plain",
-};
-
-async function run(query, texts) {
-  const chatSession = model.startChat({
-    generationConfig,
-    history: [
-      {
-        role: "user",
-        parts: [{ text: "hi\n" }],
-      },
-      {
-        role: "model",
-        parts: texts.map((text) => ({ text })),
-      },
-      {
-        role: "model",
-        parts: [
-          {
-            text: "The user said \"hi\". This is a greeting and doesn't require information from any document.\nAccording to instruction 8, I need to respond politely.\nA simple greeting in response is appropriate.",
-          },
-          { text: "Hello there! How can I help you today?" },
-        ],
-      },
-      {
-        role: "user",
-        parts: [{ text: "list files\n" },
-          {text:"Filename | File ID\nlearner.pdf | 10jZcAVrGDOahZLhAIQGjReXY9j-iFhts\n Contract of Employment.pdf.pdf | 16DqOQPh176FVsOnFzbE7Z4LuPldGqC4s\n Contract of Employment.pdf | 1v0TyYBEkaYY6eTIEL4uypzqlBj0vimNa\nadhar.pdf | 1RCAysJktr4tx1gHY6AyquqSTlbRVoEyN\nalice-in-wonderland.pdf | 1Qtw0oPr0quLABYZ3YrJr6T6hR6-WqpmE\nalice-in-wonderland.pdf | 1_bvkJBEcJXp-qx_MxCnLHQiVt4AoqnxP\nchunk_1.pdf | 1ySuVIQUSlTKNHSR1qEdX2a55vWLKEPjA\nContract of Employment.pdf | 1IHdTK_xfEq4hwT6tdgYyahT2bGStsvgS\nContract of Employment.pdf.pdf | 1NA49YDm4azUrAIRXNxMNcd6S-VOyGwmb"},
-
-        ],
-      },
-      {
-        role: "model",
-        parts: [
-          {
-            text: "The user is asking about my identity. I should respond according to the persona instructions, specifically guideline #8.  I need to state my name, purpose and developer team as Peep.",
-          },
-          { text: "I am Peep. An assistant developed by team Bludgers for queries of PDFs." },
-        ],
-      },
-      {
-        role: "user",
-        parts: [{ text: "what do you do\n" }],
-      },
-      {
-        role: "model",
-        parts: [
-          {
-            text: "The user is asking about my capabilities. I should explain that I can answer questions based on provided documents. I should also mention that I can provide sources for my answers.",
-          },
-          {
-            text: "I am designed to answer your questions based on the information within the documents you provide. I can help you find specific details, summarise content, and more, all while citing the source documents.",
-          },
-        ],
-      },
-      {
-        role: "user",
-        parts: [{ text: "give a sample table\n" }],
-      },
-      {
-        role: "model",
-        parts: [
-          {
-            text: "The user asked for a sample table. I need to create a simple table example and format it according to the given instructions.  The instructions specify that tables should be enclosed in `table-starts` and `table-ends`, columns separated by `|`, and rows separated by newlines. Also, `|---|` should not be included.\n\nPlan:\n1. Create a simple table with two columns and two rows.\n2. Format the table using `table-starts`, `table-ends`, and `|` as separators.\n3. Present the table as the response.",
-          },
-          {
-            text: "table-starts\nColumn1 | Column2\nValue1 | Value2\nValue3 | Value4\ntable-ends",
-          },
-        ],
-      },
-    ],
-  });
-
-  const result = await chatSession.sendMessage(query);
-  return result.response.text();
-}
 
 /**
- * Fetch a file from Google Drive by file ID.
+ * Fetch a file from Google Drive by file ID using the provided drive instance.
+ * @param {Object} drive - The Google Drive client instance.
  * @param {string} fileId - Google Drive file ID.
  * @returns {Promise<string>} - Resolves with the local file path of the downloaded file.
  */
-const fetchFile = async (fileId) => {
+const fetchFile = async (drive, fileId) => {
   return new Promise((resolve, reject) => {
     drive.files.get(
       { fileId: fileId, alt: "media" },
@@ -147,8 +54,7 @@ const fetchFile = async (fileId) => {
           console.error("Error downloading file:", err);
           return reject(`Error downloading file with ID ${fileId}: ${err.message}`);
         }
-        const destPath = path.join(TMP_DIR, "downloaded-file.pdf");
-
+        const destPath = path.join(__dirname, `downloaded-${fileId}.pdf`);
         const dest = fs.createWriteStream(destPath);
         response.data.pipe(dest);
         dest.on("finish", () => {
@@ -164,10 +70,12 @@ const fetchFile = async (fileId) => {
   });
 };
 
+// ... (the rest of your functions remain unchanged) ...
+
 /**
  * Split a PDF into smaller chunks.
  * @param {string} pdfPath - Path to the PDF file.
- * @param {number} maxPages - Maximum number of pages per chunk (default is 15).
+ * @param {number} maxPages - Maximum number of pages per chunk (default is 5).
  * @returns {Promise<string[]>} - Resolves with an array of chunk file paths.
  */
 const splitPdf = async (pdfPath, maxPages = 5) => {
@@ -186,8 +94,7 @@ const splitPdf = async (pdfPath, maxPages = 5) => {
     }
 
     const chunkBytes = await chunkDoc.save();
-    const chunkPath = path.join(TMP_DIR, `chunk_${Math.floor(i / maxPages) + 1}.pdf`);
-
+    const chunkPath = path.join(__dirname, `chunk_${Math.floor(i / maxPages) + 1}.pdf`);
     fs.writeFileSync(chunkPath, chunkBytes);
     chunks.push(chunkPath);
   }
@@ -302,7 +209,8 @@ async function processQueue() {
   isProcessing = true;
 
   while (processingQueue.length > 0) {
-    const { file, user } = processingQueue.shift();
+    // Each task now includes a drive instance.
+    const { file, user, drive } = processingQueue.shift();
 
     try {
       // Check if this file has already been processed.
@@ -312,8 +220,8 @@ async function processQueue() {
         continue; // Skip to the next file.
       }
 
-      // Download the PDF file from Google Drive.
-      const pdfPath = await fetchFile(file.id);
+      // Download the PDF file from Google Drive using the provided drive instance.
+      const pdfPath = await fetchFile(drive, file.id);
 
       // Split the PDF into chunks of max 5 pages.
       const chunkPaths = await splitPdf(pdfPath, 5);
@@ -373,7 +281,6 @@ async function processQueue() {
   queueEmitter.emit("empty");
 }
 
-
 function waitForQueueEmpty() {
   if (processingQueue.length === 0 && !isProcessing) {
     return Promise.resolve();
@@ -387,7 +294,7 @@ function waitForQueueEmpty() {
 
 /**
  * Adds an array of tasks to the global queue and triggers processing.
- * Each task is an object of the form { file, user }.
+ * Each task is an object of the form { file, user, drive }.
  */
 function addTasks(tasks) {
   tasks.forEach((task) => processingQueue.push(task));
@@ -405,7 +312,8 @@ router.post("/process-pdfs", async (req, res) => {
   if (!user.accessToken || !user.refreshToken) {
     return res.status(401).json({ message: "OAuth2 credentials not found in user token." });
   }
-  initializeDrive({
+  // Create a drive instance specifically for this user.
+  const driveInstance = initializeDrive({
     access_token: user.accessToken,
     refresh_token: user.refreshToken,
   });
@@ -416,8 +324,8 @@ router.post("/process-pdfs", async (req, res) => {
     return res.status(400).json({ message: "No files provided." });
   }
 
-  // Map each file to a task including the user context.
-  const tasks = files.map((file) => ({ file, user }));
+  // Map each file to a task including the user context and drive instance.
+  const tasks = files.map((file) => ({ file, user, drive: driveInstance }));
 
   // Add tasks to the global queue.
   addTasks(tasks);
@@ -445,7 +353,7 @@ router.post("/submit-query", async (req, res) => {
   try {
     const texts = await store(user.id);
     const dt = await run(query, texts);
-    res.json({ ok:true,answer: dt });
+    res.json({ ok: true, answer: dt });
     console.log("Response answer:", dt);
   } catch (error) {
     console.error("Error during query submission:", error);
