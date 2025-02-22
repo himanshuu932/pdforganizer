@@ -67,7 +67,7 @@ const DocumentModal = ({
     setLoadingFiles(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(" https://pdforganizer-vt1s.onrender.com/api/drive/files", {
+      const response = await axios.get("http://localhost:5000/api/drive/files", {
         params: { folderLink },
         headers: {
           "Content-Type": "application/json",
@@ -125,7 +125,7 @@ const DocumentModal = ({
     setShowConfirmation(false);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.delete(" https://pdforganizer-vt1s.onrender.com/api/drive/delete", {
+      const res = await axios.delete("http://localhost:5000/api/drive/delete", {
         data: {
           fileIds: selectedFiles,
           folderLink,
@@ -166,7 +166,7 @@ const DocumentModal = ({
       setIsProcessing(true);
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        " https://pdforganizer-vt1s.onrender.com/api/pdf/process-pdfs",
+        "http://localhost:5000/api/pdf/process-pdfs",
         {
           files: pdfFiles,
         },
@@ -239,7 +239,7 @@ const DocumentModal = ({
       try {
         const token = localStorage.getItem("token");
         const res = await axios.post(
-          " https://pdforganizer-vt1s.onrender.com/api/drive/upload",
+          "http://localhost:5000/api/drive/upload",
           formData,
           {
             headers: {

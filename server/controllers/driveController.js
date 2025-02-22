@@ -1,9 +1,8 @@
 const { google } = require("googleapis");
-const { PDFDocument } = require("pdf-lib");
 const { Readable } = require("stream");
 const { TextData } = require("../models/text");
 
-// Helper function to create a new Drive instance with token refresh logic.
+// Helper function to create a new Drive instance with explicit token refresh.
 const getDriveInstance = async (req) => {
   if (!req.user) {
     throw new Error("User not authenticated");
@@ -17,10 +16,13 @@ const getDriveInstance = async (req) => {
     access_token: req.user.accessToken,
     refresh_token: req.user.refreshToken,
   });
+
   try {
-    // Force a token refresh if needed.
-    const { token } = await oauth2Client.getAccessToken();
-    console.log("Refreshed access token:", token);
+    // Explicitly refresh the access token.
+    const refreshResponse = await oauth2Client.refreshAccessToken();
+    // Update the client's credentials with the refreshed token.
+    oauth2Client.credentials = refreshResponse.credentials;
+    console.log("Refreshed access token:", oauth2Client.credentials.access_token);
   } catch (err) {
     console.error("Error refreshing access token:", err);
   }
@@ -42,7 +44,6 @@ const driveController = {
         return res.status(400).json({ message: "Invalid folder link." });
       }
 
-      // List files within the folder
       const response = await drive.files.list({
         q: `'${folderId}' in parents`,
         pageSize: 100,
